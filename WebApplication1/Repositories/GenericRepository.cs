@@ -121,11 +121,6 @@ namespace API.Repositories
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public async Task<T> GetByTextAsync(string text)
-        {
-            return await _context.Set<T>().FindAsync(text);
-        }
-
         public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
