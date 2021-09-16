@@ -12,10 +12,10 @@ namespace API.Helpers
     {
         public MapperProfile()
         {
-            CreateMap<User, CreateUserRequest>();
-            CreateMap<User, UpdateUserRequest>();
-            CreateMap<User, GetUsersRequest>();
-            CreateMap<User, UserResponse>();
+            CreateMap<User, CreateUserRequest>().ReverseMap();
+            CreateMap<User, UpdateUserProfileRequest>().ReverseMap();
+            CreateMap<User, GetUsersRequest>().ReverseMap();
+            CreateMap<User, UserResponse>().ReverseMap();
 
         }
     }

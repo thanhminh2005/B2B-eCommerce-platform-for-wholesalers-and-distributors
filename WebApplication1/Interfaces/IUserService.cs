@@ -11,10 +11,14 @@ namespace API.Interfaces
     public interface IUserService
     {
         Task<Response<string>> CreateUser(CreateUserRequest request);
-        Task<Response<IQueryable<UserResponse>>> GetUsers(GetUsersRequest request);
-        Task<Response<IQueryable<UserResponse>>> GetUsersWithPagination(GetUsersWithPaginationRequest request);
+        Task<Response<IEnumerable<UserResponse>>> GetUsers(GetUsersRequest request);
+        Task<PagedResponse<IEnumerable<UserResponse>>> GetUsersWithPagination(GetUsersWithPaginationRequest request);
         Task<Response<UserResponse>> GetUserById(GetUserByIdRequest request);
-        Task<Response<string>> UpdateUser(UpdateUserRequest request);
-            
+        Task<Response<string>> UpdateUserProfile(UpdateUserProfileRequest request);
+        Task<Response<string>> UpdateUserPassword(UpdateUserPasswordRequest request);
+        Task<Response<UserCountResponse>> GetUserCount();
+
+
+
     }
 }
