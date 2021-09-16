@@ -1,6 +1,7 @@
 ﻿
 using API.Interfaces;
 using API.Repositories;
+using API.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,7 @@ namespace B2B.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

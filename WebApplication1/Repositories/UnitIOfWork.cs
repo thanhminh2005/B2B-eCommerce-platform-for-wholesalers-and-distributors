@@ -24,7 +24,14 @@ namespace API.Repositories
 
         public IGenericRepository<T> GetRepository<T>() where T : class
         {
-            throw new NotImplementedException();
+            var type = typeof(T);
+            if (!repositories.ContainsKey(type))
+            {
+                var repositoryType = typeof(GenericRepository<>);
+                var repositoryInstance = Activator.CreateInstance(repositoryType.MakeGenericType(typeof(T)), _context);
+                repositories.Add(type, repositoryInstance);
+            }
+            return (IGenericRepository<T>)repositories[type];
         }
     }
 }
