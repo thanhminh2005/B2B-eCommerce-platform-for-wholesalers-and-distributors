@@ -20,7 +20,6 @@ namespace API.Interfaces
                                       string includeProperties = "");
         Task<T> FirstAsync(Expression<Func<T, bool>> filter, string includeProperties = "");
         Task<T> GetByIdAsync(object id);
-        Task<T> GetByTextAsync(string text);
         Task<T> AddAsync(T entity);
         void UpdateAsync(T entity);
         void DeleteAsync(T entity);
