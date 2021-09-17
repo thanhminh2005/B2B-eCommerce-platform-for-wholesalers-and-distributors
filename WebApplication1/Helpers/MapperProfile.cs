@@ -1,4 +1,5 @@
 ﻿using API.Domains;
+using API.DTOs.Roles;
 using API.DTOs.Users;
 using AutoMapper;
 using System;
@@ -16,6 +17,11 @@ namespace API.Helpers
             CreateMap<User, UpdateUserProfileRequest>().ReverseMap();
             CreateMap<User, GetUsersRequest>().ReverseMap();
             CreateMap<User, UserResponse>().ReverseMap();
+
+            CreateMap<Role, CreateRoleRequest>().ReverseMap();
+            CreateMap<Role, RoleResponse>().ReverseMap();
+
+
 
         }
     }

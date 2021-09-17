@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
+    [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -43,7 +44,7 @@ namespace API.Controllers
         }
 
         [HttpGet(ApiRoute.Users.GetAll)]
-        public async Task<IActionResult> GetAll([FromRoute] GetUsersRequest request)
+        public async Task<IActionResult> GetAll([FromQuery] GetUsersRequest request)
         {
             var response = await _userService.GetUsers(request);
             if(response.Succeeded)
@@ -60,30 +61,30 @@ namespace API.Controllers
             return Ok(response);
         }
 
-        //[HttpGet(ApiRoute.Users.GetAll)]
-        //public async Task<IActionResult> GetPaging([FromRoute] GetUsersWithPaginationRequest request)
-        //{
-        //    var response = await _userService.GetUsersWithPagination(request);
-        //    if(response.Succeeded)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    return NotFound(response);
-        //}
+        [HttpGet(ApiRoute.Users.GetPaging)]
+        public async Task<IActionResult> GetPaging([FromQuery] GetUsersWithPaginationRequest request)
+        {
+            var response = await _userService.GetUsersWithPagination(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
 
-        //[HttpPut(ApiRoute.Users.Update)]
-        //public async Task<IActionResult> Update([FromRoute] UpdateUserPasswordRequest request)
-        //{
-        //    var response = await _userService.UpdateUserPassword(request);
-        //    if (response.Succeeded)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    return BadRequest(response);
-        //}
+        [HttpPut(ApiRoute.Users.UpdatePassword)]
+        public async Task<IActionResult> Update([FromBody] UpdateUserPasswordRequest request)
+        {
+            var response = await _userService.UpdateUserPassword(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
 
         [HttpPut(ApiRoute.Users.Update)]
-        public async Task<IActionResult> Update([FromRoute] UpdateUserProfileRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateUserProfileRequest request)
         {
             var response = await _userService.UpdateUserProfile(request);
             if (response.Succeeded)

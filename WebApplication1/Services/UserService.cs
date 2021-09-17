@@ -26,9 +26,8 @@ namespace API.Services
         {
             if(request != null)
             {
-
                 var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username));
-                if(user != null)
+                if(user == null)
                 {
                     User newUser = _mapper.Map<User>(request);
                     newUser.DoB = DateConverter.StringToDateTime(request.DoB);
@@ -41,7 +40,7 @@ namespace API.Services
                     newUser.Id = Guid.NewGuid();
                     await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(user.Username, message: "User Registered.");
+                    return new Response<string>(newUser.Username, message: "User Registered.");
                 }
             }
             return new Response<string>(message: "Failed to Register");
@@ -69,12 +68,15 @@ namespace API.Services
         public async Task<Response<IEnumerable<UserResponse>>> GetUsers(GetUsersRequest request)
         {
             var users = await _unitOfWork.GetRepository<User>().GetAllAsync();
-            if(string.IsNullOrWhiteSpace(request.RoleId))
-            {
-                var roleId = Guid.Parse(request.RoleId);
-                users = users.Where(x => x.RoleId.Equals(roleId));
+            if (users.Count() != 0) {
+                if (!string.IsNullOrWhiteSpace(request.RoleId))
+                {
+                    var roleId = Guid.Parse(request.RoleId);
+                    users = users.Where(x => x.RoleId.Equals(roleId));
+                }
+                return new Response<IEnumerable<UserResponse>>(_mapper.Map<IEnumerable<UserResponse>>(users), message: "Success");
             }
-            return new Response<IEnumerable<UserResponse>>(_mapper.Map<IEnumerable<UserResponse>>(users));
+            return new Response<IEnumerable<UserResponse>>(message: "Empty");
 
         }
 
@@ -84,6 +86,7 @@ namespace API.Services
                                                                                      request.PageSize,
                                                                                      filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue))));
+            
             var totalcount = await _unitOfWork.GetRepository<User>().CountAsync(filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue))));
             var response = _mapper.Map<IEnumerable<UserResponse>>(users);
@@ -96,9 +99,9 @@ namespace API.Services
             if(user != null)
             {
                
-                if (string.IsNullOrWhiteSpace(request.OldPassword) && PasswordHash.VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
+                if (!string.IsNullOrWhiteSpace(request.OldPassword) && PasswordHash.VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
                 {
-                    if (string.IsNullOrWhiteSpace(request.NewPassword) && string.IsNullOrWhiteSpace(request.ComfirmPassword))
+                    if (!string.IsNullOrWhiteSpace(request.NewPassword) && !string.IsNullOrWhiteSpace(request.ComfirmPassword))
                     {
                         if(request.NewPassword.Length > 8)
                         {
@@ -121,7 +124,7 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateUserProfile(UpdateUserProfileRequest request)
         {
-            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.UserId)));
+            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
             if (user != null)
             {
                 user.Address = request.Address;
