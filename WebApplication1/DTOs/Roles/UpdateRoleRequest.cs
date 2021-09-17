@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTOs.Users
+namespace API.DTOs.Roles
 {
-    public class GetUserByIdRequest
+    public class UpdateRoleRequest
     {
         public string Id { get; set; }
+        public string Name { get; set; }
     }
 }

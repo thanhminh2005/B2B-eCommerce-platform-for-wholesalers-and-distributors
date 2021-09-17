@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace API.DTOs.Users
 {
-    public class GetUserByIdRequest
+    public class UserCountResponse
     {
-        public string Id { get; set; }
+        public int TotalUser { get; set; }
     }
 }

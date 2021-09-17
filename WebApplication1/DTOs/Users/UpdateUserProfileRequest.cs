@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTOs.Accounts
+namespace API.DTOs.Users
 {
-    public class LoginResponse
+    public class UpdateUserProfileRequest
     {
-        public Guid Id { get; set; }
-        public Guid RoleId { get; set; }
-        public string Username { get; set; }
+        public string Id { get; set; }
         public string DisplayName { get; set; }
+        public string DoB { get; set; }
         public string Avatar { get; set; }
+        public int Sex { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public string JwtToken { get; set; }
+        public string Address { get; set; }
     }
 }

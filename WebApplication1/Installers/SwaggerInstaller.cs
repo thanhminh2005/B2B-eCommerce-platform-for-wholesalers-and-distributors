@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using API.Domains;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace B2B.Installers
 {
@@ -36,6 +38,7 @@ namespace B2B.Installers
                         },new List<string>()
                     }
                 });
+                x.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
     }

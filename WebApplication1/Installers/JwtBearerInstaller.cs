@@ -1,8 +1,12 @@
-﻿using B2B.AppSettings;
+﻿using API.Warppers;
+using B2B.AppSettings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace B2B.Installers
@@ -11,26 +15,51 @@ namespace B2B.Installers
     {
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = new JwtSettings();
-            configuration.Bind(nameof(jwtSettings), jwtSettings);
-            services.AddSingleton(jwtSettings);
-            services.AddAuthentication(x =>
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            services.AddAuthentication(options =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(x =>
+            .AddJwtBearer(o =>
             {
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                o.RequireHttpsMetadata = false;
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    RequireExpirationTime = false,
-                    ValidateLifetime = true
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidIssuer = configuration["JWTSettings:Issuer"],
+                    ValidAudience = configuration["JWTSettings:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTSettings:Key"]))
+                };
+                o.Events = new JwtBearerEvents()
+                {
+                    OnAuthenticationFailed = c =>
+                    {
+                        c.NoResult();
+                        c.Response.StatusCode = 500;
+                        c.Response.ContentType = "text/plain";
+                        return c.Response.WriteAsync(c.Exception.ToString());
+                    },
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        context.Response.ContentType = "application/json";
+                        var result = JsonConvert.SerializeObject(new Response<string>("You are not Authorized"));
+                        return context.Response.WriteAsync(result);
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        context.Response.ContentType = "application/json";
+                        var result = JsonConvert.SerializeObject(new Response<string>("You are not authorized to access this resource"));
+                        return context.Response.WriteAsync(result);
+                    },
                 };
             });
         }
