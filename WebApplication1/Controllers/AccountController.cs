@@ -20,8 +20,9 @@ namespace API.Controllers
         {
             _accountService = accountService;
         }
-        [HttpPost(ApiRoute.Accounts.Post)]
+
         [AllowAnonymous]
+        [HttpPost(ApiRoute.Accounts.Post)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var response = await _accountService.Login(request);

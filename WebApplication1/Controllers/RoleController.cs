@@ -21,6 +21,7 @@ namespace API.Controllers
             _roleService = roleService;
         }
 
+        [RoleAuthorization(Authorization.AD)]
         [HttpPost(ApiRoute.Roles.Create)]
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
 {
