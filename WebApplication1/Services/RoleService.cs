@@ -42,7 +42,7 @@ namespace API.Services
 
         public async Task<Response<RoleResponse>> GetRoleById(GetRoleByIdRequest request)
         {
-            if(string.IsNullOrWhiteSpace(request.Id))
+            if(!string.IsNullOrWhiteSpace(request.Id))
             {
                 var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(Guid.Parse(request.Id));
                 if(role != null)

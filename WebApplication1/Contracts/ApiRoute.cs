@@ -35,6 +35,12 @@ namespace API.Contracts
             public const string Update = Base + "/role/";
             public const string Delete = Base + "/role/{id}";
         }
+
+        public static class Categories
+        {
+            public const string GetAll = Base + "/Category/";
+            public const string Get = Base + "/Category/{id}";
+        }
     }
 
 }
