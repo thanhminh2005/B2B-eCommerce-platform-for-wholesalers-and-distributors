@@ -27,7 +27,6 @@ namespace API.Helpers
 
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
 
-            
         }
     }
 }

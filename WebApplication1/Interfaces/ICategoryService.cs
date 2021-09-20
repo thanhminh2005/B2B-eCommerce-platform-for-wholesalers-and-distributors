@@ -10,9 +10,8 @@ namespace API.Interfaces
     public interface ICategoryService
     {
         Task<Response<IEnumerable<CategoryResponse>>> GetCategory();
-
         Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request);
-
-        Task<Response<string>> CreateRole(CreateCategoryRequest request);
+        Task<Response<string>> CreateCategory(CreateCategoryRequest request);
+        Task<Response<string>> UpdateCategory(UpdateCategoryRequest request);
     }
 }
