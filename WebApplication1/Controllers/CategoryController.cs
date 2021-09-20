@@ -46,5 +46,26 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpPost(ApiRoute.Categories.Create)]
+        public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
+        {
+            var response = await _categoryService.CreateCategory(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+        
+        [HttpPut(ApiRoute.Categories.Update)]
+        public async Task<IActionResult> Update([FromBody] UpdateCategoryRequest request)
+        {
+            var response = await _categoryService.UpdateCategory(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
     }
 }
