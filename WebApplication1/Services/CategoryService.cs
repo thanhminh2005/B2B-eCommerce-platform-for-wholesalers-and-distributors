@@ -43,14 +43,39 @@ namespace API.Services
             return new Response<string>(message: "Failed to Create");
         }
 
-        public async Task<Response<IEnumerable<CategoryResponse>>> GetCategory()
+        public async Task<Response<IEnumerable<CategoryHierachy>>> GetCategory()
         {
-            var Categories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
-            if (Categories != null)
+            List<CategoryHierachy> items = new List<CategoryHierachy>();
+
+            var allCategories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
+            //get all parent categories
+            List<Category> parentCategories = allCategories.Where(c => c.Parent == null).ToList();
+
+            if (allCategories != null)
             {
-                return new Response<IEnumerable<CategoryResponse>>(_mapper.Map<IEnumerable<CategoryResponse>>(Categories), message: "Success");
+                foreach (var cat in parentCategories)
+                {
+                    
+                    //add the parent category to the item list
+                    items.Add(new CategoryHierachy{ ID = cat.Id, Name = cat.Name 
+                        , SubCategories = GenerateSub((IList<Category>)allCategories, cat, items)
+                    });
+                 
+                }
+                return new Response<IEnumerable<CategoryHierachy>>(_mapper.Map<IEnumerable<CategoryHierachy>>(items), message: "Success");
             }
-            return new Response<IEnumerable<CategoryResponse>>(message: "Empty");
+            return new Response<IEnumerable<CategoryHierachy>>(message: "Empty");
+        }
+        
+        private IList<CategoryHierachy> GenerateSub(IList<Category> allCats, Category parent, IList<CategoryHierachy> items)
+        {
+            var SubCategory = allCats.Where(c => c.Parent == parent.Id );
+            Console.WriteLine(parent.Name);
+            foreach (var cat in SubCategory)
+            {
+                    items.Add(new CategoryHierachy { ID = cat.Id, Name = cat.Name, SubCategories = GenerateSub(allCats, cat, items) });
+            }
+            return items;
         }
 
         public async Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request)

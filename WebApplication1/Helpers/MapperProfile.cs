@@ -24,6 +24,7 @@ namespace API.Helpers
 
             CreateMap<Category, CategoryResponse>().ReverseMap();
             CreateMap<Category, CreateCategoryRequest>().ReverseMap();
+            CreateMap<Category, CategoryHierachy>().ReverseMap();
         }
     }
 }
