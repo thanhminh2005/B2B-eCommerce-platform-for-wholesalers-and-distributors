@@ -40,6 +40,8 @@ namespace API.Contracts
         {
             public const string GetAll = Base + "/Category/";
             public const string Get = Base + "/Category/{id}";
+            public const string Create = Base + "/Category";
+            public const string Update = Base + "/Category/";
         }
     }
 

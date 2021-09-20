@@ -23,7 +23,7 @@ namespace API.Helpers
             CreateMap<Role, RoleResponse>().ReverseMap();
 
             CreateMap<Category, CategoryResponse>().ReverseMap();
-
+            CreateMap<Category, CreateCategoryRequest>().ReverseMap();
         }
     }
 }
