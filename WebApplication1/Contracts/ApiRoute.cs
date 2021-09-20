@@ -15,6 +15,15 @@ namespace API.Contracts
         {
             public const string Post = Base + "/account/";
         }
+
+        public static class Distributors
+        {
+            public const string GetAll = Base + "/distributor/";
+            public const string Get = Base + "/distributor/{id}";
+            public const string Create = Base + "/distributor";
+            public const string Update = Base + "/distributor/";
+            public const string Delete = Base + "/distributor/{id}";
+        }
         public static class Users
         {
             public const string Count = Base + "/user/count";

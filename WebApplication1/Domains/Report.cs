@@ -17,7 +17,7 @@ namespace API.Domains
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
-        public virtual Distributer Distributor { get; set; }
+        public virtual Distributor Distributor { get; set; }
         public virtual Order Order { get; set; }
         public virtual Retailer Retailer { get; set; }
     }
