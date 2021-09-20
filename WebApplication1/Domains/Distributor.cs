@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace API.Domains
 {
-    public partial class Distributer
+    public partial class Distributor
     {
-        public Distributer()
+        public Distributor()
         {
             Banners = new HashSet<Banner>();
             Products = new HashSet<Product>();

@@ -40,7 +40,7 @@ namespace API.Contracts
                 {
                     context.Result = new ForbidResult("Invalid Token");
                 }
-                if (!_role.Equals(role))
+                if (!_role.Contains(role))
                 {
                     context.Result = new UnauthorizedResult();
                 }
