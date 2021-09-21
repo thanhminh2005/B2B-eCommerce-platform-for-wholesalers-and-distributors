@@ -18,7 +18,7 @@ namespace API.Domains
 
         public virtual DbSet<Banner> Banners { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
-        public virtual DbSet<Distributer> Distributers { get; set; }
+        public virtual DbSet<Distributor> Distributors { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
@@ -63,7 +63,7 @@ namespace API.Domains
                     .WithMany(p => p.Banners)
                     .HasForeignKey(d => d.DistributorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Banner_Distributer");
+                    .HasConstraintName("FK_Banner_Distributor");
             });
 
             modelBuilder.Entity<Category>(entity =>
@@ -79,9 +79,9 @@ namespace API.Domains
                 entity.Property(e => e.Name).IsRequired();
             });
 
-            modelBuilder.Entity<Distributer>(entity =>
+            modelBuilder.Entity<Distributor>(entity =>
             {
-                entity.ToTable("Distributer");
+                entity.ToTable("Distributor");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -90,10 +90,10 @@ namespace API.Domains
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Distributers)
+                    .WithMany(p => p.Distributors)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Distributer_User");
+                    .HasConstraintName("FK_Distributor_User");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -221,7 +221,7 @@ namespace API.Domains
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.DistributorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Product_Distributer");
+                    .HasConstraintName("FK_Product_Distributor");
             });
 
             modelBuilder.Entity<Retailer>(entity =>

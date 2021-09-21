@@ -9,7 +9,7 @@ namespace API.Domains
     {
         public User()
         {
-            Distributers = new HashSet<Distributer>();
+            Distributors = new HashSet<Distributor>();
             Retailers = new HashSet<Retailer>();
         }
 
@@ -29,7 +29,7 @@ namespace API.Domains
         public DateTime? DateModified { get; set; }
 
         public virtual Role Role { get; set; }
-        public virtual ICollection<Distributer> Distributers { get; set; }
+        public virtual ICollection<Distributor> Distributors { get; set; }
         public virtual ICollection<Retailer> Retailers { get; set; }
     }
 }
