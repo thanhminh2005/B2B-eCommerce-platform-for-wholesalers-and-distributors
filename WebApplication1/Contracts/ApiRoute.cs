@@ -52,6 +52,12 @@ namespace API.Contracts
             public const string Create = Base + "/Category";
             public const string Update = Base + "/Category/";
         }
+
+        public static class Products
+        {
+            public const string Get = Base + "/Product/{id}";
+            public const string Create = Base + "/Product";
+        }
     }
 
 }

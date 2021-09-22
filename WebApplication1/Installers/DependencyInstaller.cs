@@ -17,6 +17,7 @@ namespace B2B.Installers
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IDistributorService, DistributorService>();
+            services.AddScoped<IProductService, ProductService>();
         }
     }
 }
