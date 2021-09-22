@@ -7,6 +7,7 @@ namespace API.DTOs.Products
 {
     public class CreateProductRequest
     {
+        public string DistributorId { get; set; }
         public string CategoryId { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }

@@ -1,6 +1,7 @@
 ﻿using API.Domains;
 using API.DTOs.Categories;
 using API.DTOs.Distributors;
+using API.DTOs.Products;
 using API.DTOs.Roles;
 using API.DTOs.Users;
 using AutoMapper;
@@ -28,6 +29,9 @@ namespace API.Helpers
             CreateMap<Category, CategoryHierachy>().ReverseMap();
             
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
+
+            CreateMap<Product, ProductResponse>().ReverseMap();
+            CreateMap<Product, CreateProductRequest>().ReverseMap();
         }
     }
 }
