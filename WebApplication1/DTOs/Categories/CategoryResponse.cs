@@ -9,5 +9,6 @@ namespace API.DTOs.Categories
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid? Parent { get; set; }
     }
 }
