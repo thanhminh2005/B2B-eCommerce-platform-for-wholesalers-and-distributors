@@ -84,8 +84,10 @@ namespace API.Services
         {
             var users = await _unitOfWork.GetRepository<User>().GetPagedReponseAsync(request.PageNumber,
                                                                                      request.PageSize,
-                                                                                     filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
-                                                                                     && (request.SearchValue == null || x.Username.Contains(request.SearchValue))));
+                                                                                     filter: x => 
+                                                                                     (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
+                                                                                     && (request.SearchValue == null || x.Username.Contains(request.SearchValue))), 
+                                                                                     x => x.OrderBy(x => x.Username));
             
             var totalcount = await _unitOfWork.GetRepository<User>().CountAsync(filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue))));

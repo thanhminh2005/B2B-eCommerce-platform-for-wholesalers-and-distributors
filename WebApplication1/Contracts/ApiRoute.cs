@@ -24,6 +24,15 @@ namespace API.Contracts
             public const string Update = Base + "/distributor/";
             public const string Delete = Base + "/distributor/{id}";
         }
+        public static class Retailers
+        {
+            public const string GetAll = Base + "/retailer/";
+            public const string Get = Base + "/retailer/{id}";
+            public const string Create = Base + "/retailer";
+            public const string Update = Base + "/retailer/";
+            public const string Delete = Base + "/retailer/{id}";
+        }
+
         public static class Users
         {
             public const string Count = Base + "/user/count";
@@ -57,6 +66,15 @@ namespace API.Contracts
         {
             public const string Get = Base + "/Product/{id}";
             public const string Create = Base + "/Product";
+        }
+
+        public static class PaymentMethods
+        {
+            public const string GetAll = Base + "/payment-method/";
+            public const string Get = Base + "/payment-method/{id}";
+            public const string Create = Base + "/payment-method";
+            public const string Update = Base + "/payment-method/";
+            public const string Delete = Base + "/payment-method/{id}";
         }
     }
 

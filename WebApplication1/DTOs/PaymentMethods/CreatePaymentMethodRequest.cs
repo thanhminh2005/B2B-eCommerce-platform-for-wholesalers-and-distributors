@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTOs.Categories
+namespace API.DTOs.PaymentMethods
 {
-    public class CreateCategoryRequest
+    public class CreatePaymentMethodRequest
     {
         public string Name { get; set; }
-
-        public Guid? ParentId { get; set; }
+        public string Description { get; set; }
     }
 }

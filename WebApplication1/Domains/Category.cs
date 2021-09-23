@@ -9,15 +9,18 @@ namespace API.Domains
     {
         public Category()
         {
+            InverseParent = new HashSet<Category>();
             Products = new HashSet<Product>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public Guid? Parent { get; set; }
+        public Guid? ParentId { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
+        public virtual Category Parent { get; set; }
+        public virtual ICollection<Category> InverseParent { get; set; }
         public virtual ICollection<Product> Products { get; set; }
     }
 }

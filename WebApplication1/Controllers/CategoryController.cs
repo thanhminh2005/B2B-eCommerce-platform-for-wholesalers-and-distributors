@@ -23,7 +23,7 @@ namespace API.Controllers
         [HttpGet(ApiRoute.Categories.GetAll)]
         public async Task<IActionResult> GetAll()
         {
-            var response = await _categoryService.GetCategory();
+            var response = await _categoryService.GetCategories();
             if (response.Succeeded)
             {
                 return Ok(response);

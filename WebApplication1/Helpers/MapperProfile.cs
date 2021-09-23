@@ -1,7 +1,9 @@
 ﻿using API.Domains;
 using API.DTOs.Categories;
 using API.DTOs.Distributors;
+using API.DTOs.PaymentMethods;
 using API.DTOs.Products;
+using API.DTOs.Retailers;
 using API.DTOs.Roles;
 using API.DTOs.Users;
 using AutoMapper;
@@ -27,8 +29,13 @@ namespace API.Helpers
             CreateMap<Category, CategoryResponse>().ReverseMap();
             CreateMap<Category, CreateCategoryRequest>().ReverseMap();
             CreateMap<Category, CategoryHierachy>().ReverseMap();
-            
+
+            CreateMap<PaymentMethod, PaymentMethodResponse>().ReverseMap();
+            CreateMap<PaymentMethod, CreatePaymentMethodRequest>().ReverseMap();
+
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
+
+            CreateMap<Retailer, RetailerResponse>().ReverseMap();
 
             CreateMap<Product, ProductResponse>().ReverseMap();
             CreateMap<Product, CreateProductRequest>().ReverseMap();
