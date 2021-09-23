@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTOs.Categories
+namespace API.DTOs.Retailers
 {
-    public class CategoryResponse
+    public class RetailerResponse
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public Guid? ParentId { get; set; }
+        public Guid UserId { get; set; }
+        public bool IsActive { get; set; }
     }
 }

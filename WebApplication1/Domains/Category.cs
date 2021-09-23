@@ -9,6 +9,7 @@ namespace API.Domains
     {
         public Category()
         {
+            InverseParent = new HashSet<Category>();
             Products = new HashSet<Product>();
         }
 
@@ -18,6 +19,8 @@ namespace API.Domains
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
+        public virtual Category Parent { get; set; }
+        public virtual ICollection<Category> InverseParent { get; set; }
         public virtual ICollection<Product> Products { get; set; }
     }
 }
