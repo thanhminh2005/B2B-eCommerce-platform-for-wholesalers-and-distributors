@@ -36,6 +36,32 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Products.GetDistributor)]
+        public async Task<IActionResult> GetDistributor(string id)
+        {
+            GetProductByDistributorIdRequest request = new GetProductByDistributorIdRequest
+            {
+                DistributorId = id
+            };
+            var response = await _productService.GetProductByDistributorId(request);
+            if (response.Succeeded)
+            {
+                return (Ok(response));
+            }
+            return NotFound(response);
+        }
+
+        [HttpGet(ApiRoute.Products.Filter)]
+        public async Task<IActionResult> Filter([FromQuery] GetProductsWithFilterRequest request)
+        {
+            var response = await _productService.GetProductsWithFilter(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
         [HttpPost(ApiRoute.Products.Create)]
         public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
         {
@@ -46,5 +72,30 @@ namespace API.Controllers
             }
             return BadRequest(response);
         }
+
+        [HttpPut(ApiRoute.Products.Update)]
+        public async Task<IActionResult> Update([FromBody] UpdateProductRequest request)
+        {
+            
+            var response = await _productService.UpdateProduct(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+        [HttpDelete(ApiRoute.Products.Delete)]
+        public async Task<IActionResult> Delete([FromBody] RemoveProductRequest request)
+        {
+
+            var response = await _productService.RemoveProduct(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        
     }
 }
