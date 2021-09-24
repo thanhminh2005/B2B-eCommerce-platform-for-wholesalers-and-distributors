@@ -76,7 +76,7 @@ namespace API.Services
                 if (category != null)
                 {
                     category.Name = request.Name;
-                    category.DateCreated = DateTime.UtcNow;
+                    category.DateModified = DateTime.UtcNow;
                     _unitOfWork.GetRepository<Category>().UpdateAsync(category);
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(request.Name, message: "Category is updated");

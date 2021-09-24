@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace API.DTOs.Products
 {
-    public class RemoveProductRequest
+    public class GetProductByDistributorIdRequest
     {
-        public string Id { get; set; }
-        public bool IsActive { get; set; }
+        public string DistributorId { get; set; }
     }
 }

@@ -48,6 +48,16 @@ namespace API.Services
             return new Response<string>(message: "Failed to create product");
         }
 
+        public async Task<Response<IEnumerable<ProductResponse>>> GetProductByDistributorId(GetProductByDistributorIdRequest request)
+        {
+            var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+            if (products.Count() != 0)
+            {
+                return new Response<IEnumerable<ProductResponse>>(_mapper.Map<IEnumerable<ProductResponse>>(products), message: "Success");
+            }
+            return new Response<IEnumerable<ProductResponse>>(message: "Empty");
+        }
+
         public async Task<Response<ProductResponse>> GetProductById(GetProductByIdRequest request)
         {
             if (!string.IsNullOrWhiteSpace(request.Id))
@@ -57,8 +67,84 @@ namespace API.Services
                 {
                     return new Response<ProductResponse>(_mapper.Map<ProductResponse>(product), message: "Succeed");
                 }
+                else if(!product.IsActive)
+                {
+                    return new Response<ProductResponse>(message: "Product is removed");
+                }
             }
             return new Response<ProductResponse>("Failed");
         }
+
+        public async Task<PagedResponse<IEnumerable<ProductResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request)
+        {
+            var products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
+                                                                                      request.PageSize,
+                                                                                      filter: x => (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId))
+                                                                                      && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
+                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                      ));
+
+            var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId))
+                                                                                      && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
+                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                      ));
+            var response = _mapper.Map<IEnumerable<ProductResponse>>(products);
+            return new PagedResponse<IEnumerable<ProductResponse>>(response, request.PageNumber, request.PageSize, totalcount);
+        }
+
+        public async Task<Response<string>> RemoveProduct(RemoveProductRequest request)
+        {
+            if (!string.IsNullOrWhiteSpace(request.Id))
+            {
+                var product = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+                if (product != null)
+                {
+                    product.IsActive = request.IsActive;
+                    product.DateModified = DateTime.UtcNow;
+                    _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                    await _unitOfWork.SaveAsync();
+                    if(!product.IsActive)
+                    {
+                        return new Response<string>(product.Id.ToString(), message: "Product is removed");
+                    }
+                    else
+                    {
+                        return new Response<string>(product.Id.ToString(), message: "Product is activated");
+                    }
+                    
+                }
+            }
+            return new Response<string>(message: "Fail to remove product");
+        }
+
+        public async Task<Response<string>> UpdateProduct(UpdateProductRequest request)
+        {
+            if(request != null)
+            {
+                if (!string.IsNullOrWhiteSpace(request.Id))
+                {
+                    Product product = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+                    if (product != null)
+                    {
+                        product.CategoryId = Guid.Parse(request.CategoryId);
+                        product.Name = request.Name;
+                        product.Image = request.Image;
+                        product.Status = request.Status;
+                        product.Description = request.Description;
+                        product.MinQuantity = request.MinQuantity;
+                        product.DateModified = DateTime.UtcNow;
+                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(product.Id.ToString(), message: "Product is updated");
+                    }
+                }
+                return new Response<string>(message: "Product ID can not be blanked");
+            }
+            return new Response<string>(message: "Fail to update product");
+        }
+
+
     }
 }

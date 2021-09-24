@@ -129,6 +129,7 @@ namespace API.Repositories
 
         public void UpdateAsync(T entity)
         {
+            _context.Set<T>().AsNoTracking();
             _context.Entry(entity).State = EntityState.Modified;
         }
 
