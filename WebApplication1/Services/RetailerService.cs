@@ -25,7 +25,7 @@ namespace API.Services
 
         public async Task<Response<string>> CreateRetailer(CreateRetailerRequest request)
         {
-            if(!string.IsNullOrWhiteSpace(request.UserId))
+            if (!string.IsNullOrWhiteSpace(request.UserId))
             {
                 var userId = Guid.Parse(request.UserId);
                 var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(userId);
@@ -35,7 +35,7 @@ namespace API.Services
                     if (role.Name.Equals(Authorization.DT))
                     {
                         var distributor = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(userId));
-                        if(distributor == null)
+                        if (distributor == null)
                         {
                             var newRetailer = new Retailer
                             {
@@ -48,7 +48,7 @@ namespace API.Services
                             await _unitOfWork.SaveAsync();
                             return new Response<string>(newRetailer.Id.ToString(), message: "Retailer Created");
                         }
-                    }                    
+                    }
                 }
             }
             return new Response<string>(message: "Failed to Create Retailer");
@@ -59,7 +59,7 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(Guid.Parse(request.Id));
-                if(distributor != null && distributor.IsActive != false)
+                if (distributor != null && distributor.IsActive != false)
                 {
                     return new Response<RetailerResponse>(_mapper.Map<RetailerResponse>(distributor), message: "Succeed");
                 }
@@ -80,10 +80,10 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateRetailer(UpdateRetailerRequest request)
         {
-            if(string.IsNullOrWhiteSpace(request.Id))
+            if (string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                if(distributor != null)
+                if (distributor != null)
                 {
                     distributor.IsActive = request.IsActive;
                     distributor.DateModified = DateTime.UtcNow;

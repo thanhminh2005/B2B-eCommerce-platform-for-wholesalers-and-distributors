@@ -1,12 +1,10 @@
 ﻿using API.Domains;
 using API.DTOs.Categories;
-using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -20,7 +18,7 @@ namespace API.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        
+
         public async Task<Response<string>> CreateCategory(CreateCategoryRequest request)
         {
             if (!string.IsNullOrWhiteSpace(request.Name))
@@ -46,7 +44,7 @@ namespace API.Services
         public async Task<Response<IEnumerable<CategoryResponse>>> GetCategories()
         {
             var allCategories = await _unitOfWork.GetRepository<Category>().GetAsync(includeProperties: "Parent");
-            if(allCategories != null)
+            if (allCategories != null)
             {
                 return new Response<IEnumerable<CategoryResponse>>(_mapper.Map<IEnumerable<CategoryResponse>>(allCategories));
             }
@@ -55,11 +53,11 @@ namespace API.Services
 
         public async Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request)
         {
-            
+
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.Id));
-               
+
                 if (category != null)
                 {
                     return new Response<CategoryResponse>(_mapper.Map<CategoryResponse>(category), message: "Success");
@@ -81,13 +79,13 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(request.Name, message: "Category is updated");
                 }
-                else if(category == null)
+                else if (category == null)
                 {
                     return new Response<string>(message: "Category ID is not existed");
                 }
                 //else if parent not found
             }
-            else if(string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Id))
+            else if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Id))
             {
                 return new Response<string>(message: "Name or ID cannot be blanked");
             }

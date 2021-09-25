@@ -24,10 +24,10 @@ namespace API.Services
 
         public async Task<Response<string>> CreateUser(CreateUserRequest request)
         {
-            if(request != null)
+            if (request != null)
             {
                 var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username));
-                if(user == null)
+                if (user == null)
                 {
                     User newUser = _mapper.Map<User>(request);
                     newUser.DoB = DateConverter.StringToDateTime(request.DoB);
@@ -48,10 +48,10 @@ namespace API.Services
 
         public async Task<Response<UserResponse>> GetUserById(GetUserByIdRequest request)
         {
-            if(request != null)
+            if (request != null)
             {
                 var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(Guid.Parse(request.Id));
-                if(user != null)
+                if (user != null)
                 {
                     return new Response<UserResponse>(_mapper.Map<UserResponse>(user), message: "Succeed");
                 }
@@ -68,7 +68,8 @@ namespace API.Services
         public async Task<Response<IEnumerable<UserResponse>>> GetUsers(GetUsersRequest request)
         {
             var users = await _unitOfWork.GetRepository<User>().GetAllAsync();
-            if (users.Count() != 0) {
+            if (users.Count() != 0)
+            {
                 if (!string.IsNullOrWhiteSpace(request.RoleId))
                 {
                     var roleId = Guid.Parse(request.RoleId);
@@ -84,11 +85,11 @@ namespace API.Services
         {
             var users = await _unitOfWork.GetRepository<User>().GetPagedReponseAsync(request.PageNumber,
                                                                                      request.PageSize,
-                                                                                     filter: x => 
+                                                                                     filter: x =>
                                                                                      (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
-                                                                                     && (request.SearchValue == null || x.Username.Contains(request.SearchValue))), 
+                                                                                     && (request.SearchValue == null || x.Username.Contains(request.SearchValue))),
                                                                                      x => x.OrderBy(x => x.Username));
-            
+
             var totalcount = await _unitOfWork.GetRepository<User>().CountAsync(filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue))));
             var response = _mapper.Map<IEnumerable<UserResponse>>(users);
@@ -98,14 +99,14 @@ namespace API.Services
         public async Task<Response<string>> UpdateUserPassword(UpdateUserPasswordRequest request)
         {
             var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.UserId)));
-            if(user != null)
+            if (user != null)
             {
-               
+
                 if (!string.IsNullOrWhiteSpace(request.OldPassword) && PasswordHash.VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
                 {
                     if (!string.IsNullOrWhiteSpace(request.NewPassword) && !string.IsNullOrWhiteSpace(request.ComfirmPassword))
                     {
-                        if(request.NewPassword.Length > 8)
+                        if (request.NewPassword.Length > 8)
                         {
                             byte[] passwordHash, passwordSalt;
                             PasswordHash.CreatePasswordHash(request.NewPassword, out passwordHash, out passwordSalt);
@@ -116,9 +117,9 @@ namespace API.Services
                             await _unitOfWork.SaveAsync();
                             return new Response<string>(user.Username, message: "Update Password Successfully");
                         }
-                        
+
                     }
-                    
+
                 }
             }
             return new Response<string>(message: "Failed To Update Password");

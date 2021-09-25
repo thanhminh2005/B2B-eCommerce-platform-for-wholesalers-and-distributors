@@ -1,12 +1,7 @@
 ﻿using API.Contracts;
 using API.DTOs.Retailers;
 using API.Interfaces;
-using API.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -23,7 +18,7 @@ namespace API.Controllers
 
         [HttpPost(ApiRoute.Retailers.Create)]
         public async Task<IActionResult> Create([FromBody] CreateRetailerRequest request)
-{
+        {
             var response = await _retailerService.CreateRetailer(request);
             if (response.Succeeded)
             {
@@ -49,7 +44,7 @@ namespace API.Controllers
 
         [HttpGet(ApiRoute.Retailers.GetAll)]
         public async Task<IActionResult> GetAll()
-{
+        {
             var response = await _retailerService.GetRetailers();
             if (response.Succeeded)
             {

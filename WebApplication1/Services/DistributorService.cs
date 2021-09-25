@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using static API.Contracts.ApiRoute;
 
 namespace API.Services
 {
@@ -26,7 +25,7 @@ namespace API.Services
 
         public async Task<Response<string>> CreateDistributor(CreateDistributorRequest request)
         {
-            if(!string.IsNullOrWhiteSpace(request.UserId))
+            if (!string.IsNullOrWhiteSpace(request.UserId))
             {
                 var userId = Guid.Parse(request.UserId);
                 var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(userId);
@@ -36,7 +35,7 @@ namespace API.Services
                     if (role.Name.Equals(Authorization.DT))
                     {
                         var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.UserId.Equals(userId));
-                        if(distributor == null)
+                        if (distributor == null)
                         {
                             var newDistributor = new Distributor
                             {
@@ -49,7 +48,7 @@ namespace API.Services
                             await _unitOfWork.SaveAsync();
                             return new Response<string>(newDistributor.Id.ToString(), message: "Distributor Created");
                         }
-                    }                    
+                    }
                 }
             }
             return new Response<string>(message: "Failed to Create Distributor");
@@ -60,7 +59,7 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.Id));
-                if(distributor != null && distributor.IsActive != false)
+                if (distributor != null && distributor.IsActive != false)
                 {
                     return new Response<DistributorResponse>(_mapper.Map<DistributorResponse>(distributor), message: "Succeed");
                 }
@@ -81,10 +80,10 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateDistributor(UpdateDistributorRequest request)
         {
-            if(string.IsNullOrWhiteSpace(request.Id))
+            if (string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                if(distributor != null)
+                if (distributor != null)
                 {
                     distributor.IsActive = request.IsActive;
                     distributor.DateModified = DateTime.UtcNow;

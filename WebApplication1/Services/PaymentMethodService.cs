@@ -1,13 +1,10 @@
 ﻿using API.Domains;
 using API.DTOs.PaymentMethods;
 using API.Interfaces;
-using API.Repositories;
 using API.Warppers;
 using AutoMapper;
-using Azure.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -26,7 +23,7 @@ namespace API.Services
         public async Task<Response<string>> CreatePaymentMethod(CreatePaymentMethodRequest request)
         {
             var payment = await _unitOfWork.GetRepository<PaymentMethod>().FirstAsync(x => x.Name.Equals(request.Name));
-            if(payment == null)
+            if (payment == null)
             {
                 var newPayment = _mapper.Map<PaymentMethod>(request);
                 newPayment.Id = Guid.NewGuid();
@@ -41,15 +38,15 @@ namespace API.Services
         public async Task<Response<string>> DeletePaymentMethod(DeletePaymentMethodRequest request)
         {
             var payment = await _unitOfWork.GetRepository<PaymentMethod>().GetByIdAsync(Guid.Parse(request.Id));
-            if(payment != null)
+            if (payment != null)
             {
                 var inUsed = await _unitOfWork.GetRepository<RetailerPaymentMethod>().FirstAsync(x => x.PaymentMethodId.Equals(Guid.Parse(request.Id)));
-                if(inUsed == null)
+                if (inUsed == null)
                 {
                     _unitOfWork.GetRepository<PaymentMethod>().DeleteAsync(payment);
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(payment.Name, message: "Payment Method Deleted");
-                } 
+                }
             }
             return new Response<string>(message: "Failed to Delete PaymentMethod");
         }
@@ -57,7 +54,7 @@ namespace API.Services
         public async Task<Response<PaymentMethodResponse>> GetPaymentMethodById(GetPaymentMethodByIdRequest request)
         {
             var payment = await _unitOfWork.GetRepository<PaymentMethod>().GetByIdAsync(Guid.Parse(request.Id));
-            if(payment != null)
+            if (payment != null)
             {
                 return new Response<PaymentMethodResponse>(_mapper.Map<PaymentMethodResponse>(payment), message: "Succeed");
             }
@@ -69,7 +66,7 @@ namespace API.Services
             var payment = await _unitOfWork.GetRepository<PaymentMethod>().GetAllAsync();
             if (payment != null)
             {
-                return new Response<IEnumerable<PaymentMethodResponse>>(_mapper.Map< IEnumerable < PaymentMethodResponse >> (payment), message: "Succeed");
+                return new Response<IEnumerable<PaymentMethodResponse>>(_mapper.Map<IEnumerable<PaymentMethodResponse>>(payment), message: "Succeed");
             }
             return new Response<IEnumerable<PaymentMethodResponse>>(message: "Failed");
         }

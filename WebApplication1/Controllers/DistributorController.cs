@@ -1,12 +1,7 @@
 ﻿using API.Contracts;
 using API.DTOs.Distributors;
 using API.Interfaces;
-using API.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -23,7 +18,7 @@ namespace API.Controllers
 
         [HttpPost(ApiRoute.Distributors.Create)]
         public async Task<IActionResult> Create([FromBody] CreateDistributorRequest request)
-{
+        {
             var response = await _distributorService.CreateDistributor(request);
             if (response.Succeeded)
             {
@@ -49,7 +44,7 @@ namespace API.Controllers
 
         [HttpGet(ApiRoute.Distributors.GetAll)]
         public async Task<IActionResult> GetAll()
-{
+        {
             var response = await _distributorService.GetDistributors();
             if (response.Succeeded)
             {

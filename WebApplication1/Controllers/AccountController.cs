@@ -2,11 +2,7 @@
 using API.DTOs.Accounts;
 using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -26,7 +22,7 @@ namespace API.Controllers
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var response = await _accountService.Login(request);
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 return Ok(response);
             }

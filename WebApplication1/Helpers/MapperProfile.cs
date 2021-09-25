@@ -3,14 +3,11 @@ using API.DTOs.Categories;
 using API.DTOs.Distributors;
 using API.DTOs.PaymentMethods;
 using API.DTOs.Products;
+using API.DTOs.RetailerPaymentMethods;
 using API.DTOs.Retailers;
 using API.DTOs.Roles;
 using API.DTOs.Users;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.Helpers
 {
@@ -32,6 +29,9 @@ namespace API.Helpers
 
             CreateMap<PaymentMethod, PaymentMethodResponse>().ReverseMap();
             CreateMap<PaymentMethod, CreatePaymentMethodRequest>().ReverseMap();
+
+            CreateMap<RetailerPaymentMethod, RetailerPaymentMethodResponse>().ReverseMap();
+            CreateMap<RetailerPaymentMethod, CreateRetailerPaymentMethodRequest>().ReverseMap();
 
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
 

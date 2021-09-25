@@ -2,9 +2,6 @@
 using API.DTOs.Users;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -47,7 +44,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetUsersRequest request)
         {
             var response = await _userService.GetUsers(request);
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 return Ok(response);
             }
