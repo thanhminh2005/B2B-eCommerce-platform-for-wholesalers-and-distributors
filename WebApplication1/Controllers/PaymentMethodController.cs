@@ -1,12 +1,7 @@
 ﻿using API.Contracts;
 using API.DTOs.PaymentMethods;
 using API.Interfaces;
-using API.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -23,7 +18,7 @@ namespace API.Controllers
 
         [HttpPost(ApiRoute.PaymentMethods.Create)]
         public async Task<IActionResult> Create([FromBody] CreatePaymentMethodRequest request)
-{
+        {
             var response = await _paymentMethodService.CreatePaymentMethod(request);
             if (response.Succeeded)
             {
@@ -49,7 +44,7 @@ namespace API.Controllers
 
         [HttpGet(ApiRoute.PaymentMethods.GetAll)]
         public async Task<IActionResult> GetAll()
-{
+        {
             var response = await _paymentMethodService.GetPaymentMethods();
             if (response.Succeeded)
             {

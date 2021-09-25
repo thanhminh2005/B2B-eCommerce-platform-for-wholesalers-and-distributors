@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace API.DTOs.Products
+﻿namespace API.DTOs.Products
 {
     public class CreateProductRequest
     {
@@ -14,6 +9,6 @@ namespace API.DTOs.Products
         public int Status { get; set; }
         public string Description { get; set; }
         public int MinQuantity { get; set; }
-        
+
     }
 }

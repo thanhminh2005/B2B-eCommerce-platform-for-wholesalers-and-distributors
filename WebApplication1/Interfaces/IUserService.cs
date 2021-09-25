@@ -1,9 +1,6 @@
-﻿using API.Domains;
-using API.DTOs.Users;
+﻿using API.DTOs.Users;
 using API.Warppers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Interfaces

@@ -1,11 +1,7 @@
 ﻿using API.Contracts;
 using API.DTOs.Categories;
 using API.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -56,7 +52,7 @@ namespace API.Controllers
             }
             return BadRequest(response);
         }
-        
+
         [HttpPut(ApiRoute.Categories.Update)]
         public async Task<IActionResult> Update([FromBody] UpdateCategoryRequest request)
         {

@@ -5,8 +5,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -24,10 +22,10 @@ namespace API.Services
 
         public async Task<Response<string>> CreateRole(CreateRoleRequest request)
         {
-            if(!string.IsNullOrWhiteSpace(request.Name))
+            if (!string.IsNullOrWhiteSpace(request.Name))
             {
                 var role = await _unitOfWork.GetRepository<Role>().FirstAsync(c => c.Name.Equals(request.Name));
-                if(role == null)
+                if (role == null)
                 {
                     var newRole = _mapper.Map<Role>(request);
                     newRole.Id = Guid.NewGuid();
@@ -42,14 +40,14 @@ namespace API.Services
 
         public async Task<Response<RoleResponse>> GetRoleById(GetRoleByIdRequest request)
         {
-            if(!string.IsNullOrWhiteSpace(request.Id))
+            if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(Guid.Parse(request.Id));
-                if(role != null)
+                if (role != null)
                 {
                     return new Response<RoleResponse>(_mapper.Map<RoleResponse>(role), message: "Success");
-}
-}
+                }
+            }
             return new Response<RoleResponse>(message: "Role not Found");
         }
 
