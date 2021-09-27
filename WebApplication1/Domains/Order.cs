@@ -10,7 +10,6 @@ namespace API.Domains
         public Order()
         {
             OrderDetails = new HashSet<OrderDetail>();
-            Reports = new HashSet<Report>();
         }
 
         public Guid Id { get; set; }
@@ -22,6 +21,5 @@ namespace API.Domains
 
         public virtual Session Session { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<Report> Reports { get; set; }
     }
 }

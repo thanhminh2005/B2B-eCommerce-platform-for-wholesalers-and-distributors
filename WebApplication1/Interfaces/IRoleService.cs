@@ -1,13 +1,11 @@
 ﻿using API.DTOs.Roles;
 using API.Warppers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Interfaces
 {
-    public interface IRoleService 
+    public interface IRoleService
     {
         Task<Response<string>> CreateRole(CreateRoleRequest request);
         Task<Response<IEnumerable<RoleResponse>>> GetRoles();

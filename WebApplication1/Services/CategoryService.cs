@@ -5,7 +5,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -14,7 +13,6 @@ namespace API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        
         public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -43,48 +41,23 @@ namespace API.Services
             return new Response<string>(message: "Failed to Create");
         }
 
-        public async Task<Response<IEnumerable<CategoryHierachy>>> GetCategory()
+        public async Task<Response<IEnumerable<CategoryResponse>>> GetCategories()
         {
-            List<CategoryHierachy> items = new List<CategoryHierachy>();
-
-            var allCategories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
-            //get all parent categories
-            List<Category> parentCategories = allCategories.Where(c => c.Parent == null).ToList();
-
+            var allCategories = await _unitOfWork.GetRepository<Category>().GetAsync(includeProperties: "Parent");
             if (allCategories != null)
             {
-                foreach (var cat in parentCategories)
-                {
-                    
-                    //add the parent category to the item list
-                    items.Add(new CategoryHierachy{ ID = cat.Id, Name = cat.Name 
-                        , SubCategories = GenerateSub((IList<Category>)allCategories, cat, items)
-                    });
-                 
-                }
-                return new Response<IEnumerable<CategoryHierachy>>(_mapper.Map<IEnumerable<CategoryHierachy>>(items), message: "Success");
+                return new Response<IEnumerable<CategoryResponse>>(_mapper.Map<IEnumerable<CategoryResponse>>(allCategories));
             }
-            return new Response<IEnumerable<CategoryHierachy>>(message: "Empty");
-        }
-        
-        private IList<CategoryHierachy> GenerateSub(IList<Category> allCats, Category parent, IList<CategoryHierachy> items)
-        {
-            var SubCategory = allCats.Where(c => c.Parent == parent.Id );
-            Console.WriteLine(parent.Name);
-            foreach (var cat in SubCategory)
-            {
-                    items.Add(new CategoryHierachy { ID = cat.Id, Name = cat.Name, SubCategories = GenerateSub(allCats, cat, items) });
-            }
-            return items;
+            return new Response<IEnumerable<CategoryResponse>>(message: "Empty");
         }
 
         public async Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request)
         {
-            
+
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.Id));
-               
+
                 if (category != null)
                 {
                     return new Response<CategoryResponse>(_mapper.Map<CategoryResponse>(category), message: "Success");
@@ -106,17 +79,19 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(request.Name, message: "Category is updated");
                 }
-                else if(category == null)
+                else if (category == null)
                 {
                     return new Response<string>(message: "Category ID is not existed");
                 }
                 //else if parent not found
             }
-            else if(string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Id))
+            else if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Id))
             {
                 return new Response<string>(message: "Name or ID cannot be blanked");
             }
             return new Response<string>(message: "Failed to Create");
         }
+
+
     }
 }

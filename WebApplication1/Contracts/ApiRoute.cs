@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace API.Contracts
+﻿namespace API.Contracts
 {
     public class ApiRoute
     {
@@ -24,6 +19,15 @@ namespace API.Contracts
             public const string Update = Base + "/distributor/";
             public const string Delete = Base + "/distributor/{id}";
         }
+        public static class Retailers
+        {
+            public const string GetAll = Base + "/retailer/";
+            public const string Get = Base + "/retailer/{id}";
+            public const string Create = Base + "/retailer";
+            public const string Update = Base + "/retailer/";
+            public const string Delete = Base + "/retailer/{id}";
+        }
+
         public static class Users
         {
             public const string Count = Base + "/user/count";
@@ -31,7 +35,7 @@ namespace API.Contracts
             public const string GetPaging = Base + "/user/page";
             public const string Get = Base + "/user/{id}";
             public const string Create = Base + "/user";
-            public const string UpdatePassword = Base + "/update-password/{id}";
+            public const string UpdatePassword = Base + "/update-password";
             public const string Update = Base + "/user/";
             public const string Delete = Base + "/user/{id}";
         }
@@ -61,6 +65,24 @@ namespace API.Contracts
             public const string Create = Base + "/Product";
             public const string Update = Base + "/Product/";
             public const string Delete = Base + "/Product/";
+        }
+
+        public static class PaymentMethods
+        {
+            public const string GetAll = Base + "/payment-method/";
+            public const string Get = Base + "/payment-method/{id}";
+            public const string Create = Base + "/payment-method";
+            public const string Update = Base + "/payment-method/";
+            public const string Delete = Base + "/payment-method/{id}";
+        }
+
+        public static class RetailerPaymentMethods
+        {
+            public const string GetAll = Base + "/retailer/payment-method/";
+            public const string Get = Base + "/retailer/payment-method/{id}";
+            public const string Create = Base + "/retailer/payment-method";
+            public const string Update = Base + "/retailer/payment-method/";
+            public const string Delete = Base + "/retailer/payment-method/{id}";
         }
     }
 

@@ -5,8 +5,6 @@ using API.Warppers;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -26,11 +24,11 @@ namespace API.Services
             if (request != null)
             {
                 var product = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Name.Equals(request.Name));
-                if(product == null)
+                if (product == null)
                 {
                     var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
-                   
-                    if(distributor.IsActive)
+
+                    if (distributor.IsActive)
                     {
                         Product newProduct = _mapper.Map<Product>(request);
                         newProduct.Id = Guid.NewGuid();
