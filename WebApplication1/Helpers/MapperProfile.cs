@@ -39,7 +39,7 @@ namespace API.Helpers
 
             CreateMap<Product, ProductResponse>().ReverseMap();
             CreateMap<Product, CreateProductRequest>().ReverseMap();
-            //CreateMap<Product, UpdateProductRequest>().ReverseMap();
+            CreateMap<Product, UpdateProductRequest>().ReverseMap();
         }
     }
 }

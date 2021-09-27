@@ -1,6 +1,11 @@
 ﻿using API.Contracts;
+using API.Domains;
 using API.DTOs.Products;
 using API.Interfaces;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -11,10 +16,12 @@ namespace API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IUnitOfWork unitOfWork)
         {
             _productService = productService;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet(ApiRoute.Products.Get)]
@@ -62,6 +69,7 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
         {
             var response = await _productService.CreateProduct(request);
+            
             if (response.Succeeded)
             {
                 return Ok(response);
@@ -72,8 +80,33 @@ namespace API.Controllers
         [HttpPut(ApiRoute.Products.Update)]
         public async Task<IActionResult> Update([FromBody] UpdateProductRequest request)
         {
-            
+            Product OldProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+            if (string.IsNullOrEmpty(request.CategoryId))
+            {
+                request.CategoryId = OldProduct.CategoryId.ToString();
+            }
+            if (string.IsNullOrEmpty(request.Name))
+            {
+                request.Name = OldProduct.Name;
+            }
+            if (string.IsNullOrEmpty(request.Image))
+            {
+                request.Image = OldProduct.Image;
+            }
+            if (request.Status == 0)
+            {
+                request.Status = OldProduct.Status;
+            }
+            if (string.IsNullOrEmpty(request.Description))
+            {
+                request.Description = OldProduct.Description;
+            }
+            if (request.MinQuantity == 0)
+            {
+                request.MinQuantity = OldProduct.MinQuantity;
+            }
             var response = await _productService.UpdateProduct(request);
+            
             if (response.Succeeded)
             {
                 return Ok(response);

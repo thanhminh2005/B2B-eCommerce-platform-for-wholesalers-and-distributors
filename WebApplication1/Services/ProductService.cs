@@ -3,6 +3,7 @@ using API.DTOs.Products;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Threading.Tasks;
 
@@ -46,6 +47,7 @@ namespace API.Services
             return new Response<string>(message: "Failed to create product");
         }
 
+        //get products list from a specific distributorID
         public async Task<Response<IEnumerable<ProductResponse>>> GetProductByDistributorId(GetProductByDistributorIdRequest request)
         {
             var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
@@ -119,23 +121,25 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateProduct(UpdateProductRequest request)
         {
+            
             if(request != null)
             {
                 if (!string.IsNullOrWhiteSpace(request.Id))
                 {
-                    Product product = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                    if (product != null)
+                    Product NewProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+                   
+                    if (NewProduct != null)
                     {
-                        product.CategoryId = Guid.Parse(request.CategoryId);
-                        product.Name = request.Name;
-                        product.Image = request.Image;
-                        product.Status = request.Status;
-                        product.Description = request.Description;
-                        product.MinQuantity = request.MinQuantity;
-                        product.DateModified = DateTime.UtcNow;
-                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                        NewProduct.CategoryId = Guid.Parse(request.CategoryId);
+                        NewProduct.Name = request.Name;
+                        NewProduct.Image = request.Image;
+                        NewProduct.Status = request.Status;
+                        NewProduct.Description = request.Description;
+                        NewProduct.MinQuantity = request.MinQuantity;
+                        NewProduct.DateModified = DateTime.UtcNow;
+                        _unitOfWork.GetRepository<Product>().UpdateAsync(NewProduct);
                         await _unitOfWork.SaveAsync();
-                        return new Response<string>(product.Id.ToString(), message: "Product is updated");
+                        return new Response<string>(NewProduct.Id.ToString(), message: "Product is updated");
                     }
                 }
                 return new Response<string>(message: "Product ID can not be blanked");
