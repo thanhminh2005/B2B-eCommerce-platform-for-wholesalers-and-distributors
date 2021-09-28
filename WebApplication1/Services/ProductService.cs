@@ -1,5 +1,6 @@
 ﻿using API.Domains;
 using API.DTOs.Products;
+using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
@@ -14,7 +15,7 @@ namespace API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
+      
         public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -48,15 +49,29 @@ namespace API.Services
             return new Response<string>(message: "Failed to create product");
         }
 
-        //get products list from a specific distributorID
-        public async Task<Response<IEnumerable<ProductResponse>>> GetProductByDistributorId(GetProductByDistributorIdRequest request)
+        //get products list from a specific distributorID (View by Distributor)
+        public async Task<PagedResponse<IEnumerable<ProductResponse>>> GetProductByDistributorId(GetProductByDistributorIdRequest request)
         {
-            var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-            if (products.Count() != 0)
-            {
-                return new Response<IEnumerable<ProductResponse>>(_mapper.Map<IEnumerable<ProductResponse>>(products), message: "Success");
-            }
-            return new Response<IEnumerable<ProductResponse>>(message: "Empty");
+            var products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
+                                                                                      request.PageSize,
+                                                                                      filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
+                                                                                      orderBy: x => x.OrderBy(y => y.Name));
+
+            var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+            var response = _mapper.Map<IEnumerable<ProductResponse>>(products);
+            return new PagedResponse<IEnumerable<ProductResponse>>(response, request.PageNumber, request.PageSize, totalcount);
+        }
+        //View by Retailer
+        public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> RetailerGetProductByDistributorId(GetProductByDistributorIdRequest request)
+        {
+            var products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
+                                                                                      request.PageSize,
+                                                                                      filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
+                                                                                      orderBy: x => x.OrderBy(y => y.Name));
+
+            var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
+            return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
 
         public async Task<Response<ProductResponse>> GetProductById(GetProductByIdRequest request)
@@ -76,23 +91,24 @@ namespace API.Services
             return new Response<ProductResponse>("Failed");
         }
 
-        public async Task<PagedResponse<IEnumerable<ProductResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request)
+        public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request)
         {
             var products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
                                                                                       request.PageSize,
-                                                                                      filter: x => (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId))
+                                                                                      filter: x => 
+                                                                                      (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId)))
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
-                                                                                      ));
+                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status)),
+                                                                                      orderBy: x => x.OrderBy(y => y.Name));
 
-            var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId))
+            var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x =>
+                                                                                      (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId)))
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
-                                                                                      ));
-            var response = _mapper.Map<IEnumerable<ProductResponse>>(products);
-            return new PagedResponse<IEnumerable<ProductResponse>>(response, request.PageNumber, request.PageSize, totalcount);
+                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status)));
+            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
+            return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
 
         public async Task<Response<string>> RemoveProduct(RemoveProductRequest request)
@@ -147,7 +163,17 @@ namespace API.Services
             }
             return new Response<string>(message: "Fail to update product");
         }
+        
+        public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation()
+        {
+            List<Product> products = (List<Product>)await _unitOfWork.GetRepository<Product>().GetAllAsync();
+            products = products.GetRandomItems(30);
+            int totalcount = await _unitOfWork.GetRepository<Product>().CountAsync();
+            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
 
+            //get all in list, count all, get 10 random number not duplicate, add in list
+            return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, 1, 30, totalcount);
+        }
 
     }
 }
