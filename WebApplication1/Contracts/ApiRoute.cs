@@ -60,11 +60,13 @@
         public static class Products
         {
             public const string Get = Base + "/Product/{id}";
-            public const string GetDistributor = Base + "/{id}/Product";
+            public const string GetDistributor = Base + "/Distributor/{id}/Product";
+            public const string RetailerGetDistributor = Base + "/Retailer/Distributor/{id}/Product";
             public const string Filter = Base + "/Product/page";
             public const string Create = Base + "/Product";
             public const string Update = Base + "/Product/";
             public const string Delete = Base + "/Product/";
+            public const string Recommendation = Base + "/Product/Recommendation";
         }
 
         public static class PaymentMethods

@@ -55,6 +55,21 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Products.RetailerGetDistributor)]
+        public async Task<IActionResult> RetailerGetDistributor(string id)
+        {
+            GetProductByDistributorIdRequest request = new GetProductByDistributorIdRequest
+            {
+                DistributorId = id
+            };
+            var response = await _productService.RetailerGetProductByDistributorId(request);
+            if (response.Succeeded)
+            {
+                return (Ok(response));
+            }
+            return NotFound(response);
+        }
+
         [HttpGet(ApiRoute.Products.Filter)]
         public async Task<IActionResult> Filter([FromQuery] GetProductsWithFilterRequest request)
         {
@@ -126,6 +141,15 @@ namespace API.Controllers
             return BadRequest(response);
         }
 
-        
+        [HttpGet(ApiRoute.Products.Recommendation)]
+        public async Task<IActionResult> Recommendation()
+        {
+            var response = await _productService.GetProductsRecommendation();
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
     }
 }
