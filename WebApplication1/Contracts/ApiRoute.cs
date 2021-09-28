@@ -84,6 +84,14 @@
             public const string Update = Base + "/retailer/payment-method/";
             public const string Delete = Base + "/retailer/payment-method/{id}";
         }
+        public static class OrderDetails
+        {
+            public const string GetAll = Base + "/order/product/";
+            public const string Get = Base + "/order/product/{id}";
+            public const string Create = Base + "/order/product";
+            public const string Update = Base + "/order/product/";
+            public const string Delete = Base + "/order/product/{id}";
+        }
     }
 
 }
