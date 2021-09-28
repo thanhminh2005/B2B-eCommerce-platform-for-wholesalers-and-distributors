@@ -21,6 +21,7 @@ namespace B2B.Installers
             services.AddScoped<IRetailerService, RetailerService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             services.AddScoped<IRetailerPaymentMethodService, RetailerPaymentMethodService>();
+            services.AddScoped<IOrderDetailService, OrderDetailService>();
         }
     }
 }

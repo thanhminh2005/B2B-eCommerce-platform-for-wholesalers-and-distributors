@@ -1,10 +1,7 @@
-﻿using API.Contracts;
+using API.Contracts;
 using API.Domains;
 using API.DTOs.Products;
 using API.Interfaces;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
 
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -85,7 +82,7 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
         {
             var response = await _productService.CreateProduct(request);
-            
+
             if (response.Succeeded)
             {
                 return Ok(response);
@@ -122,7 +119,7 @@ namespace API.Controllers
                 request.MinQuantity = OldProduct.MinQuantity;
             }
             var response = await _productService.UpdateProduct(request);
-            
+
             if (response.Succeeded)
             {
                 return Ok(response);
@@ -151,5 +148,6 @@ namespace API.Controllers
             }
             return NotFound(response);
         }
+
     }
 }

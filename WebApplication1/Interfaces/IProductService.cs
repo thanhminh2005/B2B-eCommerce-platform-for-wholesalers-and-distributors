@@ -1,10 +1,6 @@
-﻿using API.DTOs.Products;
+using API.DTOs.Products;
 using API.Warppers;
-
-using Microsoft.AspNetCore.JsonPatch;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using System.Threading.Tasks;
 
@@ -20,7 +16,5 @@ namespace API.Interfaces
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> RetailerGetProductByDistributorId(GetProductByDistributorIdRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation();
-
-
     }
 }

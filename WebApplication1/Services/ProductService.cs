@@ -4,7 +4,6 @@ using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
-using Microsoft.AspNetCore.JsonPatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,7 +83,7 @@ namespace API.Services
                 {
                     return new Response<ProductResponse>(_mapper.Map<ProductResponse>(product), message: "Succeed");
                 }
-                else if(!product.IsActive)
+                else if (!product.IsActive)
                 {
                     return new Response<ProductResponse>(message: "Product is removed");
                 }
@@ -123,7 +122,7 @@ namespace API.Services
                     product.DateModified = DateTime.UtcNow;
                     _unitOfWork.GetRepository<Product>().UpdateAsync(product);
                     await _unitOfWork.SaveAsync();
-                    if(!product.IsActive)
+                    if (!product.IsActive)
                     {
                         return new Response<string>(product.Id.ToString(), message: "Product is removed");
                     }
@@ -131,7 +130,7 @@ namespace API.Services
                     {
                         return new Response<string>(product.Id.ToString(), message: "Product is activated");
                     }
-                    
+
                 }
             }
             return new Response<string>(message: "Fail to remove product");
@@ -139,13 +138,13 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateProduct(UpdateProductRequest request)
         {
-            
-            if(request != null)
+
+            if (request != null)
             {
                 if (!string.IsNullOrWhiteSpace(request.Id))
                 {
                     Product NewProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                   
+
                     if (NewProduct != null)
                     {
                         NewProduct.CategoryId = Guid.Parse(request.CategoryId);
