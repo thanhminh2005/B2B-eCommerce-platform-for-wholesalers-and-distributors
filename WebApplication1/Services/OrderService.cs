@@ -5,7 +5,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -36,7 +35,7 @@ namespace API.Services
         public async Task<Response<string>> DeleteOrder(DeleteOrdetRequest request)
         {
             var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
-            if(order != null)
+            if (order != null)
             {
                 var products = await _unitOfWork.GetRepository<OrderDetail>().GetAsync(x => x.OrderId.Equals(Guid.Parse(request.Id)));
                 _unitOfWork.GetRepository<OrderDetail>().DeleteAllAsync(products);
