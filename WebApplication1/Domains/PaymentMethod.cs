@@ -10,14 +10,16 @@ namespace API.Domains
         public PaymentMethod()
         {
             RetailerPaymentMethods = new HashSet<RetailerPaymentMethod>();
+            Sessions = new HashSet<Session>();
         }
 
         public Guid Id { get; set; }
-        public string Name { get; set; }
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
+        public string Name { get; set; }
 
         public virtual ICollection<RetailerPaymentMethod> RetailerPaymentMethods { get; set; }
+        public virtual ICollection<Session> Sessions { get; set; }
     }
 }

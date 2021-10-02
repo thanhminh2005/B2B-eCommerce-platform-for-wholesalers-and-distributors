@@ -27,6 +27,7 @@ namespace API.Domains
         public string Address { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Distributor> Distributors { get; set; }

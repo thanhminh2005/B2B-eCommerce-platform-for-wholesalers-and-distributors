@@ -16,19 +16,13 @@ namespace B2B
         }
 
         public IConfiguration Configuration { get; }
-        private readonly string _policyName = "CorsPolicy";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.InstallServicesInAssembly(Configuration);
-            services.AddCors(opt =>
+            services.AddCors(c =>
             {
-                opt.AddPolicy(name: _policyName, builder =>
-                {
-                    builder.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
             });
             services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -61,7 +55,7 @@ namespace B2B
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCors("_policyName");
+            app.UseCors(options => options.AllowAnyOrigin());
 
             app.UseRouting();
 

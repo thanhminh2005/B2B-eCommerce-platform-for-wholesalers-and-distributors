@@ -21,6 +21,7 @@ namespace API.Domains
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
+        public virtual PaymentMethod PaymentMethod { get; set; }
         public virtual Retailer Retailer { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
     }

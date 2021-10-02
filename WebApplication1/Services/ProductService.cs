@@ -15,7 +15,7 @@ namespace API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-      
+
         public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -95,7 +95,7 @@ namespace API.Services
         {
             var products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
                                                                                       request.PageSize,
-                                                                                      filter: x => 
+                                                                                      filter: x =>
                                                                                       (request.CategoryId == null || x.CategoryId.Equals(Guid.Parse(request.CategoryId)))
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
@@ -163,7 +163,7 @@ namespace API.Services
             }
             return new Response<string>(message: "Fail to update product");
         }
-        
+
         public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation()
         {
             List<Product> products = (List<Product>)await _unitOfWork.GetRepository<Product>().GetAllAsync();

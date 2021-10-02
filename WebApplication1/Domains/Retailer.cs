@@ -10,6 +10,7 @@ namespace API.Domains
         public Retailer()
         {
             Feedbacks = new HashSet<Feedback>();
+            Memberships = new HashSet<Membership>();
             RetailerPaymentMethods = new HashSet<RetailerPaymentMethod>();
             Sessions = new HashSet<Session>();
         }
@@ -22,6 +23,7 @@ namespace API.Domains
 
         public virtual User User { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
+        public virtual ICollection<Membership> Memberships { get; set; }
         public virtual ICollection<RetailerPaymentMethod> RetailerPaymentMethods { get; set; }
         public virtual ICollection<Session> Sessions { get; set; }
     }
