@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
 using System.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -20,6 +22,8 @@ namespace API.Domains
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Distributor> Distributors { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<Membership> Memberships { get; set; }
+        public virtual DbSet<MembershipRank> MembershipRanks { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -130,6 +134,42 @@ namespace API.Domains
                     .HasConstraintName("FK_Feedback_Retailer");
             });
 
+            modelBuilder.Entity<Membership>(entity =>
+            {
+                entity.ToTable("Membership");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Distributor)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.DistributorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_Distributor");
+
+                entity.HasOne(d => d.MembershipRank)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.MembershipRankId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_MembershipRank");
+
+                entity.HasOne(d => d.Retailer)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.RetailerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_Retailer");
+            });
+
+            modelBuilder.Entity<MembershipRank>(entity =>
+            {
+                entity.ToTable("MembershipRank");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.RankName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.ToTable("Order");
@@ -180,9 +220,9 @@ namespace API.Domains
 
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Description);
-
-                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Price>(entity =>
@@ -299,6 +339,12 @@ namespace API.Domains
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
                 entity.Property(e => e.ShippingAddress).IsRequired();
+
+                entity.HasOne(d => d.PaymentMethod)
+                    .WithMany(p => p.Sessions)
+                    .HasForeignKey(d => d.PaymentMethodId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Session_PaymentMethod");
 
                 entity.HasOne(d => d.Retailer)
                     .WithMany(p => p.Sessions)
