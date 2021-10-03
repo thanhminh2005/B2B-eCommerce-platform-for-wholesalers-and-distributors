@@ -9,13 +9,16 @@ namespace API.Domains
     {
         public MembershipRank()
         {
+            CustomerRanks = new HashSet<CustomerRank>();
             Memberships = new HashSet<Membership>();
         }
 
         public Guid Id { get; set; }
         public string RankName { get; set; }
-        public int Threshold { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateModified { get; set; }
 
+        public virtual ICollection<CustomerRank> CustomerRanks { get; set; }
         public virtual ICollection<Membership> Memberships { get; set; }
     }
 }

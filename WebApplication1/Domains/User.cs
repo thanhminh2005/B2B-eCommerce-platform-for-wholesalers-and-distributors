@@ -10,6 +10,7 @@ namespace API.Domains
         public User()
         {
             Distributors = new HashSet<Distributor>();
+            Fcms = new HashSet<Fcm>();
             Retailers = new HashSet<Retailer>();
         }
 
@@ -27,10 +28,11 @@ namespace API.Domains
         public string Address { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Distributor> Distributors { get; set; }
+        public virtual ICollection<Fcm> Fcms { get; set; }
         public virtual ICollection<Retailer> Retailers { get; set; }
     }
 }

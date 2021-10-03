@@ -38,6 +38,7 @@ namespace API.Services
                     newUser.PasswordHash = passwordHash;
                     newUser.PasswordSalt = passwordSalt;
                     newUser.Id = Guid.NewGuid();
+                    newUser.IsActive = true;
                     await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(newUser.Username, message: "User Registered.");
@@ -117,9 +118,7 @@ namespace API.Services
                             await _unitOfWork.SaveAsync();
                             return new Response<string>(user.Username, message: "Update Password Successfully");
                         }
-
                     }
-
                 }
             }
             return new Response<string>(message: "Failed To Update Password");

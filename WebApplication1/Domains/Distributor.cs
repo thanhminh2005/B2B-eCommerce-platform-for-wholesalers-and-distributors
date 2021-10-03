@@ -10,6 +10,7 @@ namespace API.Domains
         public Distributor()
         {
             Banners = new HashSet<Banner>();
+            CustomerRanks = new HashSet<CustomerRank>();
             Memberships = new HashSet<Membership>();
             Products = new HashSet<Product>();
         }
@@ -22,6 +23,7 @@ namespace API.Domains
 
         public virtual User User { get; set; }
         public virtual ICollection<Banner> Banners { get; set; }
+        public virtual ICollection<CustomerRank> CustomerRanks { get; set; }
         public virtual ICollection<Membership> Memberships { get; set; }
         public virtual ICollection<Product> Products { get; set; }
     }

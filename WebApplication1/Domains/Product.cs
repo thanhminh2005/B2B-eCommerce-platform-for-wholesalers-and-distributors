@@ -24,6 +24,7 @@ namespace API.Domains
         public int MinQuantity { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
+        public int OrderTime { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual Distributor Distributor { get; set; }
