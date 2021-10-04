@@ -38,6 +38,7 @@ namespace API.Services
                         newProduct.CategoryId = Guid.Parse(request.CategoryId);
                         newProduct.IsActive = true;
                         newProduct.DateCreated = DateTime.UtcNow;
+                        newProduct.OrderTime = 0;
                         await _unitOfWork.GetRepository<Product>().AddAsync(newProduct);
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(newProduct.Name, message: "Product registered successfully ");
