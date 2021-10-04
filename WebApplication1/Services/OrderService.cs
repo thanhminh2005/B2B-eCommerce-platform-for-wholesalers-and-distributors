@@ -50,7 +50,7 @@ namespace API.Services
         public async Task<Response<OrderResponse>> GetOrderById(GetOrderByIdRequest request)
         {
             var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
-            if(order != null)
+            if (order != null)
             {
                 var response = _mapper.Map<OrderResponse>(order);
                 return new Response<OrderResponse>(response, message: "Succeed");
@@ -64,10 +64,10 @@ namespace API.Services
                                                                             (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                             && (request.Status == null || x.Status == request.Status)
                                                                             );
-            if(orders.Count() != 0)
+            if (orders.Count() != 0)
             {
                 var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
-                return new Response<IEnumerable<OrderResponse>>(response, message: "Succeed"); 
+                return new Response<IEnumerable<OrderResponse>>(response, message: "Succeed");
             }
             return new Response<IEnumerable<OrderResponse>>(message: "Empty");
         }
@@ -94,7 +94,7 @@ namespace API.Services
             if (order != null)
             {
                 var products = await _unitOfWork.GetRepository<OrderDetail>().GetAsync(x => x.OrderId.Equals(Guid.Parse(request.Id)));
-                if(products.Count() != 0)
+                if (products.Count() != 0)
                 {
                     _unitOfWork.GetRepository<OrderDetail>().DeleteAllAsync(products);
                 }

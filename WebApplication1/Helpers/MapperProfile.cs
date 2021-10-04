@@ -2,6 +2,7 @@ using API.Domains;
 using API.DTOs.Categories;
 using API.DTOs.Distributors;
 using API.DTOs.OrderDetails;
+using API.DTOs.Orders;
 using API.DTOs.PaymentMethods;
 using API.DTOs.Products;
 using API.DTOs.RetailerPaymentMethods;
@@ -45,6 +46,9 @@ namespace API.Helpers
 
             CreateMap<OrderDetail, CreateOrderDetailRequest>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailResponse>().ReverseMap();
+
+            CreateMap<Order, CreateOrderRequest>().ReverseMap();
+            CreateMap<Order, OrderResponse>().ReverseMap();
         }
     }
 }

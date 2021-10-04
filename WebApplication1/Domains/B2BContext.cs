@@ -40,7 +40,7 @@ namespace API.Domains
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnention"].ToString());
+                optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
             }
         }
 
@@ -151,6 +151,8 @@ namespace API.Domains
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.Tokien).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Fcms)
