@@ -94,6 +94,14 @@
             public const string Update = Base + "/order/product/";
             public const string Delete = Base + "/order/product/{id}";
         }
+        public static class Orders
+        {
+            public const string GetAll = Base + "/order/";
+            public const string Get = Base + "/order/{id}";
+            public const string Create = Base + "/order/";
+            public const string Update = Base + "/order";
+            public const string Delete = Base + "/order/{id}";
+        }
     }
 
 }

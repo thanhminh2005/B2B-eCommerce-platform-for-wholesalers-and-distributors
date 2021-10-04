@@ -5,6 +5,7 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -32,7 +33,7 @@ namespace API.Services
             return new Response<string>(order.Id.ToString(), "Created");
         }
 
-        public async Task<Response<string>> DeleteOrder(DeleteOrdetRequest request)
+        public async Task<Response<string>> DeleteOrder(DeleteOrderRequest request)
         {
             var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
             if (order != null)
@@ -46,19 +47,62 @@ namespace API.Services
             return new Response<string>("Delete Failed");
         }
 
-        public Task<Response<OrderResponse>> GetOrderById(GetOrderByIdRequest request)
+        public async Task<Response<OrderResponse>> GetOrderById(GetOrderByIdRequest request)
         {
-            throw new NotImplementedException();
+            var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
+            if(order != null)
+            {
+                var response = _mapper.Map<OrderResponse>(order);
+                return new Response<OrderResponse>(response, message: "Succeed");
+            }
+            return new Response<OrderResponse>(message: "Not Found");
         }
 
-        public Task<Response<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request)
+        public async Task<Response<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request)
         {
-            throw new NotImplementedException();
+            var orders = await _unitOfWork.GetRepository<Order>().GetAsync(filter: x =>
+                                                                            (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
+                                                                            && (request.Status == null || x.Status == request.Status)
+                                                                            );
+            if(orders.Count() != 0)
+            {
+                var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+                return new Response<IEnumerable<OrderResponse>>(response, message: "Succeed"); 
+            }
+            return new Response<IEnumerable<OrderResponse>>(message: "Empty");
         }
 
-        public Task<Response<string>> UpdateOrder(UpdateOrderRequest request)
+        public async Task<Response<string>> UpdateOrder(UpdateOrderRequest request)
         {
-            throw new NotImplementedException();
+            var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
+            if (order != null)
+            {
+                order.OrderCost = request.OrderCost;
+                order.SessionId = Guid.Parse(request.SessionId);
+                order.Status = request.Status;
+                order.DateModified = DateTime.UtcNow;
+                _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(request.Id, message: "Updated");
+            }
+            return new Response<string>(message: "Update Failed");
+        }
+
+        public async Task<Response<string>> DeteleOrder(DeleteOrderRequest request)
+        {
+            var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(request.Id));
+            if (order != null)
+            {
+                var products = await _unitOfWork.GetRepository<OrderDetail>().GetAsync(x => x.OrderId.Equals(Guid.Parse(request.Id)));
+                if(products.Count() != 0)
+                {
+                    _unitOfWork.GetRepository<OrderDetail>().DeleteAllAsync(products);
+                }
+                _unitOfWork.GetRepository<Order>().DeleteAsync(order);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(request.Id, message: "Deleted");
+            }
+            return new Response<string>(message: "Delete Failed");
         }
     }
 }

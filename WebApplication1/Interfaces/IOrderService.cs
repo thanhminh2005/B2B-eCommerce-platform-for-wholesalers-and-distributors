@@ -11,6 +11,6 @@ namespace API.Interfaces
         Task<Response<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request);
         Task<Response<OrderResponse>> GetOrderById(GetOrderByIdRequest request);
         Task<Response<string>> UpdateOrder(UpdateOrderRequest request);
-        Task<Response<string>> DeleteOrder(DeleteOrdetRequest request);
+        Task<Response<string>> DeleteOrder(DeleteOrderRequest request);
     }
 }
