@@ -6,6 +6,7 @@ namespace API.DTOs.Orders
     {
         public Guid Id { get; set; }
         public Guid SessionId { get; set; }
+        public Guid DistributorId { get; set; }
         public double OrderCost { get; set; }
         public int Status { get; set; }
     }

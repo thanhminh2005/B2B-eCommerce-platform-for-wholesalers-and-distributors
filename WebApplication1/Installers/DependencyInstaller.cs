@@ -24,6 +24,7 @@ namespace B2B.Installers
             services.AddScoped<IOrderDetailService, OrderDetailService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<ICheckoutService, CheckoutService>();
         }
     }
 }

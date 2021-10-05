@@ -68,9 +68,9 @@ namespace API.Services
 
         public async Task<Response<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
         {
-            var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x => 
-            (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId))) 
-            && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))), 
+            var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x =>
+            (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
+            && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
             orderBy: x => x.OrderByDescending(y => y.DateCreated));
             if (sessions.Count() != 0)
             {
@@ -82,7 +82,7 @@ namespace API.Services
         public async Task<Response<string>> UpdateSession(UpdateSessionRequest request)
         {
             var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(Guid.Parse(request.Id));
-            if(session != null)
+            if (session != null)
             {
                 session.DateModified = DateTime.UtcNow;
                 session.PaymentMethodId = Guid.Parse(request.PaymentMethodId);

@@ -111,6 +111,11 @@
             public const string Update = Base + "/session";
             public const string Delete = Base + "/session/{id}";
         }
+
+        public static class Checkouts
+        {
+            public const string Confirm = Base + "/checkout/";
+        }
     }
 
 }
