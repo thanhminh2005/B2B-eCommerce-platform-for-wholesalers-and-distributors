@@ -1,9 +1,11 @@
-﻿using API.DTOs.Sessions;
+﻿using API.Domains;
+using API.DTOs.Sessions;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -19,29 +21,83 @@ namespace API.Services
             _mapper = mapper;
         }
 
-        public Task<Response<string>> CreateSession(CreateSessionRequest request)
+        public async Task<Response<string>> CreateSession(CreateSessionRequest request)
         {
-            throw new NotImplementedException();
+            var session = new Session();
+            session = _mapper.Map<Session>(request);
+            session.Id = Guid.NewGuid();
+            session.DateCreated = DateTime.UtcNow;
+            session.Status = 1;
+            await _unitOfWork.GetRepository<Session>().AddAsync(session);
+            await _unitOfWork.SaveAsync();
+            return new Response<string>(session.Id.ToString(), message: "Created");
         }
 
-        public Task<Response<string>> DeleteSession(DeleteSessionRequest request)
+        public async Task<Response<string>> DeleteSession(DeleteSessionRequest request)
         {
-            throw new NotImplementedException();
+            var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(Guid.Parse(request.Id));
+            if (session != null)
+            {
+                var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(Guid.Parse(request.Id)));
+                if (orders.Count() != 0)
+                {
+                    foreach (var order in orders)
+                    {
+                        var products = await _unitOfWork.GetRepository<OrderDetail>().GetAsync(x => x.OrderId.Equals(order.Id));
+                        _unitOfWork.GetRepository<OrderDetail>().DeleteAllAsync(products);
+                    }
+                    _unitOfWork.GetRepository<Order>().DeleteAllAsync(orders);
+
+                }
+                _unitOfWork.GetRepository<Session>().DeleteAsync(session);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(request.Id, message: "Deleted");
+            }
+            return new Response<string>(message: "Delete Failed");
         }
 
-        public Task<Response<SessionResponse>> GetSessionById(GetSessionByIdRequest request)
+        public async Task<Response<SessionResponse>> GetSessionById(GetSessionByIdRequest request)
         {
-            throw new NotImplementedException();
+            var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(Guid.Parse(request.Id));
+            if (session != null)
+            {
+                return new Response<SessionResponse>(_mapper.Map<SessionResponse>(session), message: "Succeed");
+            }
+            return new Response<SessionResponse>(message: "Not Found");
         }
 
-        public Task<Response<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
+        public async Task<Response<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
         {
-            throw new NotImplementedException();
+            var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x => 
+            (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId))) 
+            && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))), 
+            orderBy: x => x.OrderByDescending(y => y.DateCreated));
+            if (sessions.Count() != 0)
+            {
+                return new Response<IEnumerable<SessionResponse>>(_mapper.Map<IEnumerable<SessionResponse>>(sessions), message: "Succeed");
+            }
+            return new Response<IEnumerable<SessionResponse>>(message: "Empty");
         }
 
-        public Task<Response<string>> UpdateSession(UpdateSessionRequest request)
+        public async Task<Response<string>> UpdateSession(UpdateSessionRequest request)
         {
-            throw new NotImplementedException();
+            var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(Guid.Parse(request.Id));
+            if(session != null)
+            {
+                session.DateModified = DateTime.UtcNow;
+                session.PaymentMethodId = Guid.Parse(request.PaymentMethodId);
+                session.ShippingAddress = request.ShippingAddress;
+                session.Status = request.Status;
+                session.TotalCost = request.TotalCost;
+                _unitOfWork.GetRepository<Session>().UpdateAsync(session);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(request.Id, message: "Updated");
+            }
+            return new Response<string>(message: "Update Failed");
+
+
+
+
         }
     }
 }

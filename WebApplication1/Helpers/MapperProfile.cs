@@ -8,6 +8,7 @@ using API.DTOs.Products;
 using API.DTOs.RetailerPaymentMethods;
 using API.DTOs.Retailers;
 using API.DTOs.Roles;
+using API.DTOs.Sessions;
 using API.DTOs.Users;
 using AutoMapper;
 
@@ -49,6 +50,9 @@ namespace API.Helpers
 
             CreateMap<Order, CreateOrderRequest>().ReverseMap();
             CreateMap<Order, OrderResponse>().ReverseMap();
+
+            CreateMap<Session, CreateSessionRequest>().ReverseMap();
+            CreateMap<Session, SessionResponse>().ReverseMap();
         }
     }
 }
