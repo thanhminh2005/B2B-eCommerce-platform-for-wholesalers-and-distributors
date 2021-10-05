@@ -102,6 +102,15 @@
             public const string Update = Base + "/order";
             public const string Delete = Base + "/order/{id}";
         }
+
+        public static class Sessions
+        {
+            public const string GetAll = Base + "/session/";
+            public const string Get = Base + "/session/{id}";
+            public const string Create = Base + "/session/";
+            public const string Update = Base + "/session";
+            public const string Delete = Base + "/session/{id}";
+        }
     }
 
 }
