@@ -1,4 +1,5 @@
 ﻿using API.Domains;
+using API.DTOs.Categories;
 using API.DTOs.Products;
 using API.Helpers;
 using API.Interfaces;
@@ -59,7 +60,17 @@ namespace API.Services
                                                                                       orderBy: x => x.OrderBy(y => y.Name));
 
             var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-            var response = _mapper.Map<IEnumerable<ProductResponse>>(products);
+
+            List<ProductResponse> response = new List<ProductResponse>();
+            foreach (var product in products)
+            {
+                var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
+                CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
+                ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                CurProduct.Category = CurCategory;
+                response.Add(CurProduct);
+            }
+
             return new PagedResponse<IEnumerable<ProductResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
         //View by Retailer
@@ -69,9 +80,18 @@ namespace API.Services
                                                                                       request.PageSize,
                                                                                       filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
                                                                                       orderBy: x => x.OrderBy(y => y.Name));
-
+            
             var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
+           
+            List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
+            foreach (var product in products)
+            {
+                var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
+                CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
+                RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Category = CurCategory;
+                response.Add(CurProduct);
+            }
             return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
 
@@ -82,7 +102,11 @@ namespace API.Services
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.Id));
                 if (product != null && product.IsActive != false)
                 {
-                    return new Response<ProductResponse>(_mapper.Map<ProductResponse>(product), message: "Succeed");
+                    var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
+                    CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
+                    ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                    CurProduct.Category = CurCategory;
+                    return new Response<ProductResponse>(CurProduct, message: "Succeed");
                 }
                 else if (!product.IsActive)
                 {
@@ -108,7 +132,17 @@ namespace API.Services
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                                       && (request.Status == 0 || x.Status.Equals(request.Status)));
-            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
+            
+            List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
+            foreach (var product in products)
+            {
+                var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
+                CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
+                RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Category = CurCategory;
+                response.Add(CurProduct);
+            }
+
             return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
 
@@ -170,8 +204,17 @@ namespace API.Services
             List<Product> products = (List<Product>)await _unitOfWork.GetRepository<Product>().GetAllAsync();
             products = products.GetRandomItems(30);
             int totalcount = await _unitOfWork.GetRepository<Product>().CountAsync();
-            var response = _mapper.Map<IEnumerable<RetailerGetProductsResponse>>(products);
-
+            
+            
+            List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
+            foreach (var product in products)
+            {
+                var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
+                CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
+                RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Category = CurCategory;
+                response.Add(CurProduct);
+            }
             //get all in list, count all, get 10 random number not duplicate, add in list
             return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, 1, 30, totalcount);
         }
