@@ -18,7 +18,9 @@ namespace API.Domains
         public int Status { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
+        public Guid DistributorId { get; set; }
 
+        public virtual Distributor Distributor { get; set; }
         public virtual Session Session { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }

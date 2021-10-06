@@ -244,6 +244,12 @@ namespace API.Domains
 
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
+                entity.HasOne(d => d.Distributor)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.DistributorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Order_Distributor");
+
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.SessionId)
