@@ -16,10 +16,15 @@ namespace API.Domains
         {
         }
 
+        public virtual DbSet<AdministrationAsset> AdministrationAssets { get; set; }
         public virtual DbSet<Banner> Banners { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<CustomerRank> CustomerRanks { get; set; }
         public virtual DbSet<Distributor> Distributors { get; set; }
+        public virtual DbSet<Fcm> Fcms { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<Membership> Memberships { get; set; }
+        public virtual DbSet<MembershipRank> MembershipRanks { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -42,6 +47,19 @@ namespace API.Domains
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<AdministrationAsset>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("AdministrationAsset");
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
 
             modelBuilder.Entity<Banner>(entity =>
             {
@@ -77,6 +95,36 @@ namespace API.Domains
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.Parent)
+                    .WithMany(p => p.InverseParent)
+                    .HasForeignKey(d => d.ParentId)
+                    .HasConstraintName("FK_Category_Category");
+            });
+
+            modelBuilder.Entity<CustomerRank>(entity =>
+            {
+                entity.ToTable("CustomerRank");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Distributor)
+                    .WithMany(p => p.CustomerRanks)
+                    .HasForeignKey(d => d.DistributorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CustomerRank_Distributor");
+
+                entity.HasOne(d => d.MembershipRank)
+                    .WithMany(p => p.CustomerRanks)
+                    .HasForeignKey(d => d.MembershipRankId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CustomerRank_MembershipRank");
             });
 
             modelBuilder.Entity<Distributor>(entity =>
@@ -94,6 +142,23 @@ namespace API.Domains
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Distributor_User");
+            });
+
+            modelBuilder.Entity<Fcm>(entity =>
+            {
+                entity.ToTable("FCM");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.Tokien).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Fcms)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_FCM_User");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -125,6 +190,50 @@ namespace API.Domains
                     .HasConstraintName("FK_Feedback_Retailer");
             });
 
+            modelBuilder.Entity<Membership>(entity =>
+            {
+                entity.ToTable("Membership");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Distributor)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.DistributorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_Distributor");
+
+                entity.HasOne(d => d.MembershipRank)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.MembershipRankId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_MembershipRank");
+
+                entity.HasOne(d => d.Retailer)
+                    .WithMany(p => p.Memberships)
+                    .HasForeignKey(d => d.RetailerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Membership_Retailer");
+            });
+
+            modelBuilder.Entity<MembershipRank>(entity =>
+            {
+                entity.ToTable("MembershipRank");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.Property(e => e.RankName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.ToTable("Order");
@@ -134,6 +243,12 @@ namespace API.Domains
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Distributor)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.DistributorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Order_Distributor");
 
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.Orders)
@@ -175,7 +290,9 @@ namespace API.Domains
 
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Description).IsRequired();
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Price>(entity =>
@@ -292,6 +409,12 @@ namespace API.Domains
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
                 entity.Property(e => e.ShippingAddress).IsRequired();
+
+                entity.HasOne(d => d.PaymentMethod)
+                    .WithMany(p => p.Sessions)
+                    .HasForeignKey(d => d.PaymentMethodId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Session_PaymentMethod");
 
                 entity.HasOne(d => d.Retailer)
                     .WithMany(p => p.Sessions)

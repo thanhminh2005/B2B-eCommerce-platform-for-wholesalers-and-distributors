@@ -7,7 +7,7 @@ namespace API.DTOs.Categories
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public Guid? Parent { get; set; }
-        public IList<CategoryHierachy> SubCategories { get; set; }
+        public Guid? ParentId { get; set; }
+        public CategoryHierachy Parent { get; set; }
     }
 }
