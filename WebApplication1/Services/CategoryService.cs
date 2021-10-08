@@ -44,15 +44,16 @@ namespace API.Services
             return new Response<string>(message: "Failed to Create");
         }
 
-        public async Task<Response<IEnumerable<TreeItem<Category>>>> GetCategories()
+        public async Task<Response<IEnumerable<TreeItem<CategoryResponse>>>> GetCategories()
         {
             var allCategories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
             if (allCategories != null)
             {
-                var root = allCategories.GenerateTree(x => x.Id, y => y.ParentId);
-                return new Response<IEnumerable<TreeItem<Category>>>(root);
+                var allCatergoryResponse = _mapper.Map<IEnumerable<CategoryResponse>>(allCategories);
+                var root = allCatergoryResponse.GenerateTree(x => x.Id, y => y.ParentId);
+                return new Response<IEnumerable<TreeItem<CategoryResponse>>>(root);
             }
-            return new Response<IEnumerable<TreeItem<Category>>>(message: "Empty");
+            return new Response<IEnumerable<TreeItem<CategoryResponse>>>(message: "Empty");
         }
 
         public async Task<Response<CategoryHierachy>> GetCategoryById(GetCategoryByIdRequest request)

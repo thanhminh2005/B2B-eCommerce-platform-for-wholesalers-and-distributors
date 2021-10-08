@@ -4,6 +4,7 @@ using API.DTOs.Distributors;
 using API.DTOs.OrderDetails;
 using API.DTOs.Orders;
 using API.DTOs.PaymentMethods;
+using API.DTOs.Prices;
 using API.DTOs.Products;
 using API.DTOs.RetailerPaymentMethods;
 using API.DTOs.Retailers;
@@ -53,6 +54,9 @@ namespace API.Helpers
 
             CreateMap<Session, CreateSessionRequest>().ReverseMap();
             CreateMap<Session, SessionResponse>().ReverseMap();
+
+            CreateMap<Price, PriceResponse>().ReverseMap();
+            CreateMap<Price, CreatePriceRequest>().ReverseMap();
         }
     }
 }

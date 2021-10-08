@@ -116,6 +116,15 @@
         {
             public const string Confirm = Base + "/checkout/";
         }
+
+        public static class Prices
+        {
+            public const string GetAll = Base + "/product/{productId}/price/";
+            public const string Get = Base + "/product/price/{id}";
+            public const string Create = Base + "/product/price/";
+            public const string Update = Base + "/product/price";
+            public const string Delete = Base + "/product/price/{id}";
+        }
     }
 
 }
