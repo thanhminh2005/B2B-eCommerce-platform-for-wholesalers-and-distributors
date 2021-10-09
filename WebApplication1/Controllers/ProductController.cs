@@ -126,6 +126,7 @@ namespace API.Controllers
             }
             return BadRequest(response);
         }
+
         [HttpDelete(ApiRoute.Products.Delete)]
         public async Task<IActionResult> Delete([FromBody] RemoveProductRequest request)
         {

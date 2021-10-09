@@ -1,4 +1,5 @@
 using API.Domains;
+using API.DTOs.Banners;
 using API.DTOs.Categories;
 using API.DTOs.Distributors;
 using API.DTOs.OrderDetails;
@@ -57,6 +58,10 @@ namespace API.Helpers
 
             CreateMap<Price, PriceResponse>().ReverseMap();
             CreateMap<Price, CreatePriceRequest>().ReverseMap();
+
+            CreateMap<Banner, BannerResponse>().ReverseMap();
+            CreateMap<Banner, CreateBannerRequest>().ReverseMap();
+            CreateMap<Banner, UpdateBannerRequest>().ReverseMap();
         }
     }
 }
