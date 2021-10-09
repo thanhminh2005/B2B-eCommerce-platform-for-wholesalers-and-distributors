@@ -1,4 +1,5 @@
-﻿using API.DTOs.Banners;
+﻿using API.Domains;
+using API.DTOs.Banners;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
@@ -12,29 +13,118 @@ namespace API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public Task<Response<string>> CreateBanner(CreateBannerRequest request)
+
+        public BannerService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public Task<Response<string>> DeleteBanner(DeleteBannerRequest request)
+        public async Task<Response<string>> CreateBanner(CreateBannerRequest request)
         {
-            throw new NotImplementedException();
+            if (request != null)
+            {
+                var banner = await _unitOfWork.GetRepository<Banner>().FirstAsync(x => x.Name.Equals(request.Name));
+                if (banner == null)
+                {
+                    var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
+                    if (distributor == null)
+                    {
+                        return new Response<string>(message: "Distributor is not existed ");
+                    }
+                    else if (distributor.IsActive)
+                    {
+                        Banner newBanner = _mapper.Map<Banner>(request);
+                        newBanner.Id = Guid.NewGuid();
+                        newBanner.DistributorId = Guid.Parse(request.DistributorId);
+                        newBanner.DateCreated = DateTime.UtcNow;
+                        
+                        await _unitOfWork.GetRepository<Banner>().AddAsync(newBanner);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(newBanner.Name, message: "Banner created successfully ");
+                    }
+                    return new Response<string>(message: "Distributor is removed ");
+                }
+                return new Response<string>(message: "Banner is existed");
+            }
+            return new Response<string>(message: "Failed to create banner");
         }
 
-        public Task<Response<BannerResponse>> GetBannerById(GetBannerByIdRequest request)
+        public async Task<Response<string>> DeleteBanner(DeleteBannerRequest request)
         {
-            throw new NotImplementedException();
+            var banner = await _unitOfWork.GetRepository<Banner>().GetByIdAsync(Guid.Parse(request.Id));
+            if (banner != null)
+            {
+                _unitOfWork.GetRepository<Banner>().DeleteAsync(banner);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(banner.Id.ToString(), "Banner deleted successfully");
+            }
+            return new Response<string>("Banner deleted failed");
         }
 
-        public Task<Response<IEnumerable<BannerResponse>>> GetBanners()
+        public async Task<Response<BannerResponse>> GetBannerById(GetBannerByIdRequest request)
         {
-            throw new NotImplementedException();
+            var banner = await _unitOfWork.GetRepository<Banner>().GetByIdAsync(Guid.Parse(request.Id));
+
+            if (banner != null)
+            {
+                return new Response<BannerResponse>(_mapper.Map<BannerResponse>(banner), message: "Success");
+            }
+            return new Response<BannerResponse>("Banner Not Found");
         }
 
-        public Task<Response<string>> UpdateBanner(UpdateBannerRequest request)
+        public async Task<Response<IEnumerable<BannerResponse>>> GetBanners()
         {
-            throw new NotImplementedException();
+            var banners = await _unitOfWork.GetRepository<Banner>().GetAllAsync();
+            var count = await _unitOfWork.GetRepository<Banner>().CountAsync();
+            if (count != 0)
+            {
+                return new Response<IEnumerable<BannerResponse>>(_mapper.Map<IEnumerable<BannerResponse>>(banners), message: "Success");
+            }
+            return new Response<IEnumerable<BannerResponse>>(message: "Empty");
+        }
+
+        public async Task<Response<IEnumerable<BannerResponse>>> GetBannersByDistributor(GetBannerByDistributorRequest request)
+        {
+            var banners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+            var count = await _unitOfWork.GetRepository<Banner>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+            if (count != 0)
+            {
+                var response = _mapper.Map<IEnumerable<BannerResponse>>(banners);
+                return new Response<IEnumerable<BannerResponse>>(response, message: "Success");
+            }
+            return new Response<IEnumerable<BannerResponse>>(message: "Empty");
+        }
+
+        public async Task<Response<string>> UpdateBanner(UpdateBannerRequest request)
+        {
+            if (request != null)
+            {
+                if (!string.IsNullOrWhiteSpace(request.Id))
+                {
+                    Banner newBanner = await _unitOfWork.GetRepository<Banner>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+                    var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
+                    if (distributor == null)
+                    {
+                        return new Response<string>(message: "Distributor is not existed ");
+                    }
+                    else if (distributor.IsActive)
+                    {
+                        newBanner.DistributorId = Guid.Parse(request.DistributorId);
+                        newBanner.Name = request.Name;
+                        newBanner.Image = request.Image;
+                        newBanner.Position = request.Position;
+                        newBanner.DateModified = DateTime.UtcNow;
+                        _unitOfWork.GetRepository<Banner>().UpdateAsync(newBanner);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(newBanner.Id.ToString(), message: "Banner is updated");
+                    }
+                    
+                    return new Response<string>(message: "Distributor is removed ");
+                }
+                return new Response<string>(message: "Banner ID can not be blanked");
+            }
+            return new Response<string>(message: "Fail to update banner");
         }
     }
 }

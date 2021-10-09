@@ -198,14 +198,12 @@ namespace API.Services
             }
             return new Response<string>(message: "Fail to update product");
         }
-
+        //get 30 random product
         public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation()
         {
             List<Product> products = (List<Product>)await _unitOfWork.GetRepository<Product>().GetAllAsync();
             products = products.GetRandomItems(30);
             int totalcount = await _unitOfWork.GetRepository<Product>().CountAsync();
-            
-            
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {
