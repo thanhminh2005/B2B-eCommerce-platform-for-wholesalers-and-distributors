@@ -27,6 +27,7 @@ namespace B2B.Installers
             services.AddScoped<ICheckoutService, CheckoutService>();
             services.AddScoped<IPriceService, PriceService>();
             services.AddScoped<IMembershipRankService, MembershipRankService>();
+            services.AddScoped<IBannerService, BannerService>();
         }
     }
 }

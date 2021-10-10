@@ -69,6 +69,15 @@
             public const string Recommendation = Base + "/Product/Recommendation";
         }
 
+        public static class Banners
+        {
+            public const string Create = Base + "/Banner";
+            public const string Get = Base + "/Banner/{id}";
+            public const string GetAll = Base + "/Banner/";
+            public const string GetDistributor = Base + "/Distributor/{id}/Banner";
+            public const string Update = Base + "/Banner/";
+            public const string Delete = Base + "/Banner/";
+        }
         public static class PaymentMethods
         {
             public const string GetAll = Base + "/payment-method/";
