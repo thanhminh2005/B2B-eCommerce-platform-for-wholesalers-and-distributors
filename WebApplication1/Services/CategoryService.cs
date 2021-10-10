@@ -6,7 +6,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static API.Helpers.TreeExtensions;
 
@@ -67,7 +66,7 @@ namespace API.Services
                     var response = _mapper.Map<CategoryHierachy>(category);
                     var result = response;
                     while (response.ParentId != null)
-                    {   
+                    {
                         var parent = _mapper.Map<CategoryHierachy>(await _unitOfWork.GetRepository<Category>().GetByIdAsync((response.ParentId)));
                         response.Parent = parent;
                         response = parent;
