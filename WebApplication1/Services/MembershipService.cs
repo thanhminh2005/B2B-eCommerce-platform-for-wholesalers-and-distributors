@@ -39,12 +39,12 @@ namespace API.Services
 
         public async Task<Response<MembershipResponse>> GetMembershipById(GetMembershipByIdRequest request)
         {
-                var membership = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId))
-                                                                                               && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
-                if (membership != null)
-                {
-                    return new Response<MembershipResponse>(_mapper.Map<MembershipResponse>(membership), message: "Success");
-                }
+            var membership = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId))
+                                                                                           && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
+            if (membership != null)
+            {
+                return new Response<MembershipResponse>(_mapper.Map<MembershipResponse>(membership), message: "Success");
+            }
             return new Response<MembershipResponse>(message: "Not found");
         }
 

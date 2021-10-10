@@ -28,7 +28,7 @@ namespace API.Controllers
         }
 
         [HttpGet(ApiRoute.Memberships.Get)]
-        public async Task<IActionResult> Get([FromRoute(Name = "distributor-id")]string distributorId, [FromRoute(Name = "retailer-id")] string retailerId)
+        public async Task<IActionResult> Get([FromRoute(Name = "distributor-id")] string distributorId, [FromRoute(Name = "retailer-id")] string retailerId)
         {
             GetMembershipByIdRequest request = new GetMembershipByIdRequest
             {

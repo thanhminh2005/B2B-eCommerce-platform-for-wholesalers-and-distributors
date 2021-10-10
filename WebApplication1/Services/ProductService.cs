@@ -80,9 +80,9 @@ namespace API.Services
                                                                                       request.PageSize,
                                                                                       filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
                                                                                       orderBy: x => x.OrderBy(y => y.Name));
-            
+
             var totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-           
+
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {
@@ -132,7 +132,7 @@ namespace API.Services
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                                       && (request.Status == 0 || x.Status.Equals(request.Status)));
-            
+
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {

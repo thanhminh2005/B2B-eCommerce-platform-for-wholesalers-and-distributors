@@ -5,7 +5,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -26,10 +25,10 @@ namespace API.Services
             var price = await _unitOfWork.GetRepository<Price>().FirstAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId))
                                                                                  && x.Volume == request.Volume);
             var count = await _unitOfWork.GetRepository<Price>().CountAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)));
-            if(price == null && count <= 5)
+            if (price == null && count <= 5)
             {
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.ProductId));
-                if(product != null)
+                if (product != null)
                 {
                     if (product.MinQuantity <= request.Volume)
                     {
@@ -48,7 +47,7 @@ namespace API.Services
         public async Task<Response<string>> DeletePrice(DeletePriceRequest request)
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
-            if(price != null)
+            if (price != null)
             {
                 _unitOfWork.GetRepository<Price>().DeleteAsync(price);
                 await _unitOfWork.SaveAsync();
@@ -61,12 +60,12 @@ namespace API.Services
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
 
-            if(price != null)
+            if (price != null)
             {
                 return new Response<PriceResponse>(_mapper.Map<PriceResponse>(price), message: "Succeed");
             }
             return new Response<PriceResponse>("Not Found");
-        } 
+        }
 
         public async Task<Response<IEnumerable<PriceResponse>>> GetPrices(GetPricesRequest request)
         {
@@ -82,7 +81,7 @@ namespace API.Services
         public async Task<Response<string>> UpdatePrice(UpdatePriceRequest request)
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
-            if(price != null)
+            if (price != null)
             {
                 price.Value = request.Value;
                 price.Volume = request.Volume;
