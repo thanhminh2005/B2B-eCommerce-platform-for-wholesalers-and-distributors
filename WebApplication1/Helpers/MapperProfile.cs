@@ -1,6 +1,7 @@
 using API.Domains;
 using API.DTOs.Banners;
 using API.DTOs.Categories;
+using API.DTOs.CustomerRanks;
 using API.DTOs.Distributors;
 using API.DTOs.MembershipRanks;
 using API.DTOs.OrderDetails;
@@ -60,12 +61,15 @@ namespace API.Helpers
             CreateMap<Price, PriceResponse>().ReverseMap();
             CreateMap<Price, CreatePriceRequest>().ReverseMap();
 
-            CreateMap<MembershipRank, MembershipRankResponse>().ReverseMap();
-            CreateMap<MembershipRank, CreateMembershipRankRequest>().ReverseMap();
-
             CreateMap<Banner, BannerResponse>().ReverseMap();
             CreateMap<Banner, CreateBannerRequest>().ReverseMap();
             CreateMap<Banner, UpdateBannerRequest>().ReverseMap();
+
+            CreateMap<MembershipRank, MembershipRankResponse>().ReverseMap();
+            CreateMap<MembershipRank, CreateMembershipRankRequest>().ReverseMap();
+
+            CreateMap<CustomerRank, CustomerRankResponse>().ReverseMap();
+            CreateMap<CustomerRank, CreateCustomerRankRequest>().ReverseMap();
         }
     }
 }

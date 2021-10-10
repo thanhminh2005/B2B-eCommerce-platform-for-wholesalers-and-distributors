@@ -143,6 +143,15 @@
             public const string Update = Base + "/membership-rank";
             public const string Delete = Base + "/membership-rank/{id}";
         }
+
+        public static class CustomerRanks
+        {
+            public const string GetAll = Base + "/distributor/customer-rank";
+            public const string Get = Base + "/distributor/customer-rank/{id}";
+            public const string Create = Base + "/distributor/customer-rank/";
+            public const string Update = Base + "/distributor/customer-rank";
+            public const string Delete = Base + "/distributor/customer-rank/{id}";
+        }
     }
 
 }
