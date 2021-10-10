@@ -29,6 +29,7 @@ namespace B2B.Installers
             services.AddScoped<IMembershipRankService, MembershipRankService>();
             services.AddScoped<ICustomerRankService, CustomerRankService>();
             services.AddScoped<IBannerService, BannerService>();
+            services.AddScoped<IMembershipService, MembershipService>();
         }
     }
 }

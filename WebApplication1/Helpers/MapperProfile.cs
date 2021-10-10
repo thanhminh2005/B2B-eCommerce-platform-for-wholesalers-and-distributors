@@ -4,6 +4,7 @@ using API.DTOs.Categories;
 using API.DTOs.CustomerRanks;
 using API.DTOs.Distributors;
 using API.DTOs.MembershipRanks;
+using API.DTOs.Memberships;
 using API.DTOs.OrderDetails;
 using API.DTOs.Orders;
 using API.DTOs.PaymentMethods;
@@ -70,6 +71,9 @@ namespace API.Helpers
 
             CreateMap<CustomerRank, CustomerRankResponse>().ReverseMap();
             CreateMap<CustomerRank, CreateCustomerRankRequest>().ReverseMap();
+
+            CreateMap<Membership, MembershipResponse>().ReverseMap();
+            CreateMap<Membership, CreateMembershipRequest>().ReverseMap();
         }
     }
 }

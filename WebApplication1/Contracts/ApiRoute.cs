@@ -152,6 +152,15 @@
             public const string Update = Base + "/distributor/customer-rank";
             public const string Delete = Base + "/distributor/customer-rank/{id}";
         }
+
+        public static class Memberships
+        {
+            public const string GetAll = Base + "/membership/";
+            public const string Get = Base + "/membership/distributor/{distributor-id}/customer/{retailer-id}";
+            public const string Create = Base + "/membership/";
+            public const string Update = Base + "/membership";
+            public const string Delete = Base + "/membership/{id}";
+        }
     }
 
 }
