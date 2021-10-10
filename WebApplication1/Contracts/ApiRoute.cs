@@ -125,6 +125,15 @@
             public const string Update = Base + "/product/price";
             public const string Delete = Base + "/product/price/{id}";
         }
+
+        public static class MembershipRanks
+        {
+            public const string GetAll = Base + "/membership-rank/";
+            public const string Get = Base + "/membership-rank/{id}";
+            public const string Create = Base + "/membership-rank/";
+            public const string Update = Base + "/membership-rank";
+            public const string Delete = Base + "/membership-rank/{id}";
+        }
     }
 
 }
