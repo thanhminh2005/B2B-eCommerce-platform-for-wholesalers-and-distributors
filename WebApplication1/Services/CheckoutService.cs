@@ -27,6 +27,12 @@ namespace API.Services
             {
                 if (request.Cart.Count() != 0)
                 {
+                    var paymentMethod = await _unitOfWork.GetRepository<PaymentMethod>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.PaymentMethodId)));
+                    var status = 1;
+                    if (paymentMethod.Name.Equals("COD"))
+                    {
+                        status = 2;
+                    }
                     var session = new Session
                     {
                         DateCreated = DateTime.UtcNow,
@@ -34,11 +40,11 @@ namespace API.Services
                         PaymentMethodId = Guid.Parse(request.PaymentMethodId),
                         RetailerId = Guid.Parse(request.RetailerId),
                         ShippingAddress = request.ShippingAddress,
-                        Status = 1,
+                        Status = status,
                         TotalCost = 0,
                     };
-
                     await _unitOfWork.GetRepository<Session>().AddAsync(session);
+                    
                     var orders = new List<Guid>();
                     double sessionCost = 0;
                     foreach (var product in request.Cart)
@@ -55,7 +61,7 @@ namespace API.Services
                                     DistributorId = productDetail.DistributorId,
                                     OrderCost = 0,
                                     SessionId = session.Id,
-                                    Status = 1
+                                    Status = status
                                 };
                                 orders.Add(order.Id);
                                 await _unitOfWork.GetRepository<Order>().AddAsync(order);
@@ -86,6 +92,7 @@ namespace API.Services
                                     await _unitOfWork.GetRepository<OrderDetail>().AddAsync(orderDetail);
                                     var orderPriceUpdateObj = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderid);
                                     orderPriceUpdateObj.OrderCost += orderPrice;
+                                    
                                     sessionCost += orderPrice;
                                     _unitOfWork.GetRepository<Order>().UpdateAsync(orderPriceUpdateObj);
                                 }
