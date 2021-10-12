@@ -9,6 +9,6 @@
         public int Status { get; set; }
         public string Description { get; set; }
         public int MinQuantity { get; set; }
-
+        public double Price { get; set; }
     }
 }
