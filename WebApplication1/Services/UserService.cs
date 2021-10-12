@@ -136,6 +136,7 @@ namespace API.Services
                 user.Email = request.Email;
                 user.PhoneNumber = request.PhoneNumber;
                 user.Sex = request.Sex;
+                user.IsActive = request.IsActive;
                 user.DateModified = DateTime.UtcNow;
                 _unitOfWork.GetRepository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveAsync();

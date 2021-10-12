@@ -26,11 +26,11 @@ namespace API.Services
                                                                                  && x.Volume == request.Volume);
             var count = await _unitOfWork.GetRepository<Price>().CountAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)));
 
-            if(count > 5)
+            if (count > 5)
             {
                 return new Response<string>("Product can only have 5 different prices at maximum");
             }
-            else if(price == null && count <= 5)
+            else if (price == null && count <= 5)
             {
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.ProductId));
                 if (product != null)
@@ -91,7 +91,7 @@ namespace API.Services
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
             var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
-            if(price != null)
+            if (price != null)
             {
                 if (product.MinQuantity <= request.Volume)
                 {

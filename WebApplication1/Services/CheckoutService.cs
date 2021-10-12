@@ -27,6 +27,12 @@ namespace API.Services
             {
                 if (request.Cart.Count() != 0)
                 {
+                    var status = 1;
+                    var paymentMethod = await _unitOfWork.GetRepository<PaymentMethod>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.PaymentMethodId)));
+                    if (paymentMethod.Name.Equals("COD"))
+                    {
+                        status = 2;
+                    }
                     var session = new Session
                     {
                         DateCreated = DateTime.UtcNow,
@@ -34,19 +40,19 @@ namespace API.Services
                         PaymentMethodId = Guid.Parse(request.PaymentMethodId),
                         RetailerId = Guid.Parse(request.RetailerId),
                         ShippingAddress = request.ShippingAddress,
-                        Status = 1,
+                        Status = status,
                         TotalCost = 0,
                     };
-
                     await _unitOfWork.GetRepository<Session>().AddAsync(session);
-                    var orders = new List<Guid>();
+
+                    var orders = new List<Order>();
                     double sessionCost = 0;
                     foreach (var product in request.Cart)
                     {
                         var productDetail = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(product.Id));
                         if (productDetail != null)
                         {
-                            if (!orders.Contains(productDetail.DistributorId))
+                            if (!orders.Exists(x => x.DistributorId.Equals(productDetail.DistributorId)))
                             {
                                 var order = new Order
                                 {
@@ -55,10 +61,10 @@ namespace API.Services
                                     DistributorId = productDetail.DistributorId,
                                     OrderCost = 0,
                                     SessionId = session.Id,
-                                    Status = 1
+                                    Status = status
                                 };
-                                orders.Add(order.Id);
                                 await _unitOfWork.GetRepository<Order>().AddAsync(order);
+                                orders.Add(order);
                             }
                             var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(productDetail.Id));
                             double orderPrice = 0;
@@ -69,27 +75,48 @@ namespace API.Services
                                     orderPrice = price.Value * product.Quantity;
                                 }
                             }
-                            foreach (var orderid in orders)
+                            foreach (var order in orders)
                             {
-                                if (productDetail.DistributorId.Equals(orderid))
+                                if (productDetail.DistributorId.Equals(order))
                                 {
                                     var orderDetail = new OrderDetail
                                     {
                                         DateCreated = DateTime.UtcNow,
                                         Id = Guid.NewGuid(),
-                                        OrderId = orderid,
+                                        OrderId = order.Id,
                                         OrderPrice = orderPrice,
                                         ProductId = productDetail.Id,
                                         Quantity = product.Quantity
 
                                     };
                                     await _unitOfWork.GetRepository<OrderDetail>().AddAsync(orderDetail);
-                                    var orderPriceUpdateObj = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderid);
-                                    orderPriceUpdateObj.OrderCost += orderPrice;
+                                    order.OrderCost += orderPrice;
                                     sessionCost += orderPrice;
-                                    _unitOfWork.GetRepository<Order>().UpdateAsync(orderPriceUpdateObj);
+                                    _unitOfWork.GetRepository<Order>().UpdateAsync(order);
                                 }
                             }
+                        }
+                    }
+                    var memberships = new List<Membership>();
+                    foreach (var order in orders)
+                    {
+                        var membership = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(order.DistributorId) && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
+                        if (membership == null)
+                        {
+                            var ranks = await _unitOfWork.GetRepository<CustomerRank>()
+                                                          .GetAsync(x => x.DistributorId.Equals(order.DistributorId),
+                                                                          x => x.OrderByDescending(y => y.Threshold));
+                            var rank = ranks.FirstOrDefault(x => x.Threshold < membership.Point);
+                            if (rank != null)
+                            {
+
+                            }
+                            var newMembership = new Membership
+                            {
+                                DateCreated = DateTime.UtcNow,
+                                DistributorId = order.DistributorId,
+                                Point = 0,
+                            };
                         }
                     }
                     session.TotalCost = sessionCost;

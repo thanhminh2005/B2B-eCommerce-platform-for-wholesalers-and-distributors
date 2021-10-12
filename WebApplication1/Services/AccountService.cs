@@ -36,8 +36,13 @@ namespace API.Services
 
             if (user != null)
             {
+
                 if (PasswordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 {
+                    if (!user.IsActive)
+                    {
+                        return new Response<LoginResponse>(message: "This Account has be deactivated");
+                    }
                     JwtSecurityToken jwtSecurityToken = await GenerateJwtToken(user);
                     LoginResponse response = new LoginResponse
                     {
@@ -52,6 +57,7 @@ namespace API.Services
                     };
                     return new Response<LoginResponse>(response, message: "Login Successed");
                 }
+
             }
             return new Response<LoginResponse>(message: "Invalid Username or Password");
         }
