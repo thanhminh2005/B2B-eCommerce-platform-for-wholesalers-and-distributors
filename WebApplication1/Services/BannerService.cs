@@ -136,31 +136,14 @@ namespace API.Services
                         newBanner.Image = request.Image;
                         var ExistedBanners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(newBanner.DistributorId),
                                                                                                 orderBy: x => x.OrderBy(y => y.Position));
-                        Boolean check = false;
                         foreach (Banner banner1 in ExistedBanners)
                         {
                             if (request.Position == banner1.Position && newBanner.Id != banner1.Id)
                             {
-                                check = true;
+                                request.Position = banner1.Position + 1;
                             }
                         }
-                        //case: duplicate with other banner's position
-                        if(check)
-                        {
-                            foreach (Banner banner1 in ExistedBanners)
-                            {
-                                if (request.Position == banner1.Position && newBanner.Id != banner1.Id)
-                                {
-                                    request.Position = banner1.Position + 1;
-                                }
-                            }
-                            newBanner.Position = request.Position;
-                        }
-                        //case: new position or duplicate the position of the previous self
-                        else
-                        {
-                            newBanner.Position = request.Position;
-                        }
+                        newBanner.Position = request.Position;
                         newBanner.DateModified = DateTime.UtcNow;
                         _unitOfWork.GetRepository<Banner>().UpdateAsync(newBanner);
                         await _unitOfWork.SaveAsync();
