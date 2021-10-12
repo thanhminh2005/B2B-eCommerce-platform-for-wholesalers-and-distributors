@@ -11,6 +11,7 @@ namespace API.Domains
         {
             Distributors = new HashSet<Distributor>();
             Fcms = new HashSet<Fcm>();
+            Notifications = new HashSet<Notification>();
             Retailers = new HashSet<Retailer>();
         }
 
@@ -33,6 +34,7 @@ namespace API.Domains
         public virtual Role Role { get; set; }
         public virtual ICollection<Distributor> Distributors { get; set; }
         public virtual ICollection<Fcm> Fcms { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Retailer> Retailers { get; set; }
     }
 }

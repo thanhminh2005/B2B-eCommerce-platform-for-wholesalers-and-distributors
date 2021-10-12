@@ -44,7 +44,7 @@ namespace API.Services
                         TotalCost = 0,
                     };
                     await _unitOfWork.GetRepository<Session>().AddAsync(session);
-                    
+
                     var orders = new List<Order>();
                     double sessionCost = 0;
                     foreach (var product in request.Cart)
@@ -98,11 +98,19 @@ namespace API.Services
                         }
                     }
                     var memberships = new List<Membership>();
-                    foreach(var order in orders)
+                    foreach (var order in orders)
                     {
-                        var membership = _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(order.DistributorId) && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
-                        if(membership == null)
+                        var membership = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(order.DistributorId) && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
+                        if (membership == null)
                         {
+                            var ranks = await _unitOfWork.GetRepository<CustomerRank>()
+                                                          .GetAsync(x => x.DistributorId.Equals(order.DistributorId),
+                                                                          x => x.OrderByDescending(y => y.Threshold));
+                            var rank = ranks.FirstOrDefault(x => x.Threshold < membership.Point);
+                            if (rank != null)
+                            {
+
+                            }
                             var newMembership = new Membership
                             {
                                 DateCreated = DateTime.UtcNow,

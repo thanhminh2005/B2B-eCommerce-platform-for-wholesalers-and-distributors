@@ -25,6 +25,7 @@ namespace API.Domains
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Membership> Memberships { get; set; }
         public virtual DbSet<MembershipRank> MembershipRanks { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -209,7 +210,6 @@ namespace API.Domains
                 entity.HasOne(d => d.MembershipRank)
                     .WithMany(p => p.Memberships)
                     .HasForeignKey(d => d.MembershipRankId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Membership_MembershipRank");
 
                 entity.HasOne(d => d.Retailer)
@@ -232,6 +232,23 @@ namespace API.Domains
                 entity.Property(e => e.RankName)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.ToTable("Notification");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreate).HasColumnType("datetime");
+
+                entity.Property(e => e.Title).HasMaxLength(100);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Notification_User");
             });
 
             modelBuilder.Entity<Order>(entity =>
