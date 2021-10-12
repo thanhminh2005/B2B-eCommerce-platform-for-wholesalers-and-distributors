@@ -66,7 +66,7 @@ namespace API.Services
                             {
                                 if (product.Quantity <= price.Volume)
                                 {
-                                    orderPrice = price.Value;
+                                    orderPrice = price.Value * product.Quantity;
                                 }
                             }
                             foreach (var orderid in orders)

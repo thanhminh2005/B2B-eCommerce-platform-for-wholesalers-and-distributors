@@ -134,6 +134,33 @@
             public const string Update = Base + "/product/price";
             public const string Delete = Base + "/product/price/{id}";
         }
+
+        public static class MembershipRanks
+        {
+            public const string GetAll = Base + "/membership-rank/";
+            public const string Get = Base + "/membership-rank/{id}";
+            public const string Create = Base + "/membership-rank/";
+            public const string Update = Base + "/membership-rank";
+            public const string Delete = Base + "/membership-rank/{id}";
+        }
+
+        public static class CustomerRanks
+        {
+            public const string GetAll = Base + "/distributor/customer-rank";
+            public const string Get = Base + "/distributor/customer-rank/{id}";
+            public const string Create = Base + "/distributor/customer-rank/";
+            public const string Update = Base + "/distributor/customer-rank";
+            public const string Delete = Base + "/distributor/customer-rank/{id}";
+        }
+
+        public static class Memberships
+        {
+            public const string GetAll = Base + "/membership/";
+            public const string Get = Base + "/membership/distributor/{distributor-id}/customer/{retailer-id}";
+            public const string Create = Base + "/membership/";
+            public const string Update = Base + "/membership";
+            public const string Delete = Base + "/membership/{id}";
+        }
     }
 
 }

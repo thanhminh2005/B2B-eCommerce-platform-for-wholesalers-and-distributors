@@ -1,5 +1,4 @@
-﻿using API.Domains;
-using API.DTOs.Categories;
+﻿using API.DTOs.Categories;
 using API.Warppers;
 using System.Collections.Generic;
 using System.Threading.Tasks;

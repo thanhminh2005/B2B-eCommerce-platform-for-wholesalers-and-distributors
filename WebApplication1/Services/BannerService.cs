@@ -149,7 +149,7 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(newBanner.Id.ToString(), message: "Banner is updated");
                     }
-                    
+
                     return new Response<string>(message: "Distributor is removed ");
                 }
                 return new Response<string>(message: "Banner ID can not be blanked");
