@@ -69,7 +69,7 @@ namespace API.Services
         public async Task<Response<IEnumerable<UserResponse>>> GetUsers(GetUsersRequest request)
         {
             var users = await _unitOfWork.GetRepository<User>().GetAllAsync();
-            if (users.Count() != 0)
+            if (users.Any())
             {
                 if (!string.IsNullOrWhiteSpace(request.RoleId))
                 {

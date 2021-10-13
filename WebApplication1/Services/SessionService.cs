@@ -39,7 +39,7 @@ namespace API.Services
             if (session != null)
             {
                 var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(Guid.Parse(request.Id)));
-                if (orders.Count() != 0)
+                if (orders.Any())
                 {
                     foreach (var order in orders)
                     {
@@ -72,7 +72,7 @@ namespace API.Services
             (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
             && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
             orderBy: x => x.OrderByDescending(y => y.DateCreated));
-            if (sessions.Count() != 0)
+            if (sessions.Any())
             {
                 return new Response<IEnumerable<SessionResponse>>(_mapper.Map<IEnumerable<SessionResponse>>(sessions), message: "Succeed");
             }
@@ -94,10 +94,6 @@ namespace API.Services
                 return new Response<string>(request.Id, message: "Updated");
             }
             return new Response<string>(message: "Update Failed");
-
-
-
-
         }
     }
 }

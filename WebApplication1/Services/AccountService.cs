@@ -1,8 +1,10 @@
 ﻿using API.Domains;
 using API.DTOs.Accounts;
+using API.DTOs.Roles;
 using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
+using AutoMapper;
 using B2B.AppSettings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,11 +19,13 @@ namespace API.Services
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         private readonly JwtSettings _jwtSettings;
 
-        public AccountService(IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettings)
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<JwtSettings> jwtSettings)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
             _jwtSettings = jwtSettings.Value;
         }
 
@@ -33,7 +37,7 @@ namespace API.Services
             }
 
             var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username));
-
+            var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(user.RoleId);
             if (user != null)
             {
 
@@ -51,7 +55,7 @@ namespace API.Services
                         Email = user.Email,
                         Id = user.Id,
                         PhoneNumber = user.PhoneNumber,
-                        RoleId = user.RoleId,
+                        Role = _mapper.Map<RoleResponse>(role),
                         Username = user.Username,
                         JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
                     };

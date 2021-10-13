@@ -90,9 +90,9 @@ namespace API.Services
         public async Task<Response<string>> UpdatePrice(UpdatePriceRequest request)
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
-            var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
             if (price != null)
             {
+                var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
                 if (product.MinQuantity <= request.Volume)
                 {
                     price.Value = request.Value;

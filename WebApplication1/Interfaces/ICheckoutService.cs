@@ -6,6 +6,6 @@ namespace API.Interfaces
 {
     public interface ICheckoutService
     {
-        public Task<Response<string>> Checkout(CheckoutRequest request);
+        public Task<Response<CheckOutResponse>> Checkout(CheckoutRequest request);
     }
 }

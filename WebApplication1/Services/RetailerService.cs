@@ -32,7 +32,7 @@ namespace API.Services
                 if (user != null)
                 {
                     var role = await _unitOfWork.GetRepository<Role>().FirstAsync(x => x.Id.Equals(user.RoleId));
-                    if (role.Name.Equals(Authorization.DT))
+                    if (role.Name.Equals(Authorization.RT))
                     {
                         var distributor = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(userId));
                         if (distributor == null)
@@ -70,7 +70,7 @@ namespace API.Services
         public async Task<Response<IEnumerable<RetailerResponse>>> GetRetailers()
         {
             var distributor = await _unitOfWork.GetRepository<Retailer>().GetAllAsync();
-            if (distributor.Count() != 0)
+            if (distributor.Any())
             {
                 distributor = distributor.Where(x => x.IsActive == true);
                 return new Response<IEnumerable<RetailerResponse>>(_mapper.Map<IEnumerable<RetailerResponse>>(distributor), message: "Success");
