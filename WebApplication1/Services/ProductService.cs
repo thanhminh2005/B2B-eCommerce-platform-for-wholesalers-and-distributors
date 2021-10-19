@@ -72,6 +72,8 @@ namespace API.Services
             List<ProductResponse> response = new List<ProductResponse>();
             foreach (var product in products)
             {
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
                 var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
                                                                              orderBy: x => x.OrderBy(y => y.Volume));
@@ -83,6 +85,7 @@ namespace API.Services
                 }
                 CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
                 ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                CurProduct.Distributor = user.Username;
                 CurProduct.Category = CurCategory;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -103,6 +106,8 @@ namespace API.Services
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
                 var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
                                                                              orderBy: x => x.OrderBy(y => y.Volume));
@@ -114,6 +119,7 @@ namespace API.Services
                 }
                 CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Distributor = user.Username;
                 CurProduct.Category = CurCategory;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -128,6 +134,8 @@ namespace API.Services
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.Id));
                 if (product != null && product.IsActive != false)
                 {
+                    var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                    var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
                     var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
                     var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
                                                                              orderBy: x => x.OrderBy(y => y.Volume));
@@ -139,6 +147,7 @@ namespace API.Services
                     }
                     CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
                     ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                    CurProduct.Distributor = user.Username;
                     CurProduct.Category = CurCategory;
                     CurProduct.ListPrice = priceResponses;
                     return new Response<ProductResponse>(CurProduct, message: "Succeed");
@@ -171,6 +180,8 @@ namespace API.Services
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
                 var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
                                                                              orderBy: x => x.OrderBy(y => y.Volume));
@@ -182,6 +193,7 @@ namespace API.Services
                 }
                 CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Distributor = user.Username;
                 CurProduct.Category = CurCategory;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -251,6 +263,8 @@ namespace API.Services
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
             {
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
                 var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(product.CategoryId);
                 var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
                                                                              orderBy: x => x.OrderBy(y => y.Volume));
@@ -262,6 +276,7 @@ namespace API.Services
                 }
                 CategoryResponse CurCategory = _mapper.Map<CategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
+                CurProduct.Distributor = user.Username;
                 CurProduct.Category = CurCategory;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
