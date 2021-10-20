@@ -8,9 +8,8 @@ namespace API.DTOs.Products
     public class RetailerGetProductsResponse
     {
         public Guid Id { get; set; }
-        public Guid DistributorId { get; set; }
-        //public Guid CategoryId { get; set; }
         public SubCategoryResponse SubCategory { get; set; }
+        public string Distributor { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }
