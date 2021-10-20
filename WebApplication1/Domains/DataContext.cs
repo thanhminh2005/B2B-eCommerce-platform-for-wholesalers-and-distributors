@@ -35,6 +35,7 @@ namespace API.Domains
         public virtual DbSet<RetailerPaymentMethod> RetailerPaymentMethods { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Session> Sessions { get; set; }
+        public virtual DbSet<SubCategory> SubCategories { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -96,11 +97,6 @@ namespace API.Domains
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).IsRequired();
-
-                entity.HasOne(d => d.Parent)
-                    .WithMany(p => p.InverseParent)
-                    .HasForeignKey(d => d.ParentId)
-                    .HasConstraintName("FK_Category_Category");
             });
 
             modelBuilder.Entity<CustomerRank>(entity =>
@@ -345,17 +341,17 @@ namespace API.Domains
 
                 entity.Property(e => e.Name).IsRequired();
 
-                entity.HasOne(d => d.Category)
-                    .WithMany(p => p.Products)
-                    .HasForeignKey(d => d.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Product_Category");
-
                 entity.HasOne(d => d.Distributor)
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.DistributorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Product_Distributor");
+
+                entity.HasOne(d => d.SubCategory)
+                    .WithMany(p => p.Products)
+                    .HasForeignKey(d => d.SubCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Product_Category");
             });
 
             modelBuilder.Entity<Retailer>(entity =>
@@ -438,6 +434,25 @@ namespace API.Domains
                     .HasForeignKey(d => d.RetailerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Session_Retailer");
+            });
+
+            modelBuilder.Entity<SubCategory>(entity =>
+            {
+                entity.ToTable("SubCategory");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.SubCategories)
+                    .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubCategory_Category1");
             });
 
             modelBuilder.Entity<User>(entity =>

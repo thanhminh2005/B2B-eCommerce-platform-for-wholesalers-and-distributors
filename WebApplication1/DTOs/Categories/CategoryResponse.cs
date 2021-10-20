@@ -1,4 +1,5 @@
-﻿using System;
+﻿using API.DTOs.SubCategories;
+using System;
 
 namespace API.DTOs.Categories
 {
@@ -6,6 +7,6 @@ namespace API.DTOs.Categories
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public Guid? ParentId { get; set; }
+        public SubCategoryResponse SubCategory { get; set; }
     }
 }

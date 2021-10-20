@@ -2,7 +2,6 @@ using API.Contracts;
 using API.Domains;
 using API.DTOs.Products;
 using API.Interfaces;
-
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -94,9 +93,9 @@ namespace API.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateProductRequest request)
         {
             Product OldProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-            if (string.IsNullOrEmpty(request.CategoryId))
+            if (string.IsNullOrEmpty(request.SubCategoryId))
             {
-                request.CategoryId = OldProduct.CategoryId.ToString();
+                request.SubCategoryId = OldProduct.SubCategoryId.ToString();
             }
             if (string.IsNullOrEmpty(request.Name))
             {

@@ -65,7 +65,7 @@ namespace API.Services
             {
                 payments = payments.Where(x => x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)));
             }
-            if (payments.Count() != 0)
+            if (payments.Any())
             {
                 return new Response<IEnumerable<RetailerPaymentMethodResponse>>(_mapper.Map<IEnumerable<RetailerPaymentMethodResponse>>(payments), message: "Succeed");
             }

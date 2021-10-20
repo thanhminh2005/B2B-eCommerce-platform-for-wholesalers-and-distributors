@@ -1,5 +1,7 @@
 ﻿using API.Domains;
 using API.DTOs.Checkouts;
+using API.DTOs.Orders;
+using API.DTOs.PaymentMethods;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
@@ -21,14 +23,14 @@ namespace API.Services
             _mapper = mapper;
         }
 
-        public async Task<Response<string>> Checkout(CheckoutRequest request)
+        public async Task<Response<CheckOutResponse>> Checkout(CheckoutRequest request)
         {
             if (request != null)
             {
-                if (request.Cart.Count() != 0)
+                if (request.Cart.Any())
                 {
                     var status = 1;
-                    var paymentMethod = await _unitOfWork.GetRepository<PaymentMethod>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.PaymentMethodId)));
+                    var paymentMethod = await _unitOfWork.GetRepository<PaymentMethod>().GetByIdAsync(Guid.Parse(request.PaymentMethodId));
                     if (paymentMethod.Name.Equals("COD"))
                     {
                         status = 2;
@@ -64,6 +66,7 @@ namespace API.Services
                                     Status = status
                                 };
                                 await _unitOfWork.GetRepository<Order>().AddAsync(order);
+                                await _unitOfWork.SaveAsync();
                                 orders.Add(order);
                             }
                             var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(productDetail.Id));
@@ -77,7 +80,7 @@ namespace API.Services
                             }
                             foreach (var order in orders)
                             {
-                                if (productDetail.DistributorId.Equals(order))
+                                if (productDetail.DistributorId.Equals(order.DistributorId))
                                 {
                                     var orderDetail = new OrderDetail
                                     {
@@ -90,42 +93,72 @@ namespace API.Services
 
                                     };
                                     await _unitOfWork.GetRepository<OrderDetail>().AddAsync(orderDetail);
+                                    await _unitOfWork.SaveAsync();
                                     order.OrderCost += orderPrice;
-                                    sessionCost += orderPrice;
                                     _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                                    await _unitOfWork.SaveAsync();
                                 }
+                            }
+                            if (status == 1)
+                            {
+                                productDetail.OrderTime += 1;
+                                _unitOfWork.GetRepository<Product>().UpdateAsync(productDetail);
+                                await _unitOfWork.SaveAsync();
                             }
                         }
                     }
-                    var memberships = new List<Membership>();
                     foreach (var order in orders)
                     {
                         var membership = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(order.DistributorId) && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
                         if (membership == null)
                         {
-                            var ranks = await _unitOfWork.GetRepository<CustomerRank>()
-                                                          .GetAsync(x => x.DistributorId.Equals(order.DistributorId),
-                                                                          x => x.OrderByDescending(y => y.Threshold));
-                            var rank = ranks.FirstOrDefault(x => x.Threshold < membership.Point);
-                            if (rank != null)
-                            {
-
-                            }
                             var newMembership = new Membership
                             {
                                 DateCreated = DateTime.UtcNow,
                                 DistributorId = order.DistributorId,
                                 Point = 0,
+                                RetailerId = Guid.Parse(request.RetailerId),
+                                Id = Guid.NewGuid(),
                             };
+                            membership = newMembership;
                         }
+                        if (status == 1)
+                        {
+                            int point = (int)Math.Floor(order.OrderCost / 1000);
+                            membership.Point += point;
+                            var customerRank = await _unitOfWork.GetRepository<CustomerRank>().GetAllAsync();
+                            if (customerRank.Any())
+                            {
+                                customerRank.OrderBy(x => x.Threshold);
+                                foreach (var rank in customerRank)
+                                {
+                                    if (rank.Threshold <= membership.Point)
+                                    {
+                                        membership.MembershipRankId = rank.Id;
+                                    }
+                                }
+                            }
+                        }
+                        sessionCost += order.OrderCost;
+                        await _unitOfWork.GetRepository<Membership>().AddAsync(membership);
                     }
                     session.TotalCost = sessionCost;
                     _unitOfWork.GetRepository<Session>().UpdateAsync(session);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(session.Id.ToString(), message: "Order Succeed");
+                    var response = new CheckOutResponse
+                    {
+                        DateCreated = session.DateCreated,
+                        OrderResponses = _mapper.Map<List<OrderResponse>>(orders),
+                        PaymentMethod = _mapper.Map<PaymentMethodResponse>(paymentMethod),
+                        RetailerId = Guid.Parse(request.RetailerId),
+                        SessionId = session.Id,
+                        ShippingAddress = request.ShippingAddress,
+                        TotalCost = session.TotalCost
+                    };
+                    return new Response<CheckOutResponse>(response, message: "Order Succeed");
                 }
             }
-            return new Response<string>(message: "Order Failed");
+            return new Response<CheckOutResponse>(message: "Order Failed");
         }
     }
 }

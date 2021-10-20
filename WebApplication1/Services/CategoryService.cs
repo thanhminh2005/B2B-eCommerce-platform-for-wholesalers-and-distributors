@@ -1,13 +1,12 @@
 ﻿using API.Domains;
 using API.DTOs.Categories;
-using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using static API.Helpers.TreeExtensions;
 
 namespace API.Services
 {
@@ -43,39 +42,61 @@ namespace API.Services
             return new Response<string>(message: "Failed to Create");
         }
 
-        public async Task<Response<IEnumerable<TreeItem<CategoryResponse>>>> GetCategories()
+        public async Task<Response<IEnumerable<CategoryResponse>>> GetCategories()
         {
-            var allCategories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
-            if (allCategories != null)
+            var categories = await _unitOfWork.GetRepository<Category>().GetAsync(includeProperties: "SubCategories");
+            if (categories.Any())
             {
-                var allCatergoryResponse = _mapper.Map<IEnumerable<CategoryResponse>>(allCategories);
-                var root = allCatergoryResponse.GenerateTree(x => x.Id, y => y.ParentId);
-                return new Response<IEnumerable<TreeItem<CategoryResponse>>>(root);
+                return new Response<IEnumerable<CategoryResponse>>(_mapper.Map<IEnumerable<CategoryResponse>>(categories), message: "Succeed");
             }
-            return new Response<IEnumerable<TreeItem<CategoryResponse>>>(message: "Empty");
+            return new Response<IEnumerable<CategoryResponse>>(message: "Empty");
         }
 
-        public async Task<Response<CategoryHierachy>> GetCategoryById(GetCategoryByIdRequest request)
+        public async Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request)
         {
-
-            if (!string.IsNullOrWhiteSpace(request.Id))
+            var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.Id));
+            if (category != null)
             {
-                var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.Id));
-                if (category != null)
-                {
-                    var response = _mapper.Map<CategoryHierachy>(category);
-                    var result = response;
-                    while (response.ParentId != null)
-                    {
-                        var parent = _mapper.Map<CategoryHierachy>(await _unitOfWork.GetRepository<Category>().GetByIdAsync((response.ParentId)));
-                        response.Parent = parent;
-                        response = parent;
-                    }
-                    return new Response<CategoryHierachy>(_mapper.Map<CategoryHierachy>(result), message: "Success");
-                }
+                return new Response<CategoryResponse>(_mapper.Map<CategoryResponse>(category), message: "Succeed");
             }
-            return new Response<CategoryHierachy>(message: "Category not Found");
+            return new Response<CategoryResponse>(message: "Not Found");
         }
+
+
+
+        //public async Task<Response<IEnumerable<TreeItem<CategoryResponse>>>> GetCategories()
+        //{
+        //    var allCategories = await _unitOfWork.GetRepository<Category>().GetAllAsync();
+        //    if (allCategories != null)
+        //    {
+        //        var allCatergoryResponse = _mapper.Map<IEnumerable<CategoryResponse>>(allCategories);
+        //        var root = allCatergoryResponse.GenerateTree(x => x.Id, y => y.ParentId);
+        //        return new Response<IEnumerable<TreeItem<CategoryResponse>>>(root);
+        //    }
+        //    return new Response<IEnumerable<TreeItem<CategoryResponse>>>(message: "Empty");
+        //}
+
+        //public async Task<Response<CategoryHierachy>> GetCategoryById(GetCategoryByIdRequest request)
+        //{
+
+        //    if (!string.IsNullOrWhiteSpace(request.Id))
+        //    {
+        //        var category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.Id));
+        //        if (category != null)
+        //        {
+        //            var response = _mapper.Map<CategoryHierachy>(category);
+        //            var result = response;
+        //            while (response.ParentId != null)
+        //            {
+        //                var parent = _mapper.Map<CategoryHierachy>(await _unitOfWork.GetRepository<Category>().GetByIdAsync((response.ParentId)));
+        //                response.Parent = parent;
+        //                response = parent;
+        //            }
+        //            return new Response<CategoryHierachy>(_mapper.Map<CategoryHierachy>(result), message: "Success");
+        //        }
+        //    }
+        //    return new Response<CategoryHierachy>(message: "Category not Found");
+        //}
 
         public async Task<Response<string>> UpdateCategory(UpdateCategoryRequest request)
         {

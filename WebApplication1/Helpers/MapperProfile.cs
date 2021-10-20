@@ -14,6 +14,7 @@ using API.DTOs.RetailerPaymentMethods;
 using API.DTOs.Retailers;
 using API.DTOs.Roles;
 using API.DTOs.Sessions;
+using API.DTOs.SubCategories;
 using API.DTOs.Users;
 using AutoMapper;
 
@@ -33,7 +34,9 @@ namespace API.Helpers
 
             CreateMap<Category, CategoryResponse>().ReverseMap();
             CreateMap<Category, CreateCategoryRequest>().ReverseMap();
-            CreateMap<Category, CategoryHierachy>().ReverseMap();
+
+            CreateMap<SubCategory, SubCategoryResponse>().ReverseMap();
+            CreateMap<SubCategory, CreateSubCategoryRequest>().ReverseMap();
 
             CreateMap<PaymentMethod, PaymentMethodResponse>().ReverseMap();
             CreateMap<PaymentMethod, CreatePaymentMethodRequest>().ReverseMap();

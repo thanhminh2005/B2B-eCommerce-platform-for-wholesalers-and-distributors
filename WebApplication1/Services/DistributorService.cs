@@ -70,7 +70,7 @@ namespace API.Services
         public async Task<Response<IEnumerable<DistributorResponse>>> GetDistributors()
         {
             var distributor = await _unitOfWork.GetRepository<Distributor>().GetAllAsync();
-            if (distributor.Count() != 0)
+            if (distributor.Any())
             {
                 distributor = distributor.Where(x => x.IsActive == true);
                 return new Response<IEnumerable<DistributorResponse>>(_mapper.Map<IEnumerable<DistributorResponse>>(distributor), message: "Success");

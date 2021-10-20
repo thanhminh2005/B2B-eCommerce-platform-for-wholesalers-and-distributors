@@ -1,11 +1,12 @@
-﻿using System;
+﻿using API.DTOs.Roles;
+using System;
 
 namespace API.DTOs.Accounts
 {
     public class LoginResponse
     {
         public Guid Id { get; set; }
-        public Guid RoleId { get; set; }
+        public RoleResponse Role { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
         public string Avatar { get; set; }

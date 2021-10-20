@@ -12,7 +12,7 @@ namespace API.Domains
         public Guid? MembershipRankId { get; set; }
         public int Point { get; set; }
         public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
+        public DateTime? DateModified { get; set; }
 
         public virtual Distributor Distributor { get; set; }
         public virtual MembershipRank MembershipRank { get; set; }

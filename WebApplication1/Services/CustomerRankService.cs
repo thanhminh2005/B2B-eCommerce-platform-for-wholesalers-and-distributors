@@ -53,7 +53,7 @@ namespace API.Services
         public async Task<Response<IEnumerable<CustomerRankResponse>>> GetCustomerRanks(GetCustomerRanksRequest request)
         {
             var customerRanks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(filter: x => request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-            if (customerRanks.Count() != 0)
+            if (customerRanks.Any())
             {
                 return new Response<IEnumerable<CustomerRankResponse>>(_mapper.Map<IEnumerable<CustomerRankResponse>>(customerRanks), message: "Success");
             }
