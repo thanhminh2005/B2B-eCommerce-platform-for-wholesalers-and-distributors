@@ -99,6 +99,12 @@ namespace API.Services
                                     await _unitOfWork.SaveAsync();
                                 }
                             }
+                            if (status == 1)
+                            {
+                                productDetail.OrderTime += 1;
+                                _unitOfWork.GetRepository<Product>().UpdateAsync(productDetail);
+                                await _unitOfWork.SaveAsync();
+                            }
                         }
                     }
                     foreach (var order in orders)

@@ -15,7 +15,7 @@ namespace API.Domains
 
         public Guid Id { get; set; }
         public Guid DistributorId { get; set; }
-        public Guid CategoryId { get; set; }
+        public Guid SubCategoryId { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }
@@ -26,8 +26,8 @@ namespace API.Domains
         public DateTime? DateModified { get; set; }
         public int OrderTime { get; set; }
 
-        public virtual Category Category { get; set; }
         public virtual Distributor Distributor { get; set; }
+        public virtual SubCategory SubCategory { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         public virtual ICollection<Price> Prices { get; set; }
     }

@@ -51,10 +51,18 @@
 
         public static class Categories
         {
-            public const string GetAll = Base + "/Category/";
-            public const string Get = Base + "/Category/{id}";
-            public const string Create = Base + "/Category";
-            public const string Update = Base + "/Category/";
+            public const string GetAll = Base + "/category/";
+            public const string Get = Base + "/category/{id}";
+            public const string Create = Base + "/category";
+            public const string Update = Base + "/category/";
+        }
+
+        public static class SubCategories
+        {
+            public const string GetAll = Base + "/category/sub-category";
+            public const string Get = Base + "/category/sub-category/{id}";
+            public const string Create = Base + "/category/sub-category";
+            public const string Update = Base + "/category/sub-category/";
         }
 
         public static class Products
