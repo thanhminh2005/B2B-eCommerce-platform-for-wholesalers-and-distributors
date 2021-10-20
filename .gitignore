@@ -9,6 +9,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.json
+!/*.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -577,3 +579,4 @@ project.lock.json
 #####
 
 appsettings.json
+gecko-b3c27-firebase-adminsdk-ifp2n-c7fbae9866.json
