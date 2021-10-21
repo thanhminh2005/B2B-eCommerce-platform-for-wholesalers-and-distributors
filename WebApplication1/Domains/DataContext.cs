@@ -149,7 +149,7 @@ namespace API.Domains
 
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
-                entity.Property(e => e.Tokien).IsRequired();
+                entity.Property(e => e.Token).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Fcms)

@@ -59,6 +59,15 @@ namespace API.Services
                         Username = user.Username,
                         JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
                     };
+                    //var fcm = new Fcm
+                    //{
+                    //    DateCreated = DateTime.Now,
+                    //    Id = Guid.NewGuid(),
+                    //    Token = "",
+                    //    UserId = response.Id
+                    //};
+                    //await _unitOfWork.GetRepository<Fcm>().AddAsync(fcm);
+                    //await _unitOfWork.SaveAsync();
                     return new Response<LoginResponse>(response, message: "Login Successed");
                 }
 
