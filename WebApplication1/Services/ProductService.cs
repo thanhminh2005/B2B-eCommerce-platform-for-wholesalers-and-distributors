@@ -83,10 +83,12 @@ namespace API.Services
                     PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
                     priceResponses.Add(CurPrice);
                 }
-                SubCategoryResponse CurCategory = _mapper.Map<SubCategoryResponse>(category);
+                SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
                 ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
-
-                CurProduct.SubCategory = CurCategory;
+                var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                CurProduct.ParentCategoryId = parent.Id;
+                CurProduct.ParentCategoryName = parent.Name;
+                CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.Username;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -119,10 +121,12 @@ namespace API.Services
                     PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
                     priceResponses.Add(CurPrice);
                 }
-                SubCategoryResponse CurCategory = _mapper.Map<SubCategoryResponse>(category);
+                SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
-
-                CurProduct.SubCategory = CurCategory;
+                var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                CurProduct.ParentCategoryId = parent.Id;
+                CurProduct.ParentCategoryName = parent.Name;
+                CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.Username;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -148,9 +152,12 @@ namespace API.Services
                         PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
                         priceResponses.Add(CurPrice);
                     }
-                    SubCategoryResponse CurCategory = _mapper.Map<SubCategoryResponse>(category);
+                    SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
                     ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
-                    CurProduct.SubCategory = CurCategory;
+                    var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                    CurProduct.ParentCategoryId = parent.Id;
+                    CurProduct.ParentCategoryName = parent.Name;
+                    CurProduct.SubCategory = CurSubCategory;
                     CurProduct.Distributor = user.Username;
                     CurProduct.ListPrice = priceResponses;
                     return new Response<ProductResponse>(CurProduct, message: "Succeed");
@@ -194,9 +201,12 @@ namespace API.Services
                     PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
                     priceResponses.Add(CurPrice);
                 }
-                SubCategoryResponse CurCategory = _mapper.Map<SubCategoryResponse>(category);
+                SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
-                CurProduct.SubCategory = CurCategory;
+                var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                CurProduct.ParentCategoryId = parent.Id;
+                CurProduct.ParentCategoryName = parent.Name;
+                CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.Username;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -257,11 +267,12 @@ namespace API.Services
             }
             return new Response<string>(message: "Fail to update product");
         }
-        //get 30 random product
+        //get 30 random product and sort by most OrderTime
         public async Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation()
         {
             List<Product> products = (List<Product>)await _unitOfWork.GetRepository<Product>().GetAllAsync();
             products = products.GetRandomItems(30);
+            products.OrderByDescending(x => x.OrderTime);
             int totalcount = await _unitOfWork.GetRepository<Product>().CountAsync();
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();
             foreach (var product in products)
@@ -277,9 +288,12 @@ namespace API.Services
                     PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
                     priceResponses.Add(CurPrice);
                 }
-                SubCategoryResponse CurCategory = _mapper.Map<SubCategoryResponse>(category);
+                SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
                 RetailerGetProductsResponse CurProduct = _mapper.Map<RetailerGetProductsResponse>(product);
-                CurProduct.SubCategory = CurCategory;
+                var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                CurProduct.ParentCategoryId = parent.Id;
+                CurProduct.ParentCategoryName = parent.Name;
+                CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.Username;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
@@ -287,6 +301,46 @@ namespace API.Services
             //get all in list, count all, get 10 random number not duplicate, add in list
             return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, 1, 30, totalcount);
         }
-
+        //get all products like database order
+        public async Task<PagedResponse<IEnumerable<ProductResponse>>> GetAll()
+        {
+            var products = await _unitOfWork.GetRepository<Product>().GetAllAsync();
+            int totalcount = await _unitOfWork.GetRepository<Product>().CountAsync();
+            List<ProductResponse> response = new List<ProductResponse>();
+            foreach (var product in products)
+            {
+                var category = await _unitOfWork.GetRepository<SubCategory>().GetByIdAsync(product.SubCategoryId);
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
+                var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
+                                                                             orderBy: x => x.OrderBy(y => y.Volume));
+                List<PriceResponse> priceResponses = new List<PriceResponse>();
+                foreach (var price in listPrice)
+                {
+                    PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
+                    priceResponses.Add(CurPrice);
+                }
+                SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
+                ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                CurProduct.ParentCategoryId = parent.Id;
+                CurProduct.ParentCategoryName = parent.Name;
+                CurProduct.SubCategory = CurSubCategory;
+                CurProduct.Distributor = user.Username;
+                CurProduct.ListPrice = priceResponses;
+                response.Add(CurProduct);
+            }
+            return new PagedResponse<IEnumerable<ProductResponse>>(response, 1, 30, totalcount);
+        }
+        //get list products by parent category
+        public Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsByCategory(GetProductByCategoryIdRequest request)
+        {
+            throw new NotImplementedException();
+        }
+        //get list products by 1 subcategory
+        public Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetPopularProductsBySubCategory(GetProductByCategoryIdRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

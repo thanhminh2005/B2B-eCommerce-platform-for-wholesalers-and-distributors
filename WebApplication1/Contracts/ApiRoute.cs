@@ -75,6 +75,8 @@
             public const string Update = Base + "/Product/";
             public const string Delete = Base + "/Product/";
             public const string Recommendation = Base + "/Product/Recommendation";
+            public const string GetAll = Base + "/Product/";
+            //public const string GetAll = Base + "/Product/";
         }
 
         public static class Banners
