@@ -149,5 +149,15 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Products.GetAll)]
+        public async Task<IActionResult> GetAll()
+        {
+            var response = await _productService.GetAll();
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
     }
 }

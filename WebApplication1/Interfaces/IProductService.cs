@@ -16,5 +16,8 @@ namespace API.Interfaces
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> RetailerGetProductByDistributorId(GetProductByDistributorIdRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation();
+        Task<PagedResponse<IEnumerable<ProductResponse>>> GetAll();
+        Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsByCategory(GetProductByCategoryIdRequest request);
+        Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetPopularProductsBySubCategory(GetProductByCategoryIdRequest request);
     }
 }
