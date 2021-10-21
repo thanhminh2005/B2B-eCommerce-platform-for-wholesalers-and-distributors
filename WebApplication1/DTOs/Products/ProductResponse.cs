@@ -1,4 +1,5 @@
-﻿using API.DTOs.Prices;
+﻿using API.DTOs.Categories;
+using API.DTOs.Prices;
 using API.DTOs.SubCategories;
 using System;
 using System.Collections.Generic;
