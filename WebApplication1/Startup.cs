@@ -1,10 +1,13 @@
 using B2B.AppSettings;
 using B2B.Installers;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace B2B
 {
@@ -26,6 +29,8 @@ namespace B2B
             });
             services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +57,15 @@ namespace B2B
                 option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
             }
             );
+
+            var googleCredential = env.ContentRootPath;
+            var filePath = "gecko-b3c27-firebase-adminsdk-ifp2n-c7fbae9866.json";
+            googleCredential = Path.Combine(googleCredential, filePath);
+            var credential = GoogleCredential.FromFile(googleCredential);
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = credential
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
