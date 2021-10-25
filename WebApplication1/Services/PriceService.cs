@@ -5,6 +5,7 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Services
@@ -78,8 +79,7 @@ namespace API.Services
 
         public async Task<Response<IEnumerable<PriceResponse>>> GetPrices(GetPricesRequest request)
         {
-            var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)));
-
+            var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)), x => x.OrderBy(y => y.Volume));
             if (prices != null)
             {
                 return new Response<IEnumerable<PriceResponse>>(_mapper.Map<IEnumerable<PriceResponse>>(prices), message: "Succeed");
