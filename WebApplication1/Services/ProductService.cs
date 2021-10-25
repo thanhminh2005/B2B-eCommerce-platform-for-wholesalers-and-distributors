@@ -139,7 +139,7 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.Id));
-                if (product != null && product.IsActive != false)
+                if (product != null && product.IsActive)
                 {
                     var category = await _unitOfWork.GetRepository<SubCategory>().GetByIdAsync(product.SubCategoryId);
                     var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
@@ -162,7 +162,7 @@ namespace API.Services
                     CurProduct.ListPrice = priceResponses;
                     return new Response<ProductResponse>(CurProduct, message: "Succeed");
                 }
-                else if (!product.IsActive)
+                else if (product != null && !product.IsActive)
                 {
                     return new Response<ProductResponse>(message: "Product is removed");
                 }

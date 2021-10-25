@@ -171,6 +171,12 @@
             public const string Update = Base + "/membership";
             public const string Delete = Base + "/membership/{id}";
         }
+
+        public static class Momo
+        {
+            public const string Create = Base + "/momo/";
+            public const string IPN = Base + "/momo/ipn";
+        }
     }
 
 }

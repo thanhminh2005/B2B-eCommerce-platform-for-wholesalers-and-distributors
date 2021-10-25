@@ -8,5 +8,6 @@ namespace API.DTOs.Checkouts
         public string PaymentMethodId { get; set; }
         public string RetailerId { get; set; }
         public string ShippingAddress { get; set; }
+        public string RedirectUrl { get; set; } = "";
     }
 }
