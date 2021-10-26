@@ -19,14 +19,14 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost(ApiRoute.Momo.IPN)]
-        public async Task<IActionResult> IPN([FromBody]IPNRequest request)
+        public async Task<IActionResult> IPN([FromBody] IPNRequest request)
         {
             var response = await _moMoPaymentService.GetPaymentStatusAsync(request);
-            if (response.Succeeded)
+            if (response.Message != "")
             {
                 return Ok(response);
             }
-            return BadRequest(response);
+            return BadRequest();
         }
     }
 }
