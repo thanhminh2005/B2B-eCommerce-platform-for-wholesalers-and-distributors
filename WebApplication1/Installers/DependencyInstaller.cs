@@ -32,6 +32,7 @@ namespace B2B.Installers
             services.AddScoped<IMembershipService, MembershipService>();
             services.AddScoped<ISubCategoryService, SubCategoryService>();
             services.AddScoped<IMoMoPaymentService, MoMoPaymentService>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
     }
 }

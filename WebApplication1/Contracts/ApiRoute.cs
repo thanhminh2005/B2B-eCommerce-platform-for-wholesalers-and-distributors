@@ -172,6 +172,12 @@
             public const string Delete = Base + "/membership/{id}";
         }
 
+        public static class Notifications
+        {
+            public const string Clients = Base + "/manager/notification/clients";
+            public const string Role = Base + "/manager/notification/role";
+        }
+
         public static class Momo
         {
             public const string Create = Base + "/momo/";
