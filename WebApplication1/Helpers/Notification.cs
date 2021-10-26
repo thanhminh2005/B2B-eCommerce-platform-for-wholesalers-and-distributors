@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace API.Helpers
 {
-    public class Notification
+    public static class Notification
     {
-        public async Task<string> SendNotifications(List<string> clientTokens, string title, string description)
+        public static async Task<string> SendNotifications(List<string> clientTokens, string title, string description)
         {
             var message = new MulticastMessage()
             {
