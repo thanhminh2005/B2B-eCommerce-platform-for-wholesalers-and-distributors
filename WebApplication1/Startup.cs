@@ -59,7 +59,7 @@ namespace B2B
             );
 
             var googleCredential = env.ContentRootPath;
-            var filePath = "gecko-b3c27-firebase-adminsdk-ifp2n-c7fbae9866.json";
+            var filePath = Configuration.GetSection("Google")["CredentialFile"];
             googleCredential = Path.Combine(googleCredential, filePath);
             var credential = GoogleCredential.FromFile(googleCredential);
             FirebaseApp.Create(new AppOptions()

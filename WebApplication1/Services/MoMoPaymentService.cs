@@ -1,7 +1,6 @@
 ﻿using API.Domains;
 using API.Interfaces;
 using API.MoMo;
-using API.Warppers;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
@@ -21,13 +20,13 @@ namespace API.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Response<string>> GetPaymentStatusAsync(IPNRequest request)
+        public async Task<IPNResponse> GetPaymentStatusAsync(IPNRequest request)
         {
             string secretkey = _configuration.GetSection("MomoKey")["SecretKey"];
             string accessKey = _configuration.GetSection("MomoKey")["AccessKey"];
             string rawHash = "accessKey=" + accessKey +
                 "&amount=" + request.Amount +
-                "&extraData=" + request.Message +
+                "&extraData=" + request.ExtraData +
                 "&message=" + request.Message +
                 "&orderId=" + request.OrderId +
                 "&orderInfo=" + request.OrderInfo +
@@ -41,9 +40,34 @@ namespace API.Services
                 ;
             MoMoSecurity crypto = new MoMoSecurity();
             string signature = crypto.signSHA256(rawHash, secretkey);
+
+            string responseHash = "accessKey=" + accessKey +
+                "&extraData=" + request.ExtraData +
+                "&message=" + request.Message +
+                "&orderId=" + request.OrderId +
+                "&partnerCode=" + request.PartnerCode +
+                "&requestId=" + request.RequestId +
+                "&responseTime=" + request.ResponseTime +
+                "&resultCode=" + request.ResultCode
+                ;
+            string responseSignature = crypto.signSHA256(responseHash, secretkey);
+            IPNResponse response = new IPNResponse
+            {
+                ExtraData = request.ExtraData,
+                Message = "",
+                OrderId = request.OrderId,
+                PartnerCode = request.PartnerCode,
+                RequestId = request.OrderId,
+                ResponseTime = request.ResponseTime,
+                ResultCode = request.ResultCode,
+                Signature = responseSignature
+            };
+
             if (!request.Signature.Equals(signature))
             {
-                return new Response<string>(message: "Payment failed");
+                response.ResultCode = 11;
+                response.Message = "Signature not match";
+                return response;
             }
             if (request.ResultCode == 0)
             {
@@ -106,14 +130,17 @@ namespace API.Services
                                         _unitOfWork.GetRepository<Membership>().UpdateAsync(membership);
                                     }
                                 }
+                                response.Message = "Payment succeed";
                                 transaction.Complete();
-                                return new Response<string>("OK", "success");
+                                return response;
                             }
                         }
                     }
                 }
             }
-            return new Response<string>(message: "Payment failed");
+            response.ResultCode = 7000;
+            response.Message = "There is some problem is system";
+            return response;
         }
     }
 }
