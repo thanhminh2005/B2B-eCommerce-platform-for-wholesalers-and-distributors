@@ -27,8 +27,16 @@ namespace API.Services
         {
             if (request != null)
             {
-                var product = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Name.Equals(request.Name));
-                if (product == null)
+                var listProduct = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+                Boolean exist = false;
+                foreach(var product in listProduct)
+                {
+                    if(request.Name == product.Name)
+                    {
+                        exist = true;
+                    }
+                }
+                if (exist == false)
                 {
                     var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
                     if (distributor.IsActive)
@@ -264,14 +272,25 @@ namespace API.Services
 
         public async Task<Response<string>> UpdateProduct(UpdateProductRequest request)
         {
-
             if (request != null)
             {
                 if (!string.IsNullOrWhiteSpace(request.Id))
                 {
                     Product NewProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-
-                    if (NewProduct != null)
+                    var listProduct = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(NewProduct.DistributorId));
+                    Boolean exist = false;
+                    foreach (var product in listProduct)
+                    {
+                        if (request.Name == product.Name)
+                        {
+                            exist = true;
+                        }
+                        else if(request.Name == NewProduct.Name)
+                        {
+                            exist = false;
+                        }
+                    }
+                    if (exist == false)
                     {
                         NewProduct.SubCategoryId = Guid.Parse(request.SubCategoryId);
                         NewProduct.Name = request.Name;
@@ -284,6 +303,7 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(NewProduct.Id.ToString(), message: "Product is updated");
                     }
+                    return new Response<string>(message: "Product name is existed");
                 }
                 return new Response<string>(message: "Product ID can not be blanked");
             }

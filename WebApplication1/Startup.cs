@@ -60,12 +60,12 @@ namespace B2B
 
             var googleCredential = env.ContentRootPath;
             var filePath = Configuration.GetSection("Google")["CredentialFile"];
-            googleCredential = Path.Combine(googleCredential, filePath);
-            var credential = GoogleCredential.FromFile(googleCredential);
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential = credential
-            });
+            //googleCredential = Path.Combine(googleCredential, filePath);
+            //var credential = GoogleCredential.FromFile(googleCredential);
+            //FirebaseApp.Create(new AppOptions()
+            //{
+            //    Credential = credential
+            //});
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
