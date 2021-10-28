@@ -71,7 +71,9 @@ namespace API.Services
             var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x =>
             (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
             && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
-            orderBy: x => x.OrderByDescending(y => y.DateCreated));
+            orderBy: x => x.OrderByDescending(y => y.DateCreated), 
+            includeProperties: "PaymentMethod"
+            );
             if (sessions.Any())
             {
                 return new Response<IEnumerable<SessionResponse>>(_mapper.Map<IEnumerable<SessionResponse>>(sessions), message: "Succeed");

@@ -45,7 +45,7 @@ namespace API.Services
                         await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
                         _unitOfWork.GetRepository<Product>().UpdateAsync(product);
                         await _unitOfWork.SaveAsync();
-                        return new Response<string>(product.Name, message: "Price added successfully");
+                        return new Response<string>(product.Id.ToString(), message: "Price added successfully");
                     }
                     return new Response<string>("The minimum volume required is more than: " + product.MinQuantity);
                 }
