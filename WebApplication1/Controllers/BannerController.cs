@@ -85,6 +85,10 @@ namespace API.Controllers
             {
                 request.Name = OldBanner.Name;
             }
+            if (string.IsNullOrEmpty(request.Link))
+            {
+                request.Link = OldBanner.Link;
+            }
             if (string.IsNullOrEmpty(request.Image))
             {
                 request.Image = OldBanner.Image;

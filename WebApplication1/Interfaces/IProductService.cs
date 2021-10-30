@@ -13,6 +13,7 @@ namespace API.Interfaces
         Task<Response<string>> UpdateProduct(UpdateProductRequest request);
         Task<Response<string>> RemoveProduct(RemoveProductRequest request);
         Task<PagedResponse<IEnumerable<ProductResponse>>> GetProductByDistributorId(GetProductByDistributorIdRequest request);
+        Task<Response<IEnumerable<ProductResponse>>> GetAllProductByDistributorId(GetProductByDistributorIdRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> RetailerGetProductByDistributorId(GetProductByDistributorIdRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsWithFilter(GetProductsWithFilterRequest request);
         Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetProductsRecommendation();

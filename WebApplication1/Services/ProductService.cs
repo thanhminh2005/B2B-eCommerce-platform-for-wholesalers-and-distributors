@@ -27,43 +27,30 @@ namespace API.Services
         {
             if (request != null)
             {
-                var listProduct = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-                Boolean exist = false;
-                foreach(var product in listProduct)
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
+                if (distributor.IsActive)
                 {
-                    if(request.Name == product.Name)
+                    Product newProduct = _mapper.Map<Product>(request);
+                    newProduct.Id = Guid.NewGuid();
+                    newProduct.DistributorId = Guid.Parse(request.DistributorId);
+                    newProduct.SubCategoryId = Guid.Parse(request.SubCategoryId);
+                    newProduct.IsActive = true;
+                    newProduct.DateCreated = DateTime.UtcNow;
+                    newProduct.OrderTime = 0;
+                    Price newPrice = new Price
                     {
-                        exist = true;
-                    }
+                        Id = Guid.NewGuid(),
+                        ProductId = newProduct.Id,
+                        Value = request.Price,
+                        Volume = request.MinQuantity,
+                        DateCreated = DateTime.UtcNow
+                    };
+                    await _unitOfWork.GetRepository<Product>().AddAsync(newProduct);
+                    await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
+                    await _unitOfWork.SaveAsync();
+                    return new Response<string>(newProduct.Name, message: "Product registered successfully ");
                 }
-                if (exist == false)
-                {
-                    var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
-                    if (distributor.IsActive)
-                    {
-                        Product newProduct = _mapper.Map<Product>(request);
-                        newProduct.Id = Guid.NewGuid();
-                        newProduct.DistributorId = Guid.Parse(request.DistributorId);
-                        newProduct.SubCategoryId = Guid.Parse(request.SubCategoryId);
-                        newProduct.IsActive = true;
-                        newProduct.DateCreated = DateTime.UtcNow;
-                        newProduct.OrderTime = 0;
-                        Price newPrice = new Price
-                        {
-                            Id = Guid.NewGuid(),
-                            ProductId = newProduct.Id,
-                            Value = request.Price,
-                            Volume = request.MinQuantity,
-                            DateCreated = DateTime.UtcNow
-                        };
-                        await _unitOfWork.GetRepository<Product>().AddAsync(newProduct);
-                        await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
-                        await _unitOfWork.SaveAsync();
-                        return new Response<string>(newProduct.Name, message: "Product registered successfully ");
-                    }
-                    return new Response<string>(message: "Distributor is removed ");
-                }
-                return new Response<string>(message: "Product's name is existed");
+                return new Response<string>(message: "Distributor is not activated ");
             }
             return new Response<string>(message: "Failed to create product");
         }
@@ -277,20 +264,7 @@ namespace API.Services
                 if (!string.IsNullOrWhiteSpace(request.Id))
                 {
                     Product NewProduct = await _unitOfWork.GetRepository<Product>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                    var listProduct = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(NewProduct.DistributorId));
-                    Boolean exist = false;
-                    foreach (var product in listProduct)
-                    {
-                        if (request.Name == product.Name)
-                        {
-                            exist = true;
-                        }
-                        else if(request.Name == NewProduct.Name)
-                        {
-                            exist = false;
-                        }
-                    }
-                    if (exist == false)
+                    if (NewProduct != null)
                     {
                         NewProduct.SubCategoryId = Guid.Parse(request.SubCategoryId);
                         NewProduct.Name = request.Name;
@@ -303,7 +277,7 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(NewProduct.Id.ToString(), message: "Product is updated");
                     }
-                    return new Response<string>(message: "Product name is existed");
+                    return new Response<string>(message: "Product ID is not existed");
                 }
                 return new Response<string>(message: "Product ID can not be blanked");
             }
@@ -383,6 +357,41 @@ namespace API.Services
         public Task<PagedResponse<IEnumerable<RetailerGetProductsResponse>>> GetPopularProductsBySubCategory(GetProductByCategoryIdRequest request)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Response<IEnumerable<ProductResponse>>> GetAllProductByDistributorId(GetProductByDistributorIdRequest request)
+        {
+            var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
+                                                                                      orderBy: x => x.OrderBy(y => y.Name));
+            if (products != null)
+            {
+                List<ProductResponse> response = new List<ProductResponse>();
+                foreach (var product in products)
+                {
+                    var category = await _unitOfWork.GetRepository<SubCategory>().GetByIdAsync(product.SubCategoryId);
+                    var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(product.DistributorId);
+                    var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
+                    var listPrice = await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(product.Id),
+                                                                                 orderBy: x => x.OrderBy(y => y.Volume));
+                    List<PriceResponse> priceResponses = new List<PriceResponse>();
+                    foreach (var price in listPrice)
+                    {
+                        PriceResponse CurPrice = _mapper.Map<PriceResponse>(price);
+                        priceResponses.Add(CurPrice);
+                    }
+                    SubCategoryResponse CurSubCategory = _mapper.Map<SubCategoryResponse>(category);
+                    ProductResponse CurProduct = _mapper.Map<ProductResponse>(product);
+                    var parent = await _unitOfWork.GetRepository<Category>().GetByIdAsync(category.CategoryId);
+                    CurProduct.ParentCategoryId = parent.Id;
+                    CurProduct.ParentCategoryName = parent.Name;
+                    CurProduct.SubCategory = CurSubCategory;
+                    CurProduct.Distributor = user.Username;
+                    CurProduct.ListPrice = priceResponses;
+                    response.Add(CurProduct);
+                }
+                return new Response<IEnumerable<ProductResponse>>(response, message: "Succeed");
+            }
+            return new Response<IEnumerable<ProductResponse>>("Not Found");
         }
     }
 }
