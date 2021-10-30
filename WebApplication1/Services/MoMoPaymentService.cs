@@ -65,7 +65,7 @@ namespace API.Services
 
             if (!request.Signature.Equals(signature))
             {
-                response.ResultCode = 11;
+                response.ResultCode = 1;
                 response.Message = "Signature not match";
                 return response;
             }
@@ -138,7 +138,7 @@ namespace API.Services
                     }
                 }
             }
-            response.ResultCode = 7000;
+            response.ResultCode = 1;
             response.Message = "There is some problem is system";
             return response;
         }

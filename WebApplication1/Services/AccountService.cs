@@ -1,4 +1,5 @@
-﻿using API.Domains;
+﻿using API.Contracts;
+using API.Domains;
 using API.DTOs.Accounts;
 using API.DTOs.Roles;
 using API.Helpers;
@@ -48,29 +49,49 @@ namespace API.Services
                         return new Response<LoginResponse>(message: "This Account has be deactivated");
                     }
                     JwtSecurityToken jwtSecurityToken = await GenerateJwtToken(user);
-                    LoginResponse response = new LoginResponse
+                    var actorId = Guid.Empty;
+                    if(role.Name.Equals(Authorization.DT))
                     {
-                        Avatar = user.Avatar,
-                        DisplayName = user.DisplayName,
-                        Email = user.Email,
-                        Id = user.Id,
-                        PhoneNumber = user.PhoneNumber,
-                        Role = _mapper.Map<RoleResponse>(role),
-                        Username = user.Username,
-                        JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
-                    };
-                    //var fcm = new Fcm
-                    //{
-                    //    DateCreated = DateTime.Now,
-                    //    Id = Guid.NewGuid(),
-                    //    Token = "",
-                    //    UserId = response.Id
-                    //};
-                    //await _unitOfWork.GetRepository<Fcm>().AddAsync(fcm);
-                    //await _unitOfWork.SaveAsync();
-                    return new Response<LoginResponse>(response, message: "Login Successed");
+                        var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.UserId.Equals(user.Id));
+                        if(distributor != null)
+                        {
+                            actorId = distributor.Id;
+                        }
+                    }
+                    if (role.Name.Equals(Authorization.RT))
+                    {
+                        var retailer = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(user.Id));
+                        if (retailer != null)
+                        {
+                            actorId = retailer.Id;
+                        }
+                    }
+                    if(!actorId.Equals(Guid.Empty))
+                    {
+                        LoginResponse response = new LoginResponse
+                        {
+                            Avatar = user.Avatar,
+                            DisplayName = user.DisplayName,
+                            Email = user.Email,
+                            Id = user.Id,
+                            PhoneNumber = user.PhoneNumber,
+                            Role = _mapper.Map<RoleResponse>(role),
+                            Username = user.Username,
+                            JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                            ActorId = actorId
+                        };
+                        //var fcm = new Fcm
+                        //{
+                        //    DateCreated = DateTime.Now,
+                        //    Id = Guid.NewGuid(),
+                        //    Token = "",
+                        //    UserId = response.Id
+                        //};
+                        //await _unitOfWork.GetRepository<Fcm>().AddAsync(fcm);
+                        //await _unitOfWork.SaveAsync();
+                        return new Response<LoginResponse>(response, message: "Login Successed");
+                    }
                 }
-
             }
             return new Response<LoginResponse>(message: "Invalid Username or Password");
         }
