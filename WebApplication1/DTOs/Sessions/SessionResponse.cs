@@ -1,4 +1,5 @@
-﻿using System;
+﻿using API.DTOs.PaymentMethods;
+using System;
 
 namespace API.DTOs.Sessions
 {
@@ -6,7 +7,7 @@ namespace API.DTOs.Sessions
     {
         public Guid Id { get; set; }
         public Guid RetailerId { get; set; }
-        public Guid PaymentMethodId { get; set; }
+        public PaymentMethodResponse PaymentMethod { get; set; }
         public double TotalCost { get; set; }
         public string ShippingAddress { get; set; }
         public int Status { get; set; }

@@ -7,6 +7,7 @@ namespace API.DTOs.Accounts
     {
         public Guid Id { get; set; }
         public RoleResponse Role { get; set; }
+        public Guid ActorId { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
         public string Avatar { get; set; }
