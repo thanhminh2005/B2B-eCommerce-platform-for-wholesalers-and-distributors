@@ -9,6 +9,7 @@ namespace API.Domains
         public Guid Id { get; set; }
         public Guid DistributorId { get; set; }
         public string Name { get; set; }
+        public string Link { get; set; }
         public string Image { get; set; }
         public int Position { get; set; }
         public DateTime DateCreated { get; set; }

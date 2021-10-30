@@ -51,6 +51,21 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Products.GetAllProductDistributor)]
+        public async Task<IActionResult> GetAllProductDistributor(string DistributorId)
+        {
+            GetProductByDistributorIdRequest request = new GetProductByDistributorIdRequest
+            {
+                DistributorId = DistributorId
+            };
+            var response = await _productService.GetAllProductByDistributorId(request);
+            if (response.Succeeded)
+            {
+                return (Ok(response));
+            }
+            return NotFound(response);
+        }
+
         [HttpGet(ApiRoute.Products.RetailerGetDistributor)]
         public async Task<IActionResult> RetailerGetDistributor(string id)
         {

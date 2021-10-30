@@ -69,6 +69,7 @@
         {
             public const string Get = Base + "/Product/{id}";
             public const string GetDistributor = Base + "/Distributor/{id}/Product";
+            public const string GetAllProductDistributor = Base + "/{DistributorId}/Product";
             public const string RetailerGetDistributor = Base + "/Retailer/Distributor/{id}/Product";
             public const string Filter = Base + "/Product/page";
             public const string Create = Base + "/Product";

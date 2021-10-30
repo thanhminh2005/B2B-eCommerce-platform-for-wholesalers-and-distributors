@@ -102,11 +102,12 @@ namespace API.Services
                     _unitOfWork.GetRepository<Price>().UpdateAsync(price);
                     _unitOfWork.GetRepository<Product>().UpdateAsync(product);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(price.Id.ToString(), message: "Updated successfully");
+                    return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
                 }
-                return new Response<string>("The minimum volume required is more than: " + product.MinQuantity);
+                return new Response<string>(price.ProductId.ToString(), 
+                    "The minimum volume required for " + product.Name + " is more than: " + product.MinQuantity);
             }
-            return new Response<string>("Update Failed");
+            return new Response<string>(request.Id, "Price ID is not existed");
         }
     }
 }

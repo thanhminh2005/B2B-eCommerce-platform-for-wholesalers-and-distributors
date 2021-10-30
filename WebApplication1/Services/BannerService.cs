@@ -35,32 +35,43 @@ namespace API.Services
                     }
                     else if (distributor.IsActive)
                     {
-                        Banner newBanner = _mapper.Map<Banner>(request);
-                        newBanner.Id = Guid.NewGuid();
-                        newBanner.DistributorId = Guid.Parse(request.DistributorId);
-                        var ExistedBanners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
-                                                                             orderBy: x => x.OrderBy(y => y.Position));
-                        var count = await _unitOfWork.GetRepository<Banner>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-                        if (count == 0)
+                        if (request.Position < 0 || request.Position == 0 || request.Position > 5)
                         {
-                            newBanner.Position = 1;
+                            return new Response<string>(message: "Banner position must be from range 1 to 5");
                         }
                         else
                         {
-                            //update banner's position to the lowest empty position
-                            foreach (Banner banner1 in ExistedBanners)
+                            Banner newBanner = _mapper.Map<Banner>(request);
+                            newBanner.Id = Guid.NewGuid();
+                            newBanner.DistributorId = Guid.Parse(request.DistributorId);
+                            var ExistedBanners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)),
+                                                                                 orderBy: x => x.OrderBy(y => y.Position));
+                            var count = await _unitOfWork.GetRepository<Banner>().CountAsync(filter: x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
+                            if (count == 0)
                             {
-                                if (request.Position == banner1.Position)
+                                newBanner.Position = 1;
+                            }
+                            else
+                            {
+                                //update banner's position to the lowest empty position
+                                foreach (Banner banner1 in ExistedBanners)
                                 {
-                                    request.Position = banner1.Position + 1;
+                                    if (request.Position == banner1.Position)
+                                    {
+                                        request.Position = banner1.Position + 1;
+                                    }
+                                }
+                                newBanner.Position = request.Position;
+                                if (newBanner.Position > 5)
+                                {
+                                    return new Response<string>(message: "You have reached maximum size of banner, please remove another banner to add the new one");
                                 }
                             }
-                            newBanner.Position = request.Position;
+                            newBanner.DateCreated = DateTime.UtcNow;
+                            await _unitOfWork.GetRepository<Banner>().AddAsync(newBanner);
+                            await _unitOfWork.SaveAsync();
+                            return new Response<string>(newBanner.Name, message: "Banner created successfully ");
                         }
-                        newBanner.DateCreated = DateTime.UtcNow;
-                        await _unitOfWork.GetRepository<Banner>().AddAsync(newBanner);
-                        await _unitOfWork.SaveAsync();
-                        return new Response<string>(newBanner.Name, message: "Banner created successfully ");
                     }
                     return new Response<string>(message: "Distributor is removed ");
                 }
@@ -131,25 +142,32 @@ namespace API.Services
                     }
                     else if (distributor.IsActive)
                     {
-                        newBanner.DistributorId = Guid.Parse(request.DistributorId);
-                        newBanner.Name = request.Name;
-                        newBanner.Image = request.Image;
-                        var ExistedBanners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(newBanner.DistributorId),
-                                                                                                orderBy: x => x.OrderBy(y => y.Position));
-                        foreach (Banner banner1 in ExistedBanners)
+                        if (request.Position < 0 || request.Position == 0 || request.Position > 5)
                         {
-                            if (request.Position == banner1.Position && newBanner.Id != banner1.Id)
-                            {
-                                request.Position = banner1.Position + 1;
-                            }
+                            return new Response<string>(message: "Banner position must be from range 1 to 5");
                         }
-                        newBanner.Position = request.Position;
-                        newBanner.DateModified = DateTime.UtcNow;
-                        _unitOfWork.GetRepository<Banner>().UpdateAsync(newBanner);
-                        await _unitOfWork.SaveAsync();
-                        return new Response<string>(newBanner.Id.ToString(), message: "Banner is updated");
+                        else
+                        {
+                            newBanner.DistributorId = Guid.Parse(request.DistributorId);
+                            newBanner.Name = request.Name;
+                            newBanner.Link = request.Link;
+                            newBanner.Image = request.Image;
+                            var ExistedBanners = await _unitOfWork.GetRepository<Banner>().GetAsync(filter: x => x.DistributorId.Equals(newBanner.DistributorId),
+                                                                                                    orderBy: x => x.OrderBy(y => y.Position));
+                            foreach (Banner banner1 in ExistedBanners)
+                            {
+                                if (request.Position == banner1.Position && newBanner.Id != banner1.Id)
+                                {
+                                    request.Position = banner1.Position + 1;
+                                }
+                            }
+                            newBanner.Position = request.Position;
+                            newBanner.DateModified = DateTime.UtcNow;
+                            _unitOfWork.GetRepository<Banner>().UpdateAsync(newBanner);
+                            await _unitOfWork.SaveAsync();
+                            return new Response<string>(newBanner.Id.ToString(), message: "Banner is updated");
+                        }
                     }
-
                     return new Response<string>(message: "Distributor is removed ");
                 }
                 return new Response<string>(message: "Banner ID can not be blanked");
