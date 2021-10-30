@@ -90,23 +90,11 @@ namespace API.Services
         public async Task<Response<string>> UpdatePrice(UpdatePriceRequest request)
         {
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
-            
             if (price != null)
             {
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
                 if (product.MinQuantity <= request.Volume)
                 {
-                    var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(price.ProductId), orderBy: x => x.OrderBy(y => y.Volume));
-                    var minVolume = prices.Min(x => x.Volume);
-                    if(minVolume == price.Volume)
-                    {
-                        price.Volume = request.Volume;
-                        if(prices.Any(x => x.Volume > request.Volume))
-                        {
-                            product.MinQuantity = prices.First(x => x.Volume >= request.Volume).Volume;
-                        }
-                        product.MinQuantity = request.Volume;
-                    }
                     price.Value = request.Value;
                     price.Volume = request.Volume;
                     price.DateModified = DateTime.UtcNow;
@@ -116,7 +104,7 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
                 }
-                return new Response<string>(price.ProductId.ToString(), 
+                return new Response<string>(price.ProductId.ToString(),
                     "The minimum volume required for " + product.Name + " is more than: " + product.MinQuantity);
             }
             return new Response<string>(request.Id, "Price ID is not existed");
