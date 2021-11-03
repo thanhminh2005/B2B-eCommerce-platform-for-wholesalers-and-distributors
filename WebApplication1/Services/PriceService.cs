@@ -26,17 +26,16 @@ namespace API.Services
             var price = await _unitOfWork.GetRepository<Price>().FirstAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId))
                                                                                  && x.Volume == request.Volume);
             var count = await _unitOfWork.GetRepository<Price>().CountAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)));
-
-            if (count > 5)
+            var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.ProductId));
+            if(product != null)
             {
-                return new Response<string>("Product can only have 5 different prices at maximum");
-            }
-            else if (price == null && count <= 5)
-            {
-                var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.ProductId));
-                if (product != null)
+                if (count > 5)
                 {
-                    if (product.MinQuantity <= request.Volume)
+                    return new Response<string>("Product can only have 5 different prices at maximum");
+                }
+                else if (price == null && count <= 5)
+                {
+                    if (request.Volume > product.MinQuantity)
                     {
                         var newPrice = _mapper.Map<Price>(request);
                         newPrice.Id = Guid.NewGuid();
@@ -47,11 +46,22 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(product.Id.ToString(), message: "Price added successfully");
                     }
-                    return new Response<string>("The minimum volume required is more than: " + product.MinQuantity);
+                    else if(request.Volume < product.MinQuantity)
+                    {
+                        var newPrice = _mapper.Map<Price>(request);
+                        newPrice.Id = Guid.NewGuid();
+                        newPrice.DateCreated = DateTime.UtcNow;
+                        product.MinQuantity = newPrice.Volume;
+                        product.DateModified = DateTime.UtcNow;
+                        await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
+                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(product.Id.ToString(), message: "Price added successfully");
+                    }
                 }
-                return new Response<string>("Product Id not found");
+                return new Response<string>(product.Id.ToString(),message: "This specific quantity already has a price, please try again!");
             }
-            return new Response<string>("Add Failed");
+            return new Response<string>("Product Id not found");
         }
 
         public async Task<Response<string>> DeletePrice(DeletePriceRequest request)
@@ -59,11 +69,34 @@ namespace API.Services
             var price = await _unitOfWork.GetRepository<Price>().GetByIdAsync(Guid.Parse(request.Id));
             if (price != null)
             {
-                _unitOfWork.GetRepository<Price>().DeleteAsync(price);
-                await _unitOfWork.SaveAsync();
-                return new Response<string>(price.Id.ToString(), message: "Succeed");
+                var count = await _unitOfWork.GetRepository<Price>().CountAsync(x => x.ProductId.Equals(price.ProductId));
+                var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
+                if (count > 1)
+                {
+                    if(price.Volume > product.MinQuantity)
+                    {
+                        product.DateModified = DateTime.UtcNow;
+                        _unitOfWork.GetRepository<Price>().DeleteAsync(price);
+                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(price.Id.ToString(), message: "Deleted price successfully");
+                    }
+                    else if(price.Volume == product.MinQuantity)
+                    {
+                        List<Price> listPrice = (List<Price>)await _unitOfWork.GetRepository<Price>().GetAsync(filter:x => x.ProductId.Equals(price.ProductId),
+                                                                                            orderBy:x => x.OrderBy(y => y.Volume));
+                        product.MinQuantity = listPrice[1].Volume;
+                        product.DateModified = DateTime.UtcNow;
+                        _unitOfWork.GetRepository<Price>().DeleteAsync(price);
+                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(price.Id.ToString(), message: "Deleted price successfully");
+                    }
+                    return new Response<string>(product.Id.ToString(), message: "Can not delete price with volume lower than Minimum Quantity of Product, please try again!");
+                }
+                return new Response<string>(product.Id.ToString(), message: "Can not delete the final price of product");
             }
-            return new Response<string>("Delete Failed");
+            return new Response<string>("Price Id is not existed");
         }
 
         public async Task<Response<PriceResponse>> GetPriceById(GetPriceByIdRequest request)
@@ -93,7 +126,7 @@ namespace API.Services
             if (price != null)
             {
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
-                if (product.MinQuantity <= request.Volume)
+                if (request.Volume > product.MinQuantity)
                 {
                     price.Value = request.Value;
                     price.Volume = request.Volume;
@@ -104,10 +137,38 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
                 }
-                return new Response<string>(price.ProductId.ToString(),
-                    "The minimum volume required for " + product.Name + " is more than: " + product.MinQuantity);
+                else if(request.Volume == product.MinQuantity)
+                {
+                    var oldPrice = await _unitOfWork.GetRepository<Price>().FirstAsync(x => x.ProductId.Equals(product.Id)
+                                                                                 && x.Volume == request.Volume);
+                    if(oldPrice.Id != price.Id)
+                    {
+                        _unitOfWork.GetRepository<Price>().DeleteAsync(oldPrice);
+                    }
+                    price.Value = request.Value;
+                    price.Volume = request.Volume;
+                    price.DateModified = DateTime.UtcNow;
+                    product.DateModified = DateTime.UtcNow;
+                    _unitOfWork.GetRepository<Price>().UpdateAsync(price);
+                    _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                    await _unitOfWork.SaveAsync();
+                    return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
+                }
+                else
+                {
+                    price.Value = request.Value;
+                    price.Volume = request.Volume;
+                    price.DateModified = DateTime.UtcNow;
+                    product.MinQuantity = price.Volume;
+                    product.DateModified = DateTime.UtcNow;
+                    _unitOfWork.GetRepository<Price>().UpdateAsync(price);
+                    _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                    await _unitOfWork.SaveAsync();
+                    return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
+                }
             }
             return new Response<string>(request.Id, "Price ID is not existed");
         }
+
     }
 }
