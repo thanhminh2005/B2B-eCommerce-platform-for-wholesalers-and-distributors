@@ -85,9 +85,25 @@ namespace API.Services
             var banner = await _unitOfWork.GetRepository<Banner>().GetByIdAsync(Guid.Parse(request.Id));
             if (banner != null)
             {
+                var banners = await _unitOfWork.GetRepository<Banner>().GetAsync(x => x.DistributorId.Equals(banner.DistributorId), orderBy: x => x.OrderBy(y => y.Position));
+                if(banners.Count() > 1)
+                {
+                    if(banner.Position < banners.Count())
+                    {
+                        foreach(var current in banners)
+                        {
+                            if(current.Position > banner.Position)
+                            {
+                                current.Position -= 1;
+                                _unitOfWork.GetRepository<Banner>().UpdateAsync(current);
+                                await _unitOfWork.SaveAsync();
+                            }
+                        }
+                    }
+                }
                 _unitOfWork.GetRepository<Banner>().DeleteAsync(banner);
                 await _unitOfWork.SaveAsync();
-                return new Response<string>(banner.Id.ToString(), banner.Name + " is deleted successfully");
+                return new Response<string>(banner.DistributorId.ToString(), banner.Name + " is deleted successfully");
             }
             return new Response<string>("Banner deleted failed");
         }
@@ -165,7 +181,7 @@ namespace API.Services
                             newBanner.DateModified = DateTime.UtcNow;
                             _unitOfWork.GetRepository<Banner>().UpdateAsync(newBanner);
                             await _unitOfWork.SaveAsync();
-                            return new Response<string>(newBanner.Id.ToString(), message: "Banner is updated");
+                            return new Response<string>(newBanner.DistributorId.ToString(), message: "Banner is updated");
                         }
                     }
                     return new Response<string>(message: "Distributor is removed ");
