@@ -61,25 +61,51 @@ namespace API.Services
             var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(Guid.Parse(request.Id));
             if (session != null)
             {
-                return new Response<SessionResponse>(_mapper.Map<SessionResponse>(session), message: "Succeed");
+                var response = _mapper.Map<SessionResponse>(session);
+                var retailer = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(response.RetailerId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(retailer.UserId);
+                response.RetailerName = user.DisplayName;
+                return new Response<SessionResponse>(response, message: "Succeed");
             }
             return new Response<SessionResponse>(message: "Not Found");
         }
-
-        public async Task<Response<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
+        public async Task<PagedResponse<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
         {
-            var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x =>
+            var sessions = await _unitOfWork.GetRepository<Session>().GetPagedReponseAsync(request.PageNumber, request.PageSize ,filter: x =>
             (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
             && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
-            orderBy: x => x.OrderByDescending(y => y.DateCreated), 
+            orderBy: x => x.OrderByDescending(y => y.DateCreated),
             includeProperties: "PaymentMethod"
             );
-            if (sessions.Any())
+
+            var count = await _unitOfWork.GetRepository<Session>().CountAsync(x =>
+            (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
+            && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))));
+            var response = _mapper.Map<IEnumerable<SessionResponse>>(sessions);
+            foreach (var session in response)
             {
-                return new Response<IEnumerable<SessionResponse>>(_mapper.Map<IEnumerable<SessionResponse>>(sessions), message: "Succeed");
+                var retailer = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(session.RetailerId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(retailer.UserId);
+                session.RetailerName = user.DisplayName;
             }
-            return new Response<IEnumerable<SessionResponse>>(message: "Empty");
+
+            return new PagedResponse<IEnumerable<SessionResponse>>(response, request.PageNumber, request.PageSize, count);
         }
+
+        //public async Task<Response<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
+        //{
+        //    var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(filter: x =>
+        //    (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
+        //    && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
+        //    orderBy: x => x.OrderByDescending(y => y.DateCreated), 
+        //    includeProperties: "PaymentMethod"
+        //    );
+        //    if (sessions.Any())
+        //    {
+        //        return new Response<IEnumerable<SessionResponse>>(_mapper.Map<IEnumerable<SessionResponse>>(sessions), message: "Succeed");
+        //    }
+        //    return new Response<IEnumerable<SessionResponse>>(message: "Empty");
+        //}
 
         public async Task<Response<string>> UpdateSession(UpdateSessionRequest request)
         {
