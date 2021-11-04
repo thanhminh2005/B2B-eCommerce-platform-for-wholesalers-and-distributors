@@ -11,6 +11,7 @@ namespace B2B.Installers
     {
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddHttpContextAccessor();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();

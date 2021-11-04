@@ -6,6 +6,7 @@ using API.Interfaces;
 using API.MoMo;
 using API.Warppers;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -20,12 +21,14 @@ namespace API.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public CheckoutService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
+        public CheckoutService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _configuration = configuration;
+            _httpContext = httpContext;
         }
 
         public async Task<Response<CheckOutResponse>> Checkout(CheckoutRequest request)
@@ -145,7 +148,8 @@ namespace API.Services
                                 OrderInfo = "test",
                                 RedirectUrl = request.RedirectUrl
                             };
-                            paymentResponse = MoMoHandler.CreatePayment(paymentRequest, _configuration);
+                            var momoHandler = new MoMoHandler(_httpContext);
+                            paymentResponse = momoHandler.CreatePayment(paymentRequest, _configuration);
                             if (paymentResponse.ResultCode != 0)
                             {
                                 return new Response<CheckOutResponse>("Momo payment is not connect able");

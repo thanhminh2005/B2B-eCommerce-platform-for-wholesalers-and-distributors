@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,7 +9,14 @@ namespace API.MoMo
 {
     public class MoMoHandler
     {
-        public static MoMoPaymentResponse CreatePayment(MoMoPaymentRequest request, IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContext;
+
+        public MoMoHandler(IHttpContextAccessor httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
+        public MoMoPaymentResponse CreatePayment(MoMoPaymentRequest request, IConfiguration configuration)
         {
             string endpoint = MoMoEndpoint.PaymentCreate;
             string secretkey = configuration.GetSection("MomoKey")["SecretKey"];
@@ -17,7 +26,8 @@ namespace API.MoMo
             string lang = configuration.GetSection("MomoKey")["Lang"];
             string requestId = Guid.NewGuid().ToString();
             string extraData = "";
-            string ipnUrl = Contracts.ApiRoute.Momo.IPN;
+            var domainName = _httpContext.HttpContext.Request.Scheme + Uri.SchemeDelimiter + _httpContext.HttpContext.Request.Host;
+            string ipnUrl = domainName + "/"+ Contracts.ApiRoute.Momo.IPN;
             string rawHash = "accessKey=" + accessKey +
                 "&amount=" + request.Amount +
                 "&extraData=" + extraData +
