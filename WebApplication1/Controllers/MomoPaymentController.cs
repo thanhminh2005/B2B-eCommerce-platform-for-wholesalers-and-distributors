@@ -22,7 +22,7 @@ namespace API.Controllers
         public async Task<IActionResult> IPN([FromBody] IPNRequest request)
         {
             var response = await _moMoPaymentService.GetPaymentStatusAsync(request);
-            if (response.Message != "")
+            if (response.Message != "" && response.ResultCode == 0)
             {
                 return Ok(response);
             }
