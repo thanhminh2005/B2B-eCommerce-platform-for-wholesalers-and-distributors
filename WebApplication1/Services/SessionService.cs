@@ -71,7 +71,7 @@ namespace API.Services
         }
         public async Task<PagedResponse<IEnumerable<SessionResponse>>> GetSessions(GetSessionsRequest request)
         {
-            var sessions = await _unitOfWork.GetRepository<Session>().GetPagedReponseAsync(request.PageNumber, request.PageSize ,filter: x =>
+            var sessions = await _unitOfWork.GetRepository<Session>().GetPagedReponseAsync(request.PageNumber, request.PageSize, filter: x =>
             (request.PaymentMethodId == null || x.PaymentMethodId.Equals(Guid.Parse(request.PaymentMethodId)))
             && (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId))),
             orderBy: x => x.OrderByDescending(y => y.DateCreated),

@@ -1,4 +1,5 @@
 ﻿using API.Domains;
+using API.DTOs.Distributors;
 using API.DTOs.Orders;
 using API.Interfaces;
 using API.Warppers;
@@ -53,6 +54,8 @@ namespace API.Services
             if (order != null)
             {
                 var response = _mapper.Map<OrderResponse>(order);
+                var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.Distributor.Id), includeProperties: "User");
+                response.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
                 return new Response<OrderResponse>(response, message: "Succeed");
             }
             return new Response<OrderResponse>(message: "Not Found");
@@ -62,11 +65,16 @@ namespace API.Services
         {
             var orders = await _unitOfWork.GetRepository<Order>().GetAsync(filter: x =>
                                                                             (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
-                                                                            && (request.Status == null || x.Status == request.Status)
-                                                                            );
+                                                                            && (request.Status == null || x.Status == request.Status),
+                                                                            includeProperties: "Distributor");
             if (orders.Any())
             {
                 var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+                foreach (var order in response)
+                {
+                    var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.Distributor.Id), includeProperties: "User");
+                    order.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
+                }
                 return new Response<IEnumerable<OrderResponse>>(response, message: "Succeed");
             }
             return new Response<IEnumerable<OrderResponse>>(message: "Empty");

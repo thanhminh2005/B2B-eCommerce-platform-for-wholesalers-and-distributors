@@ -27,7 +27,7 @@ namespace API.Services
                                                                                  && x.Volume == request.Volume);
             var count = await _unitOfWork.GetRepository<Price>().CountAsync(x => x.ProductId.Equals(Guid.Parse(request.ProductId)));
             var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(Guid.Parse(request.ProductId));
-            if(product != null)
+            if (product != null)
             {
                 if (count > 5)
                 {
@@ -46,7 +46,7 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(product.Id.ToString(), message: "Price added successfully");
                     }
-                    else if(request.Volume < product.MinQuantity)
+                    else if (request.Volume < product.MinQuantity)
                     {
                         var newPrice = _mapper.Map<Price>(request);
                         newPrice.Id = Guid.NewGuid();
@@ -59,7 +59,7 @@ namespace API.Services
                         return new Response<string>(product.Id.ToString(), message: "Price added successfully");
                     }
                 }
-                return new Response<string>(product.Id.ToString(),message: "This specific quantity already has a price, please try again!");
+                return new Response<string>(product.Id.ToString(), message: "This specific quantity already has a price, please try again!");
             }
             return new Response<string>("Product Id not found");
         }
@@ -73,7 +73,7 @@ namespace API.Services
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
                 if (count > 1)
                 {
-                    if(price.Volume > product.MinQuantity)
+                    if (price.Volume > product.MinQuantity)
                     {
                         product.DateModified = DateTime.UtcNow;
                         _unitOfWork.GetRepository<Price>().DeleteAsync(price);
@@ -81,10 +81,10 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         return new Response<string>(price.Id.ToString(), message: "Deleted price successfully");
                     }
-                    else if(price.Volume == product.MinQuantity)
+                    else if (price.Volume == product.MinQuantity)
                     {
-                        List<Price> listPrice = (List<Price>)await _unitOfWork.GetRepository<Price>().GetAsync(filter:x => x.ProductId.Equals(price.ProductId),
-                                                                                            orderBy:x => x.OrderBy(y => y.Volume));
+                        List<Price> listPrice = (List<Price>)await _unitOfWork.GetRepository<Price>().GetAsync(filter: x => x.ProductId.Equals(price.ProductId),
+                                                                                            orderBy: x => x.OrderBy(y => y.Volume));
                         product.MinQuantity = listPrice[1].Volume;
                         product.DateModified = DateTime.UtcNow;
                         _unitOfWork.GetRepository<Price>().DeleteAsync(price);
@@ -137,11 +137,11 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
                 }
-                else if(request.Volume == product.MinQuantity)
+                else if (request.Volume == product.MinQuantity)
                 {
                     var oldPrice = await _unitOfWork.GetRepository<Price>().FirstAsync(x => x.ProductId.Equals(product.Id)
                                                                                  && x.Volume == request.Volume);
-                    if(oldPrice.Id != price.Id)
+                    if (oldPrice.Id != price.Id)
                     {
                         _unitOfWork.GetRepository<Price>().DeleteAsync(oldPrice);
                     }
