@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,7 +26,7 @@ namespace API.MoMo
             string requestId = Guid.NewGuid().ToString();
             string extraData = "";
             var domainName = _httpContext.HttpContext.Request.Scheme + Uri.SchemeDelimiter + _httpContext.HttpContext.Request.Host;
-            string ipnUrl = domainName + "/"+ Contracts.ApiRoute.Momo.IPN;
+            string ipnUrl = domainName + "/" + Contracts.ApiRoute.Momo.IPN;
             string rawHash = "accessKey=" + accessKey +
                 "&amount=" + request.Amount +
                 "&extraData=" + extraData +

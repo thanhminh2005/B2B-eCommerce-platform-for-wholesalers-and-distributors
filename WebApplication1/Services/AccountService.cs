@@ -37,11 +37,10 @@ namespace API.Services
                 return new Response<LoginResponse>("Username and Password must be required");
             }
 
-            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username));
+            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username.ToLower().Trim()));
             var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(user.RoleId);
             if (user != null)
             {
-
                 if (PasswordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 {
                     if (!user.IsActive)
@@ -50,10 +49,10 @@ namespace API.Services
                     }
                     JwtSecurityToken jwtSecurityToken = await GenerateJwtToken(user);
                     var actorId = Guid.Empty;
-                    if(role.Name.Equals(Authorization.DT))
+                    if (role.Name.Equals(Authorization.DT))
                     {
                         var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.UserId.Equals(user.Id));
-                        if(distributor != null)
+                        if (distributor != null)
                         {
                             actorId = distributor.Id;
                         }
@@ -66,7 +65,7 @@ namespace API.Services
                             actorId = retailer.Id;
                         }
                     }
-                    if(!actorId.Equals(Guid.Empty))
+                    if (!actorId.Equals(Guid.Empty))
                     {
                         LoginResponse response = new LoginResponse
                         {
@@ -93,7 +92,7 @@ namespace API.Services
                     }
                 }
             }
-            return new Response<LoginResponse>(message: "Invalid Username or Password");
+            return new Response<LoginResponse>(null, message: "Invalid Username or Password");
         }
 
         private async Task<JwtSecurityToken> GenerateJwtToken(User user)

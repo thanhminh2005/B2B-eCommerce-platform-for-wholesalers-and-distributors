@@ -28,6 +28,7 @@ namespace API.Helpers
             CreateMap<User, UpdateUserProfileRequest>().ReverseMap();
             CreateMap<User, GetUsersRequest>().ReverseMap();
             CreateMap<User, UserResponse>().ReverseMap();
+            CreateMap<User, UserDisplayResponse>().ReverseMap();
 
             CreateMap<Role, CreateRoleRequest>().ReverseMap();
             CreateMap<Role, RoleResponse>().ReverseMap();
@@ -45,6 +46,7 @@ namespace API.Helpers
             CreateMap<RetailerPaymentMethod, CreateRetailerPaymentMethodRequest>().ReverseMap();
 
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
+            CreateMap<Distributor, DistributorDisplayResponse>().ReverseMap();
 
             CreateMap<Retailer, RetailerResponse>().ReverseMap();
 

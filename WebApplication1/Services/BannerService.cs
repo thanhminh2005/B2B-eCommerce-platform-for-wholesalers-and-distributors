@@ -86,13 +86,13 @@ namespace API.Services
             if (banner != null)
             {
                 var banners = await _unitOfWork.GetRepository<Banner>().GetAsync(x => x.DistributorId.Equals(banner.DistributorId), orderBy: x => x.OrderBy(y => y.Position));
-                if(banners.Count() > 1)
+                if (banners.Count() > 1)
                 {
-                    if(banner.Position < banners.Count())
+                    if (banner.Position < banners.Count())
                     {
-                        foreach(var current in banners)
+                        foreach (var current in banners)
                         {
-                            if(current.Position > banner.Position)
+                            if (current.Position > banner.Position)
                             {
                                 current.Position -= 1;
                                 _unitOfWork.GetRepository<Banner>().UpdateAsync(current);
