@@ -48,18 +48,46 @@ namespace API.Services
             return new Response<MembershipResponse>(message: "Not found");
         }
 
-        public async Task<PagedResponse<IEnumerable<MembershipResponse>>> GetMemberships(GetMembershipsRequest request)
+        public async Task<PagedResponse<IEnumerable<object>>> GetMemberships(GetMembershipsRequest request)
         {
-            var memberships = await _unitOfWork.GetRepository<Membership>().GetPagedReponseAsync(request.PageNumber,
+            IEnumerable<Membership> memberships = null;
+            var count = 0;
+            if (!string.IsNullOrWhiteSpace(request.DistributorId) && string.IsNullOrWhiteSpace(request.RetailerId))
+            {
+                memberships = await _unitOfWork.GetRepository<Membership>().GetPagedReponseAsync(request.PageNumber,
                                                                                                  request.PageSize,
                                                                                                  filter: x => (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                                              && (request.RetailerId == null || x.Retailer.Equals(Guid.Parse(request.RetailerId)))
-                                                                                                              && (request.MembershipRankId == null || x.Retailer.Equals(Guid.Parse(request.MembershipRankId))),
-                                                                                                 orderBy: x => x.OrderByDescending(y => y.Point));
-            var count = await _unitOfWork.GetRepository<Membership>().CountAsync(x => (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                                              && (request.RetailerId == null || x.Retailer.Equals(Guid.Parse(request.RetailerId)))
-                                                                                                              && (request.MembershipRankId == null || x.Retailer.Equals(Guid.Parse(request.MembershipRankId))));
-            return new PagedResponse<IEnumerable<MembershipResponse>>(_mapper.Map<IEnumerable<MembershipResponse>>(memberships), request.PageNumber, request.PageSize, count);
+                                                                                                              && (request.MembershipRankId == null || x.MembershipRankId.Equals(Guid.Parse(request.MembershipRankId))),
+                                                                                                 orderBy: x => x.OrderByDescending(y => y.Point),
+                                                                                                 includeProperties: "Retailer,MembershipRank");
+                count = await _unitOfWork.GetRepository<Membership>().CountAsync(x => (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                    && (request.MembershipRankId == null || x.MembershipRankId.Equals(Guid.Parse(request.MembershipRankId))));
+                foreach (var member in memberships)
+                {
+                    var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(member.Retailer.UserId);
+                    member.Retailer.User = user;
+                }
+                return new PagedResponse<IEnumerable<object>>(_mapper.Map<IEnumerable<DistributorMembershipResponse>>(memberships), request.PageNumber, request.PageSize, count);
+            }
+            if (string.IsNullOrWhiteSpace(request.DistributorId) && !string.IsNullOrWhiteSpace(request.RetailerId))
+            {
+                memberships = await _unitOfWork.GetRepository<Membership>().GetPagedReponseAsync(request.PageNumber,
+                                                                                                 request.PageSize,
+                                                                                                 filter: x => (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId)))
+                                                                                                              && (request.MembershipRankId == null || x.MembershipRankId.Equals(Guid.Parse(request.MembershipRankId))),
+                                                                                                 orderBy: x => x.OrderByDescending(y => y.Point),
+                                                                                                 includeProperties: "Distributor,MembershipRank");
+                count = await _unitOfWork.GetRepository<Membership>().CountAsync(x => (request.RetailerId == null || x.RetailerId.Equals(Guid.Parse(request.RetailerId)))
+                                                                                    && (request.MembershipRankId == null || x.MembershipRankId.Equals(Guid.Parse(request.MembershipRankId))));
+                foreach (var member in memberships)
+                {
+                    var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(member.Distributor.UserId);
+                    member.Distributor.User = user;
+                }
+                return new PagedResponse<IEnumerable<object>>(_mapper.Map<IEnumerable<DistributorMembershipResponse>>(memberships), request.PageNumber, request.PageSize, count);
+            }
+
+            return new PagedResponse<IEnumerable<object>>(memberships, request.PageNumber, request.PageSize, count);
         }
 
         public async Task<Response<string>> UpdateMembership(UpdateMembershipRequest request)

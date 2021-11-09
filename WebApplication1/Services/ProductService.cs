@@ -186,7 +186,7 @@ namespace API.Services
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                                       && (request.Status == 0 || x.Status.Equals(request.Status)));
             }
-            else
+            if (string.IsNullOrWhiteSpace(request.CategoryId) && !string.IsNullOrWhiteSpace(request.SubCategoryId))
             {
                 products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
                                                                                      request.PageSize,
@@ -272,6 +272,7 @@ namespace API.Services
                         NewProduct.Status = request.Status;
                         NewProduct.Description = request.Description;
                         NewProduct.MinQuantity = request.MinQuantity;
+                        NewProduct.IsActive = request.IsActive;
                         NewProduct.DateModified = DateTime.UtcNow;
                         _unitOfWork.GetRepository<Product>().UpdateAsync(NewProduct);
                         await _unitOfWork.SaveAsync();

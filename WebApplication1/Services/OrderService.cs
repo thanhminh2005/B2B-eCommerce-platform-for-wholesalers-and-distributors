@@ -54,7 +54,7 @@ namespace API.Services
             if (order != null)
             {
                 var response = _mapper.Map<OrderResponse>(order);
-                var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.Distributor.Id), includeProperties: "User");
+                var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.DistributorId), includeProperties: "User");
                 response.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
                 return new Response<OrderResponse>(response, message: "Succeed");
             }
