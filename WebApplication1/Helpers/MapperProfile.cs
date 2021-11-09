@@ -49,6 +49,7 @@ namespace API.Helpers
             CreateMap<Distributor, DistributorDisplayResponse>().ReverseMap();
 
             CreateMap<Retailer, RetailerResponse>().ReverseMap();
+            CreateMap<Retailer, RetailerDisplayResponse>().ReverseMap();
 
             CreateMap<Product, ProductResponse>().ReverseMap();
             CreateMap<Product, CreateProductRequest>().ReverseMap();
@@ -78,6 +79,8 @@ namespace API.Helpers
             CreateMap<CustomerRank, CreateCustomerRankRequest>().ReverseMap();
 
             CreateMap<Membership, MembershipResponse>().ReverseMap();
+            CreateMap<Membership, DistributorMembershipResponse>().ReverseMap();
+            CreateMap<Membership, RetailerMembershipResponse>().ReverseMap();
             CreateMap<Membership, CreateMembershipRequest>().ReverseMap();
         }
     }

@@ -18,5 +18,6 @@ namespace API.DTOs.Products
         public int MinQuantity { get; set; }
         public List<PriceResponse> ListPrice { get; set; }
         public int Status { get; set; }
+        public bool IsActive { get; set; }
     }
 }

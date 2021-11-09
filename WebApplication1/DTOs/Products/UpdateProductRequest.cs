@@ -9,5 +9,6 @@
         public int Status { get; set; }
         public string Description { get; set; }
         public int MinQuantity { get; set; }
+        public bool IsActive { get; set; }
     }
 }
