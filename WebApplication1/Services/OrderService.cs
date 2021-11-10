@@ -65,7 +65,9 @@ namespace API.Services
         {
             var orders = await _unitOfWork.GetRepository<Order>().GetAsync(filter: x =>
                                                                             (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
+                                                                            && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                             && (request.Status == null || x.Status == request.Status),
+                                                                            orderBy: x => x.OrderByDescending(y => y.DateCreated),
                                                                             includeProperties: "Distributor");
             if (orders.Any())
             {
