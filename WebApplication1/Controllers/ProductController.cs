@@ -128,10 +128,6 @@ namespace API.Controllers
             {
                 request.Description = OldProduct.Description;
             }
-            if (request.MinQuantity == 0)
-            {
-                request.MinQuantity = OldProduct.MinQuantity;
-            }
             var response = await _productService.UpdateProduct(request);
 
             if (response.Succeeded)
