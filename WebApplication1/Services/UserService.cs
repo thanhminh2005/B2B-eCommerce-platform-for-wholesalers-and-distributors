@@ -41,7 +41,7 @@ namespace API.Services
                     newUser.IsActive = true;
                     await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(newUser.Username, message: "User Registered.");
+                    return new Response<string>(newUser.Id.ToString(), message: "User Registered.");
                 }
             }
             return new Response<string>(message: "Failed to Register");
