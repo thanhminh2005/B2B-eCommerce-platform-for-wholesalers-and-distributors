@@ -27,22 +27,21 @@ namespace API.Services
         {
             if (!string.IsNullOrWhiteSpace(request.UserId))
             {
-                var userId = Guid.Parse(request.UserId);
-                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(userId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(Guid.Parse(request.UserId));
                 if (user != null)
                 {
                     var role = await _unitOfWork.GetRepository<Role>().FirstAsync(x => x.Id.Equals(user.RoleId));
                     if (role.Name.Equals(Authorization.RT))
                     {
-                        var distributor = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(userId));
-                        if (distributor == null)
+                        var retailer = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(user.Id));
+                        if (retailer == null)
                         {
                             var newRetailer = new Retailer
                             {
                                 DateCreated = DateTime.UtcNow,
                                 Id = Guid.NewGuid(),
                                 IsActive = true,
-                                UserId = userId
+                                UserId = user.Id
                             };
                             await _unitOfWork.GetRepository<Retailer>().AddAsync(newRetailer);
                             await _unitOfWork.SaveAsync();
