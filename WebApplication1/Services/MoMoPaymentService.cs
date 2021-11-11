@@ -138,6 +138,29 @@ namespace API.Services
                     }
                 }
             }
+            using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync((Guid.Parse(request.OrderId)));
+                if (session != null)
+                {
+                    if (session.Status == -1)
+                    {
+                        session.Status = 0;
+                        _unitOfWork.GetRepository<Session>().UpdateAsync(session);
+                        await _unitOfWork.SaveAsync();
+                        var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(Guid.Parse(request.OrderId)));
+                        if (orders.Any())
+                        {
+                            foreach (var order in orders)
+                            {
+                                order.Status = 0;
+                                _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                                await _unitOfWork.SaveAsync();
+                            }
+                        }
+                    }
+                }
+            }
             response.ResultCode = 1;
             response.Message = "There is some problem is system";
             return response;

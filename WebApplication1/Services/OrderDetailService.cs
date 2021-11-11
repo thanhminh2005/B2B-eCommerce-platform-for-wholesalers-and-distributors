@@ -1,5 +1,6 @@
 ﻿using API.Domains;
 using API.DTOs.OrderDetails;
+using API.DTOs.Prices;
 using API.DTOs.Products;
 using API.Interfaces;
 using API.Warppers;
@@ -47,7 +48,10 @@ namespace API.Services
             var product = await _unitOfWork.GetRepository<OrderDetail>().GetByIdAsync(Guid.Parse(request.Id));
             if (product != null)
             {
+
                 var productInfo = _mapper.Map<ProductResponse>(await _unitOfWork.GetRepository<Product>().GetByIdAsync(product.ProductId));
+                var prices = _mapper.Map<IEnumerable<PriceResponse>>(await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(product.ProductId), orderBy: x => x.OrderBy(y => y.Volume)));
+                productInfo.ListPrice = prices.ToList();
                 var response = _mapper.Map<OrderDetailResponse>(product);
                 response.Product = productInfo;
                 return new Response<OrderDetailResponse>(response, message: "Succeed");
@@ -65,11 +69,17 @@ namespace API.Services
                 && (request.Quantity == null || x.Quantity >= request.Quantity),
                 orderBy: x => x.OrderBy(y => y.OrderId),
                 includeProperties: "Product");
+            var response = _mapper.Map<IEnumerable<OrderDetailResponse>>(products);
+            foreach (var product in response)
+            {
+                var prices = _mapper.Map<IEnumerable<PriceResponse>>(await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(product.Product.Id), orderBy: x => x.OrderBy(y => y.Volume)));
+                product.Product.ListPrice = prices.ToList();
+            }
             var count = await _unitOfWork.GetRepository<OrderDetail>().CountAsync(x =>
                 (request.OrderId == null || x.OrderId.Equals(Guid.Parse(request.OrderId)))
                 && (request.OrderPrice == null || x.OrderPrice >= request.OrderPrice)
                 && (request.Quantity == null || x.Quantity >= request.Quantity));
-            return new PagedResponse<IEnumerable<OrderDetailResponse>>(_mapper.Map<IEnumerable<OrderDetailResponse>>(products), request.PageNumber, request.PageSize, count);
+            return new PagedResponse<IEnumerable<OrderDetailResponse>>(response, request.PageNumber, request.PageSize, count);
         }
 
         public async Task<Response<string>> UpdateOrderDetail(UpdateOrderDetailRequest request)
