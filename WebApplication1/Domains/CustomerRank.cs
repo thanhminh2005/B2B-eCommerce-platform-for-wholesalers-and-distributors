@@ -10,6 +10,7 @@ namespace API.Domains
         public Guid DistributorId { get; set; }
         public Guid MembershipRankId { get; set; }
         public int Threshold { get; set; }
+        public double DiscountRate { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
 
