@@ -8,5 +8,6 @@ namespace API.DTOs.CustomerRanks
         public Guid DistributorId { get; set; }
         public Guid MembershipRankId { get; set; }
         public int Threshold { get; set; }
+        public double DiscountRate { get; set; }
     }
 }

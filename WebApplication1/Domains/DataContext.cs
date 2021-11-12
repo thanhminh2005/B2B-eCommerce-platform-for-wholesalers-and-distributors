@@ -75,6 +75,8 @@ namespace API.Domains
 
                 entity.Property(e => e.Image).IsRequired();
 
+                entity.Property(e => e.Link).IsRequired();
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
