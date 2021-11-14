@@ -1,4 +1,5 @@
-﻿using API.Contracts;
+﻿using API.AppSettings;
+using API.Contracts;
 using API.Domains;
 using API.DTOs.Accounts;
 using API.DTOs.Roles;
@@ -6,7 +7,6 @@ using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
-using B2B.AppSettings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;

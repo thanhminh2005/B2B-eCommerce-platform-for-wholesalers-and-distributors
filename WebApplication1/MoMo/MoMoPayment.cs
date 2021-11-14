@@ -12,7 +12,7 @@ namespace API.MoMo
         {
         }
 
-        public static string sendPaymentRequest(string endpoint, string postJsonString)
+        public static string SendPaymentRequest(string endpoint, string postJsonString)
         {
             try
             {

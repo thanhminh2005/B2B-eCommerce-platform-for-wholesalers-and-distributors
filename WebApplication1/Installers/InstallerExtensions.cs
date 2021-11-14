@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public static class InstallerExtensions
     {

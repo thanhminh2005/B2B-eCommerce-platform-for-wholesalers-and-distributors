@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public class SwaggerInstaller : IInstaller
     {

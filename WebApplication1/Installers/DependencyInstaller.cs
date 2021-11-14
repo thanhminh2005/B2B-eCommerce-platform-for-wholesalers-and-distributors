@@ -1,11 +1,10 @@
-﻿
-using API.Interfaces;
+﻿using API.Interfaces;
 using API.Repositories;
 using API.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public class DependencyInstaller : IInstaller
     {

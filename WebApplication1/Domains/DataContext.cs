@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Configuration;
+using Microsoft.Extensions.Configuration;
+using System;
 
 #nullable disable
 
@@ -42,7 +43,11 @@ namespace API.Domains
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+                IConfigurationRoot configuration = new ConfigurationBuilder()
+                          .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                          .AddJsonFile("appsettings.json")
+                          .Build();
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             }
         }
 

@@ -30,10 +30,10 @@ namespace API.Services
                 var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(Guid.Parse(request.UserId));
                 if (user != null)
                 {
-                    var role = await _unitOfWork.GetRepository<Role>().FirstAsync(x => x.Id.Equals(user.RoleId));
+                    var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(user.RoleId);
                     if (role.Name.Equals(Authorization.RT))
                     {
-                        var retailer = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.UserId.Equals(user.Id));
+                        var retailer = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(user.Id);
                         if (retailer == null)
                         {
                             var newRetailer = new Retailer
