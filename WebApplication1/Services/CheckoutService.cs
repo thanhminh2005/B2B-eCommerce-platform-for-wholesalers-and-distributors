@@ -91,7 +91,15 @@ namespace API.Services
                                 {
                                     if (product.Quantity <= price.Volume)
                                     {
-                                        orderPrice = price.Value * product.Quantity;
+                                        //discount
+                                        var discountRate = 0d;
+                                        var member = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(productDetail.DistributorId) && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
+                                        if (member != null)
+                                        {
+                                            var customerRank = await _unitOfWork.GetRepository<CustomerRank>().FirstAsync(x => x.DistributorId.Equals(productDetail.DistributorId) && x.MembershipRankId.Equals(member.MembershipRankId));
+                                            discountRate = customerRank.DiscountRate;
+                                        }
+                                        orderPrice = (price.Value * product.Quantity) - ((price.Value * product.Quantity) * discountRate);
                                     }
                                 }
                                 foreach (var order in orders)

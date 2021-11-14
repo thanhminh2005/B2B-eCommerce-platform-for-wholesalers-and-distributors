@@ -59,7 +59,7 @@ namespace API.MoMo
                 { "signature", signature }
 
             };
-            string responseFromMomo = MoMoPayment.sendPaymentRequest(endpoint, message.ToString());
+            string responseFromMomo = MoMoPayment.SendPaymentRequest(endpoint, message.ToString());
 
             MoMoPaymentResponse response = JsonConvert.DeserializeObject<MoMoPaymentResponse>(responseFromMomo);
 

@@ -1,5 +1,5 @@
-using B2B.AppSettings;
-using B2B.Installers;
+using API.AppSettings;
+using API.Installers;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Builder;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 
-namespace B2B
+namespace API
 {
     public class Startup
     {

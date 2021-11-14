@@ -1,8 +1,8 @@
-﻿using B2B.AppSettings;
+﻿using API.AppSettings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public class OptionInstaller : IInstaller
     {

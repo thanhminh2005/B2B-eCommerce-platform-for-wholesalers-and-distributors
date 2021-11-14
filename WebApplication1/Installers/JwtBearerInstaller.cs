@@ -1,5 +1,5 @@
-﻿using API.Warppers;
-using B2B.AppSettings;
+﻿using API.AppSettings;
+using API.Warppers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public class JwtBearerInstaller : IInstaller
     {

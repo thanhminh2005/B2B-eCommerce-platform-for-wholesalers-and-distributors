@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace B2B.Installers
+namespace API.Installers
 {
     public class DbInstaller : IInstaller
     {

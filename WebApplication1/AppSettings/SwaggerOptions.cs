@@ -1,4 +1,4 @@
-﻿namespace B2B.AppSettings
+﻿namespace API.AppSettings
 {
     public class SwaggerOptions
     {
