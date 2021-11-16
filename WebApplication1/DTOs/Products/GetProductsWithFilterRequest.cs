@@ -8,6 +8,6 @@ namespace API.DTOs.Products
         public string DistributorId { get; set; }
         public string CategoryId { get; set; }
         public string SubCategoryId { get; set; }
-        public int Status { get; set; }
+        public int? Status { get; set; }
     }
 }

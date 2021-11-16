@@ -40,13 +40,9 @@ namespace API.Services
             var payment = await _unitOfWork.GetRepository<PaymentMethod>().GetByIdAsync(Guid.Parse(request.Id));
             if (payment != null)
             {
-                var inUsed = await _unitOfWork.GetRepository<RetailerPaymentMethod>().FirstAsync(x => x.PaymentMethodId.Equals(Guid.Parse(request.Id)));
-                if (inUsed == null)
-                {
-                    _unitOfWork.GetRepository<PaymentMethod>().DeleteAsync(payment);
-                    await _unitOfWork.SaveAsync();
-                    return new Response<string>(payment.Name, message: "Payment Method Deleted");
-                }
+                _unitOfWork.GetRepository<PaymentMethod>().DeleteAsync(payment);
+                await _unitOfWork.SaveAsync();
+                return new Response<string>(payment.Name, message: "Payment Method Deleted");
             }
             return new Response<string>(message: "Failed to Delete PaymentMethod");
         }

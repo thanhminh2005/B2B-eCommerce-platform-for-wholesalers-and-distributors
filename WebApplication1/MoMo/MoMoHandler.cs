@@ -69,5 +69,49 @@ namespace API.MoMo
             }
             return null;
         }
+
+        public RefundResponse RefundPayment(RefundRequest request, IConfiguration configuration)
+        {
+            string endpoint = MoMoEndpoint.Refund;
+            string secretkey = configuration.GetSection("MomoKey")["SecretKey"];
+            string partnerCode = configuration.GetSection("MomoKey")["PartnerCode"];
+            string accessKey = configuration.GetSection("MomoKey")["AccessKey"];
+            string lang = configuration.GetSection("MomoKey")["Lang"];
+            string description = "";
+            string requestId = request.RequestId;
+            string refundHash = "accessKey=" + accessKey +
+                                                    "&amount=" + request.Amount +
+                                                    "&description" + description +
+                                                    "&orderId=" + request.OrderId +
+                                                    "&partnerCode=" + request.PartnerCode +
+                                                    "&requestId=" + request.RequestId +
+                                                    "&transId=" + request.TransId
+                                                    ;
+
+            MoMoSecurity crypto = new MoMoSecurity();
+            string signature = crypto.signSHA256(refundHash, secretkey);
+
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "orderId", request.OrderId },
+                { "requestId", requestId },
+                { "amount", request.Amount },
+                { "transId", request.TransId },
+                { "lang", lang },
+                { "description", description },
+                { "signature", signature }
+
+            };
+            string responseFromMomo = MoMoPayment.SendPaymentRequest(endpoint, message.ToString());
+
+            RefundResponse response = JsonConvert.DeserializeObject<RefundResponse>(responseFromMomo);
+
+            if (response.ResultCode == 0)
+            {
+                return response;
+            }
+            return null;
+        }
     }
 }

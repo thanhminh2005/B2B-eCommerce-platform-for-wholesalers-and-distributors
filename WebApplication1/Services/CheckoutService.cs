@@ -85,11 +85,11 @@ namespace API.Services
                                     await _unitOfWork.SaveAsync();
                                     orders.Add(order);
                                 }
-                                var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(productDetail.Id));
+                                var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(productDetail.Id), orderBy: x => x.OrderBy(y => y.Volume));
                                 double orderPrice = 0;
                                 foreach (var price in prices)
                                 {
-                                    if (product.Quantity <= price.Volume)
+                                    if (product.Quantity >= price.Volume)
                                     {
                                         //discount
                                         var discountRate = 0d;
@@ -97,7 +97,10 @@ namespace API.Services
                                         if (member != null)
                                         {
                                             var customerRank = await _unitOfWork.GetRepository<CustomerRank>().FirstAsync(x => x.DistributorId.Equals(productDetail.DistributorId) && x.MembershipRankId.Equals(member.MembershipRankId));
-                                            discountRate = customerRank.DiscountRate;
+                                            if (customerRank != null)
+                                            {
+                                                discountRate = customerRank.DiscountRate;
+                                            }
                                         }
                                         orderPrice = (price.Value * product.Quantity) - ((price.Value * product.Quantity) * discountRate);
                                     }

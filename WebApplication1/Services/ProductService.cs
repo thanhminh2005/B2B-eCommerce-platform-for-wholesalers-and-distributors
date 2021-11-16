@@ -181,14 +181,14 @@ namespace API.Services
                                                                                      (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
                                                                                      && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                     && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                     && (request.Status == null || x.Status.Equals(request.Status))
                                                                                      && (x.IsActive == true),
                                                                                      orderBy: x => x.OrderBy(y => y.Name));
                 totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x =>
                                                                                       (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                      && (request.Status == null || x.Status.Equals(request.Status))
                                                                                       && (x.IsActive == true));
             }
             if (string.IsNullOrWhiteSpace(request.CategoryId) && !string.IsNullOrWhiteSpace(request.SubCategoryId))
@@ -199,14 +199,14 @@ namespace API.Services
                                                                                      (request.SubCategoryId == null || x.SubCategoryId.Equals(Guid.Parse(request.SubCategoryId)))
                                                                                      && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                     && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                     && (request.Status == null || x.Status.Equals(request.Status))
                                                                                      && (x.IsActive == true),
                                                                                      orderBy: x => x.OrderBy(y => y.Name));
                 totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x =>
                                                                                       (request.SubCategoryId == null || x.SubCategoryId.Equals(Guid.Parse(request.SubCategoryId)))
                                                                                       && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                      && (request.Status == null || x.Status.Equals(request.Status))
                                                                                       && (x.IsActive == true));
             }
             if (string.IsNullOrWhiteSpace(request.CategoryId) && string.IsNullOrWhiteSpace(request.SubCategoryId))
@@ -215,12 +215,12 @@ namespace API.Services
                                                                                      request.PageSize,
                                                                                      filter: x => (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                     && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                     && (request.Status == null || x.Status.Equals(request.Status))
                                                                                      && (x.IsActive == true),
                                                                                      orderBy: x => x.OrderBy(y => y.Name));
                 totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x => (request.SearchValue == null || x.Name.Contains(request.SearchValue))
                                                                                       && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == 0 || x.Status.Equals(request.Status))
+                                                                                      && (request.Status == null || x.Status.Equals(request.Status))
                                                                                       && (x.IsActive == true));
             }
             List<RetailerGetProductsResponse> response = new List<RetailerGetProductsResponse>();

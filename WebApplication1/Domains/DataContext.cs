@@ -17,13 +17,13 @@ namespace API.Domains
         {
         }
 
-        public virtual DbSet<AdministrationAsset> AdministrationAssets { get; set; }
         public virtual DbSet<Banner> Banners { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CustomerRank> CustomerRanks { get; set; }
         public virtual DbSet<Distributor> Distributors { get; set; }
         public virtual DbSet<Fcm> Fcms { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
+        public virtual DbSet<HomeBanner> HomeBanners { get; set; }
         public virtual DbSet<Membership> Memberships { get; set; }
         public virtual DbSet<MembershipRank> MembershipRanks { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
@@ -33,7 +33,6 @@ namespace API.Domains
         public virtual DbSet<Price> Prices { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Retailer> Retailers { get; set; }
-        public virtual DbSet<RetailerPaymentMethod> RetailerPaymentMethods { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Session> Sessions { get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
@@ -54,19 +53,6 @@ namespace API.Domains
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<AdministrationAsset>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("AdministrationAsset");
-
-                entity.Property(e => e.DateCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.Title)
-                    .IsRequired()
-                    .HasMaxLength(50);
-            });
 
             modelBuilder.Entity<Banner>(entity =>
             {
@@ -192,6 +178,25 @@ namespace API.Domains
                     .HasForeignKey(d => d.RetailerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Feedback_Retailer");
+            });
+
+            modelBuilder.Entity<HomeBanner>(entity =>
+            {
+                entity.ToTable("HomeBanner");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Image).IsRequired();
+
+                entity.Property(e => e.Link).IsRequired();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Membership>(entity =>
@@ -376,31 +381,6 @@ namespace API.Domains
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Retailer_User");
-            });
-
-            modelBuilder.Entity<RetailerPaymentMethod>(entity =>
-            {
-                entity.ToTable("RetailerPaymentMethod");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.DateCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DateModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Detail).IsRequired();
-
-                entity.HasOne(d => d.PaymentMethod)
-                    .WithMany(p => p.RetailerPaymentMethods)
-                    .HasForeignKey(d => d.PaymentMethodId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_RetailerPaymentMethod_PaymentMethod");
-
-                entity.HasOne(d => d.Retailer)
-                    .WithMany(p => p.RetailerPaymentMethods)
-                    .HasForeignKey(d => d.RetailerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_RetailerPaymentMethod_Retailer");
             });
 
             modelBuilder.Entity<Role>(entity =>
