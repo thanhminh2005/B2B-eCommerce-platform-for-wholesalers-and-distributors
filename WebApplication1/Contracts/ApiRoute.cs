@@ -67,28 +67,38 @@
 
         public static class Products
         {
-            public const string Get = Base + "/Product/{id}";
-            public const string GetDistributor = Base + "/Distributor/{id}/Product";
-            public const string GetAllProductDistributor = Base + "/{DistributorId}/Product";
-            public const string RetailerGetDistributor = Base + "/Retailer/Distributor/{id}/Product";
-            public const string Filter = Base + "/Product/page";
-            public const string Create = Base + "/Product";
-            public const string Update = Base + "/Product/";
-            public const string Delete = Base + "/Product/";
-            public const string Recommendation = Base + "/Product/Recommendation";
-            public const string GetAll = Base + "/Product/";
-            //public const string GetAll = Base + "/Product/";
+            public const string Get = Base + "/product/{id}";
+            public const string GetDistributor = Base + "/distributor/{id}/product";
+            public const string GetAllProductDistributor = Base + "/{distributorId}/product";
+            public const string RetailerGetDistributor = Base + "/Retailer/distributor/{id}/product";
+            public const string Filter = Base + "/product/page";
+            public const string Create = Base + "/product";
+            public const string Update = Base + "/product/";
+            public const string Delete = Base + "/product/";
+            public const string Recommendation = Base + "/product/recommendation";
+            public const string GetAll = Base + "/product/";
+            //public const string GetAll = Base + "/product/";
         }
 
         public static class Banners
         {
-            public const string Create = Base + "/Banner";
-            public const string Get = Base + "/Banner/{id}";
-            public const string GetAll = Base + "/Banner/";
-            public const string GetDistributor = Base + "/Distributor/{id}/Banner";
-            public const string Update = Base + "/Banner/";
-            public const string Delete = Base + "/Banner/";
+            public const string Create = Base + "/banner";
+            public const string Get = Base + "/banner/{id}";
+            public const string GetAll = Base + "/banner/";
+            public const string GetDistributor = Base + "/distributor/{id}/banner";
+            public const string Update = Base + "/banner/";
+            public const string Delete = Base + "/banner/";
         }
+
+        public static class HomeBanners
+        {
+            public const string Create = Base + "/home/banner";
+            public const string Get = Base + "/home/banner/{id}";
+            public const string GetAll = Base + "/home/banner/";
+            public const string Update = Base + "/home/banner/";
+            public const string Delete = Base + "/home/banner/";
+        }
+
         public static class PaymentMethods
         {
             public const string GetAll = Base + "/payment-method/";
