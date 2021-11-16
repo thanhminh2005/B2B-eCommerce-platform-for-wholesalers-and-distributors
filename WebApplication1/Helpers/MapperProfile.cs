@@ -3,6 +3,7 @@ using API.DTOs.Banners;
 using API.DTOs.Categories;
 using API.DTOs.CustomerRanks;
 using API.DTOs.Distributors;
+using API.DTOs.HomeBanners;
 using API.DTOs.MembershipRanks;
 using API.DTOs.Memberships;
 using API.DTOs.OrderDetails;
@@ -68,6 +69,10 @@ namespace API.Helpers
             CreateMap<Banner, BannerResponse>().ReverseMap();
             CreateMap<Banner, CreateBannerRequest>().ReverseMap();
             CreateMap<Banner, UpdateBannerRequest>().ReverseMap();
+
+            CreateMap<HomeBanner, HomeBannerResponse>().ReverseMap();
+            CreateMap<HomeBanner, CreateHomeBannerRequest>().ReverseMap();
+            CreateMap<HomeBanner, UpdateHomeBannerRequest>().ReverseMap();
 
             CreateMap<MembershipRank, MembershipRankResponse>().ReverseMap();
             CreateMap<MembershipRank, CreateMembershipRankRequest>().ReverseMap();

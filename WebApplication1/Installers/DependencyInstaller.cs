@@ -32,6 +32,7 @@ namespace API.Installers
             services.AddScoped<ISubCategoryService, SubCategoryService>();
             services.AddScoped<IMoMoPaymentService, MoMoPaymentService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IHomeBannerService, HomeBannerService>();
         }
     }
 }
