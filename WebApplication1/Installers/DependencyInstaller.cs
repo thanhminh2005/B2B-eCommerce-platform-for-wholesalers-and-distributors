@@ -20,7 +20,6 @@ namespace API.Installers
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IRetailerService, RetailerService>();
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
-            services.AddScoped<IRetailerPaymentMethodService, RetailerPaymentMethodService>();
             services.AddScoped<IOrderDetailService, OrderDetailService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ISessionService, SessionService>();

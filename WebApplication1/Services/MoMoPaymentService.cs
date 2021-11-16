@@ -1,6 +1,7 @@
 ﻿using API.Domains;
 using API.Interfaces;
 using API.MoMo;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace API.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public MoMoPaymentService(IConfiguration configuration, IUnitOfWork unitOfWork)
+        public MoMoPaymentService(IConfiguration configuration, IUnitOfWork unitOfWork, IHttpContextAccessor httpContext)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _httpContext = httpContext;
         }
 
         public async Task<IPNResponse> GetPaymentStatusAsync(IPNRequest request)
@@ -132,6 +135,18 @@ namespace API.Services
                                 }
                                 response.Message = "Payment succeed";
                                 transaction.Complete();
+                                //refund
+                                //MoMoHandler moMoHandler = new MoMoHandler(_httpContext);
+
+                                //var refundRequest = new RefundRequest
+                                //{
+                                //    Amount = request.Amount,
+                                //    OrderId = request.OrderId,
+                                //    PartnerCode = request.PartnerCode,
+                                //    RequestId = request.RequestId,
+                                //    TransId = request.TransId
+                                //};
+                                //var refundResponse = moMoHandler.RefundPayment(refundRequest, _configuration);
                                 return response;
                             }
                         }
