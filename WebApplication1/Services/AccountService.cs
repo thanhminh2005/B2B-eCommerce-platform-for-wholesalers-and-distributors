@@ -65,31 +65,28 @@ namespace API.Services
                             actorId = retailer.Id;
                         }
                     }
-                    if (!actorId.Equals(Guid.Empty))
+                    LoginResponse response = new LoginResponse
                     {
-                        LoginResponse response = new LoginResponse
-                        {
-                            Avatar = user.Avatar,
-                            DisplayName = user.DisplayName,
-                            Email = user.Email,
-                            Id = user.Id,
-                            PhoneNumber = user.PhoneNumber,
-                            Role = _mapper.Map<RoleResponse>(role),
-                            Username = user.Username,
-                            JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                            ActorId = actorId
-                        };
-                        //var fcm = new Fcm
-                        //{
-                        //    DateCreated = DateTime.Now,
-                        //    Id = Guid.NewGuid(),
-                        //    Token = "",
-                        //    UserId = response.Id
-                        //};
-                        //await _unitOfWork.GetRepository<Fcm>().AddAsync(fcm);
-                        //await _unitOfWork.SaveAsync();
-                        return new Response<LoginResponse>(response, message: "Login Successed");
-                    }
+                        Avatar = user.Avatar,
+                        DisplayName = user.DisplayName,
+                        Email = user.Email,
+                        Id = user.Id,
+                        PhoneNumber = user.PhoneNumber,
+                        Role = _mapper.Map<RoleResponse>(role),
+                        Username = user.Username,
+                        JwtToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                        ActorId = actorId
+                    };
+                    //var fcm = new Fcm
+                    //{
+                    //    DateCreated = DateTime.Now,
+                    //    Id = Guid.NewGuid(),
+                    //    Token = "",
+                    //    UserId = response.Id
+                    //};
+                    //await _unitOfWork.GetRepository<Fcm>().AddAsync(fcm);
+                    //await _unitOfWork.SaveAsync();
+                    return new Response<LoginResponse>(response, message: "Login Successed");
                 }
             }
             return new Response<LoginResponse>(null, message: "Invalid Username or Password");

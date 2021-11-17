@@ -73,6 +73,10 @@ namespace API.Services
             foreach (var product in response)
             {
                 var prices = _mapper.Map<IEnumerable<PriceResponse>>(await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(product.Product.Id), orderBy: x => x.OrderBy(y => y.Volume)));
+                var pro = await _unitOfWork.GetRepository<Product>().GetByIdAsync(product.Product.Id);
+                var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(pro.DistributorId);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(distributor.UserId);
+                product.Product.Distributor = user.DisplayName;
                 product.Product.ListPrice = prices.ToList();
             }
             var count = await _unitOfWork.GetRepository<OrderDetail>().CountAsync(x =>
