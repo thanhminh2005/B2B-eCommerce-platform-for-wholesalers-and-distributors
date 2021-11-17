@@ -17,9 +17,9 @@ namespace API.Controllers
         }
 
         [HttpGet(ApiRoute.Categories.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] GetCategoriesRequest request)
         {
-            var response = await _categoryService.GetCategories();
+            var response = await _categoryService.GetCategories(request);
             if (response.Succeeded)
             {
                 return Ok(response);

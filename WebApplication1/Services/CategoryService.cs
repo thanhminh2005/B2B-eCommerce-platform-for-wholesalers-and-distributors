@@ -42,9 +42,36 @@ namespace API.Services
             return new Response<string>(message: "Failed to Create");
         }
 
-        public async Task<Response<IEnumerable<CategoryResponse>>> GetCategories()
+        public async Task<Response<IEnumerable<CategoryResponse>>> GetCategories(GetCategoriesRequest request)
         {
-            var categories = await _unitOfWork.GetRepository<Category>().GetAsync(includeProperties: "SubCategories");
+            IEnumerable<Category> categories = null;
+            if (!string.IsNullOrWhiteSpace(request.DistributorId))
+            {
+                var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)), includeProperties: "SubCategory");
+                var subcategories = new List<SubCategory>();
+                foreach (var product in products)
+                {
+                    if (!subcategories.Contains(product.SubCategory))
+                    {
+                        subcategories.Add(product.SubCategory);
+                    }
+                }
+                var cats = new List<Category>();
+                foreach (var sub in subcategories)
+                {
+                    if (!cats.Select(x => x.Id).Contains(sub.CategoryId))
+                    {
+                        var cat = await _unitOfWork.GetRepository<Category>().GetByIdAsync(sub.CategoryId);
+                        cat.SubCategories = subcategories.Where(x => x.CategoryId.Equals(sub.CategoryId)).ToList();
+                        cats.Add(cat);
+                    }
+                }
+                categories = cats;
+            }
+            else
+            {
+                categories = await _unitOfWork.GetRepository<Category>().GetAsync(includeProperties: "SubCategories");
+            }
             if (categories.Any())
             {
                 return new Response<IEnumerable<CategoryResponse>>(_mapper.Map<IEnumerable<CategoryResponse>>(categories), message: "Succeed");

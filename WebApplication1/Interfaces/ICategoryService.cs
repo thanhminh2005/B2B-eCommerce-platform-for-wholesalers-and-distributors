@@ -7,7 +7,7 @@ namespace API.Interfaces
 {
     public interface ICategoryService
     {
-        Task<Response<IEnumerable<CategoryResponse>>> GetCategories();
+        Task<Response<IEnumerable<CategoryResponse>>> GetCategories(GetCategoriesRequest request);
         Task<Response<CategoryResponse>> GetCategoryById(GetCategoryByIdRequest request);
         Task<Response<string>> CreateCategory(CreateCategoryRequest request);
         Task<Response<string>> UpdateCategory(UpdateCategoryRequest request);
