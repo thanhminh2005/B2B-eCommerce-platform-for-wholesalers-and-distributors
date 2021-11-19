@@ -174,24 +174,28 @@ namespace API.Services
             int totalcount = 0;
             if (!string.IsNullOrWhiteSpace(request.CategoryId) && string.IsNullOrWhiteSpace(request.SubCategoryId))
             {
-                var subCategories = await _unitOfWork.GetRepository<SubCategory>().GetAsync(x => x.CategoryId.Equals(Guid.Parse(request.CategoryId)));
-                products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
-                                                                                     request.PageSize,
-                                                                                     filter: x =>
-                                                                                     (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
-                                                                                     && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
-                                                                                     && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                     && (request.Status == null || x.Status.Equals(request.Status))
-                                                                                     && (x.IsActive == true),
-                                                                                     orderBy: x => x.OrderBy(y => y.Name));
-                totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x =>
-                                                                                      (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
-                                                                                      && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
-                                                                                      && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                      && (request.Status == null || x.Status.Equals(request.Status))
-                                                                                      && (x.IsActive == true));
+                var cat = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Guid.Parse(request.CategoryId));
+                if (cat != null)
+                {
+                    var subCategories = await _unitOfWork.GetRepository<SubCategory>().GetAsync(x => x.CategoryId.Equals(cat.Id));
+                    products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
+                                                                                         request.PageSize,
+                                                                                         filter: x =>
+                                                                                         (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
+                                                                                         && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
+                                                                                         && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                         && (request.Status == null || x.Status.Equals(request.Status))
+                                                                                         && (x.IsActive == true),
+                                                                                         orderBy: x => x.OrderBy(y => y.Name));
+                    totalcount = await _unitOfWork.GetRepository<Product>().CountAsync(filter: x =>
+                                                                                          (request.CategoryId == null || subCategories.Select(x => x.Id).Contains(x.SubCategoryId))
+                                                                                          && (request.SearchValue == null || x.Name.Contains(request.SearchValue))
+                                                                                          && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                          && (request.Status == null || x.Status.Equals(request.Status))
+                                                                                          && (x.IsActive == true));
+                }
             }
-            if (string.IsNullOrWhiteSpace(request.CategoryId) && !string.IsNullOrWhiteSpace(request.SubCategoryId))
+            if (!string.IsNullOrWhiteSpace(request.SubCategoryId))
             {
                 products = await _unitOfWork.GetRepository<Product>().GetPagedReponseAsync(request.PageNumber,
                                                                                      request.PageSize,

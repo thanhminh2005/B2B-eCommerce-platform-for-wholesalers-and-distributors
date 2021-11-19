@@ -51,6 +51,28 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Users.CheckEmail)]
+        public async Task<IActionResult> GetEmailAvailable(string email)
+        {
+            var response = await _userService.CheckEmailAvailable(email);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
+        [HttpGet(ApiRoute.Users.CheckUsername)]
+        public async Task<IActionResult> GetUsernameAvailable(string username)
+        {
+            var response = await _userService.CheckUsernameAvailable(username);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
         [HttpGet(ApiRoute.Users.Count)]
         public async Task<IActionResult> GetCount()
         {

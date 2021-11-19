@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace API.Repositories
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly DataContext _context;
+        private bool _disposed;
         private readonly Dictionary<Type, object> repositories = new Dictionary<Type, object>();
 
         public UnitOfWork(DataContext context)
@@ -31,6 +32,23 @@ namespace API.Repositories
                 repositories.Add(type, repositoryInstance);
             }
             return (IGenericRepository<T>)repositories[type];
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+            }
+            _disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

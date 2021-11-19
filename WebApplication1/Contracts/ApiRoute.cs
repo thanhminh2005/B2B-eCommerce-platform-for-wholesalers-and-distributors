@@ -38,6 +38,8 @@
             public const string UpdatePassword = Base + "/update-password";
             public const string Update = Base + "/user/";
             public const string Delete = Base + "/user/{id}";
+            public const string CheckEmail = Base + "/user/check/email";
+            public const string CheckUsername = Base + "/user/check/username";
         }
 
         public static class Roles

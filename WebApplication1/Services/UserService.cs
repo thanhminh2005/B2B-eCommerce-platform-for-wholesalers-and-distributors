@@ -29,19 +29,24 @@ namespace API.Services
                 var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username));
                 if (user == null)
                 {
-                    User newUser = _mapper.Map<User>(request);
-                    newUser.DoB = DateConverter.StringToDateTime(request.DoB);
-                    newUser.RoleId = Guid.Parse(request.RoleId);
-                    newUser.DateCreated = DateTime.UtcNow;
-                    byte[] passwordHash, passwordSalt;
-                    PasswordHash.CreatePasswordHash(request.Password, out passwordHash, out passwordSalt);
-                    newUser.PasswordHash = passwordHash;
-                    newUser.PasswordSalt = passwordSalt;
-                    newUser.Id = Guid.NewGuid();
-                    newUser.IsActive = true;
-                    await _unitOfWork.GetRepository<User>().AddAsync(newUser);
-                    await _unitOfWork.SaveAsync();
-                    return new Response<string>(newUser.Id.ToString(), message: "User Registered.");
+                    var emailExist = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Email.Equals(request.Email));
+                    if (emailExist == null)
+                    {
+
+                        User newUser = _mapper.Map<User>(request);
+                        newUser.DoB = DateConverter.StringToDateTime(request.DoB);
+                        newUser.RoleId = Guid.Parse(request.RoleId);
+                        newUser.DateCreated = DateTime.UtcNow;
+                        byte[] passwordHash, passwordSalt;
+                        PasswordHash.CreatePasswordHash(request.Password, out passwordHash, out passwordSalt);
+                        newUser.PasswordHash = passwordHash;
+                        newUser.PasswordSalt = passwordSalt;
+                        newUser.Id = Guid.NewGuid();
+                        newUser.IsActive = true;
+                        await _unitOfWork.GetRepository<User>().AddAsync(newUser);
+                        await _unitOfWork.SaveAsync();
+                        return new Response<string>(newUser.Id.ToString(), message: "User Registered.");
+                    }
                 }
             }
             return new Response<string>(message: "Failed to Register");
@@ -58,6 +63,27 @@ namespace API.Services
                 }
             }
             return new Response<UserResponse>(message: "User Not Found");
+        }
+        public async Task<Response<bool>> CheckEmailAvailable(string email)
+        {
+            var check = false;
+            var emailExist = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Email.Equals(email));
+            if (emailExist == null)
+            {
+                return new Response<bool>(check, message: "Email Available");
+            }
+            return new Response<bool>(check, message: "Email not Available");
+        }
+
+        public async Task<Response<bool>> CheckUsernameAvailable(string username)
+        {
+            var check = false;
+            var usernameExist = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(username));
+            if (usernameExist == null)
+            {
+                return new Response<bool>(check, message: "Username Available");
+            }
+            return new Response<bool>(check, message: "Username not Available");
         }
 
         public async Task<Response<UserCountResponse>> GetUserCount()
@@ -107,7 +133,7 @@ namespace API.Services
                 {
                     if (!string.IsNullOrWhiteSpace(request.NewPassword) && !string.IsNullOrWhiteSpace(request.ComfirmPassword))
                     {
-                        if (request.NewPassword.Length > 8)
+                        if (request.NewPassword.Length >= 6)
                         {
                             byte[] passwordHash, passwordSalt;
                             PasswordHash.CreatePasswordHash(request.NewPassword, out passwordHash, out passwordSalt);

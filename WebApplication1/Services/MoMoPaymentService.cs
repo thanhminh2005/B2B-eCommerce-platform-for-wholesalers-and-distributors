@@ -135,6 +135,18 @@ namespace API.Services
                                 }
                                 response.Message = "Payment succeed";
                                 transaction.Complete();
+                                var retailer = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(session.RetailerId);
+                                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(retailer.UserId);
+                                var notification = new Notification
+                                {
+                                    DateCreate = DateTime.UtcNow,
+                                    Description = "Payment using MoMo success, Total amount: " + request.Amount,
+                                    Id = Guid.NewGuid(),
+                                    Title = "MomoPayment",
+                                    UserId = user.Id
+                                };
+                                await _unitOfWork.GetRepository<Notification>().AddAsync(notification);
+                                await _unitOfWork.SaveAsync();
                                 //refund
                                 //MoMoHandler moMoHandler = new MoMoHandler(_httpContext);
 

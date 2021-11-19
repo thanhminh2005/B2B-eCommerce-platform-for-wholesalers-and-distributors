@@ -6,7 +6,6 @@ namespace API.DTOs.HomeBanners
     {
         [Required]
         public string Id { get; set; }
-        public string DistributorId { get; set; }
         public string Name { get; set; }
         public string Link { get; set; }
         public string Image { get; set; }
