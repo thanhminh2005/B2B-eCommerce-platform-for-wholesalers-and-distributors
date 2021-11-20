@@ -8,5 +8,7 @@ namespace API.Interfaces
     {
         Task<Response<string>> SendNotificationToClients(NotificationToClientsRequest request);
         Task<Response<string>> SendNotificationToRole(NotificationToRoleRequest request);
+
+
     }
 }

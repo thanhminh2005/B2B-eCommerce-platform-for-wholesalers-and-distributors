@@ -8,9 +8,6 @@ namespace API.DTOs.Products
         public string DistributorId { get; set; }
         public string CategoryId { get; set; }
         public string SubCategoryId { get; set; }
-        public bool? SortByDate { get; set; }
-        public bool? SortByPrice { get; set; }
-        public bool? IsAscending { get; set; }
         public int? Status { get; set; }
     }
 }

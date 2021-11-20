@@ -21,6 +21,8 @@ namespace API.Domains
         public bool IsActive { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
+        public string BusinessLicence { get; set; }
+        public string TaxId { get; set; }
 
         public virtual User User { get; set; }
         public virtual ICollection<Banner> Banners { get; set; }

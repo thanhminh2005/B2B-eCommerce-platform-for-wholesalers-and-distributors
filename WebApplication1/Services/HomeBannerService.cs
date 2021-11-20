@@ -117,7 +117,7 @@ namespace API.Services
             {
                 return new Response<IEnumerable<HomeBannerResponse>>(_mapper.Map<IEnumerable<HomeBannerResponse>>(homeBannerss), message: "Success");
             }
-            return new Response<IEnumerable<HomeBannerResponse>>(message: "Empty");
+            return new Response<IEnumerable<HomeBannerResponse>>(_mapper.Map<IEnumerable<HomeBannerResponse>>(homeBannerss), message: "Empty");
         }
 
         public async Task<Response<string>> UpdateHomeBanner(UpdateHomeBannerRequest request)

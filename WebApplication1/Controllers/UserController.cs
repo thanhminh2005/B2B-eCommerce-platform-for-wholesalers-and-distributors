@@ -51,6 +51,28 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Users.CheckEmail)]
+        public async Task<IActionResult> GetEmailAvailable(string email)
+        {
+            var response = await _userService.CheckEmailAvailable(email);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
+        [HttpGet(ApiRoute.Users.CheckUsername)]
+        public async Task<IActionResult> GetUsernameAvailable(string username)
+        {
+            var response = await _userService.CheckUsernameAvailable(username);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
         [HttpGet(ApiRoute.Users.Count)]
         public async Task<IActionResult> GetCount()
         {
@@ -84,6 +106,17 @@ namespace API.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateUserProfileRequest request)
         {
             var response = await _userService.UpdateUserProfile(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpPut(ApiRoute.Users.Vertified)]
+        public async Task<IActionResult> Vertification(string activationCode)
+        {
+            var response = await _userService.VertifiedUser(activationCode);
             if (response.Succeeded)
             {
                 return Ok(response);
