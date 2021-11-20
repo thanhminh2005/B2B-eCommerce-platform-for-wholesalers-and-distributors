@@ -4,6 +4,7 @@ using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,13 @@ namespace API.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<Response<string>> CreateUser(CreateUserRequest request)
@@ -42,9 +45,11 @@ namespace API.Services
                         newUser.PasswordHash = passwordHash;
                         newUser.PasswordSalt = passwordSalt;
                         newUser.Id = Guid.NewGuid();
-                        newUser.IsActive = true;
+                        newUser.IsActive = false;
+                        newUser.ActivationCode = Guid.NewGuid();
                         await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                         await _unitOfWork.SaveAsync();
+                        EmailSender.Send(_configuration, newUser.Email, newUser.ActivationCode.ToString());
                         return new Response<string>(newUser.Id.ToString(), message: "User Registered.");
                     }
                 }
@@ -169,6 +174,24 @@ namespace API.Services
                 return new Response<string>(user.Username, message: "Update Profile Successfully");
             }
             return new Response<string>(message: "Failed To Update Profile");
+        }
+
+        public async Task<Response<string>> VertifiedUser(string ActivateCode)
+        {
+            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.ActivationCode.Equals(Guid.Parse(ActivateCode)));
+            if (user != null)
+            {
+                if (!user.IsActive)
+                {
+                    user.IsActive = true;
+                    user.DateModified = DateTime.UtcNow;
+                    user.ActivationCode = null;
+                    _unitOfWork.GetRepository<User>().UpdateAsync(user);
+                    await _unitOfWork.SaveAsync();
+                    return new Response<string>(user.Username, message: "Account Vertified");
+                }
+            }
+            return new Response<string>(message: "Failed To Vertified");
         }
     }
 }

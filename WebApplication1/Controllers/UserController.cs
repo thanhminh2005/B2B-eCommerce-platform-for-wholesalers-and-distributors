@@ -112,5 +112,16 @@ namespace API.Controllers
             }
             return BadRequest(response);
         }
+
+        [HttpPut(ApiRoute.Users.Vertified)]
+        public async Task<IActionResult> Vertification(string activationCode)
+        {
+            var response = await _userService.VertifiedUser(activationCode);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
     }
 }

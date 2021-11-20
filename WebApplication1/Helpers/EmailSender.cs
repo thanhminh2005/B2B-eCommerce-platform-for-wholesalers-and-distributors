@@ -7,13 +7,12 @@ namespace API.Helpers
 {
     public static class EmailSender
     {
-        public static bool Send(IConfiguration configuration)
+        public static bool Send(IConfiguration configuration, string to, string activationCode)
         {
-            string to = "flarewave.blaze@gmail.com"; //To address    
             string from = "thanhminhmog@gmail.com"; //From address    
             MailMessage message = new MailMessage(from, to);
 
-            string mailbody = "In this article you will learn how to send a email using Asp.Net & C#";
+            string mailbody = "<a href=\"https://gecko-b3c27.web.app/email-vertified?activationCode=" + activationCode + " \"><button class=\"button\">Click Here to Vertified</button></a>";
             message.Subject = "Sending Email Using Asp.Net & C#";
             message.Body = mailbody;
             message.BodyEncoding = Encoding.UTF8;

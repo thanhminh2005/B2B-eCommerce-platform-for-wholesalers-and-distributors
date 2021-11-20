@@ -16,6 +16,7 @@ namespace API.Interfaces
         Task<Response<string>> UpdateUserProfile(UpdateUserProfileRequest request);
         Task<Response<string>> UpdateUserPassword(UpdateUserPasswordRequest request);
         Task<Response<UserCountResponse>> GetUserCount();
+        Task<Response<string>> VertifiedUser(string ActivateCode);
 
 
 
