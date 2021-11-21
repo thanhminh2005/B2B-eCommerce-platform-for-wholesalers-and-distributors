@@ -41,7 +41,7 @@ namespace API.Services
                             {
                                 DateCreated = DateTime.UtcNow,
                                 Id = Guid.NewGuid(),
-                                IsActive = true,
+                                IsActive = false,
                                 UserId = userId
                             };
                             await _unitOfWork.GetRepository<Distributor>().AddAsync(newDistributor);

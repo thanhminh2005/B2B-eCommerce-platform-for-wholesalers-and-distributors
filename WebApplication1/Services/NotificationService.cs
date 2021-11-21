@@ -2,7 +2,9 @@
 using API.DTOs.Notifications;
 using API.Interfaces;
 using API.Warppers;
+using AutoMapper;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,10 +13,32 @@ namespace API.Services
     public class NotificationService : INotificationService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public NotificationService(IUnitOfWork unitOfWork)
+        public NotificationService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        public async Task<Response<NotificationResponse>> GetNotificationById(GetNotificationByIdRequest request)
+        {
+            var notification = await _unitOfWork.GetRepository<Notification>().GetByIdAsync(Guid.Parse(request.Id));
+            if (notification != null)
+            {
+                return new Response<NotificationResponse>(_mapper.Map<NotificationResponse>(notification), "Succeed");
+            }
+            return new Response<NotificationResponse>("Not found");
+        }
+
+        public async Task<Response<IEnumerable<NotificationResponse>>> GetNotifications(GetNotificationsRequest request)
+        {
+            var notifications = await _unitOfWork.GetRepository<Notification>().GetAsync(x => x.UserId.Equals(Guid.Parse(request.UserId)));
+            if (notifications.Any())
+            {
+                return new Response<IEnumerable<NotificationResponse>>(_mapper.Map<IEnumerable<NotificationResponse>>(notifications), "Succeed");
+            }
+            return new Response<IEnumerable<NotificationResponse>>("Empty");
         }
 
         public async Task<Response<string>> SendNotificationToClients(NotificationToClientsRequest request)

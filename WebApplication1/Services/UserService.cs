@@ -49,8 +49,8 @@ namespace API.Services
                         newUser.ActivationCode = Guid.NewGuid();
                         await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                         await _unitOfWork.SaveAsync();
-                        EmailSender.Send(_configuration, newUser.Email, newUser.ActivationCode.ToString());
-                        return new Response<string>(newUser.Id.ToString(), message: "User Registered.");
+                        var emailcheck = await EmailSender.SendAsync(_configuration, newUser.Email, newUser.ActivationCode.ToString());
+                        return new Response<string>(newUser.Id.ToString(), message: emailcheck.ToString());
                     }
                 }
             }
@@ -168,6 +168,8 @@ namespace API.Services
                 user.PhoneNumber = request.PhoneNumber;
                 user.Sex = request.Sex;
                 user.IsActive = request.IsActive;
+                user.BusinessLicense = request.BusinessLicense;
+                user.TaxId = request.TaxId;
                 user.DateModified = DateTime.UtcNow;
                 _unitOfWork.GetRepository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveAsync();

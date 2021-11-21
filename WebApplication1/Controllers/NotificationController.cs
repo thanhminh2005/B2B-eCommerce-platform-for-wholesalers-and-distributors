@@ -39,5 +39,31 @@ namespace API.Controllers
             }
             return BadRequest(response);
         }
+
+        [HttpGet(ApiRoute.Notifications.GetAll)]
+        public async Task<IActionResult> GetAll([FromRoute(Name = "user-id")] string userId)
+        {
+            GetNotificationsRequest request = new GetNotificationsRequest
+            {
+                UserId = userId
+            };
+            var response = await _notificationService.GetNotifications(request);
+            if (response.Succeeded)
+            {
+                return (Ok(response));
+            }
+            return NotFound(response);
+        }
+
+        [HttpGet(ApiRoute.Notifications.Get)]
+        public async Task<IActionResult> Get(GetNotificationByIdRequest request)
+        {
+            var response = await _notificationService.GetNotificationById(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
     }
 }

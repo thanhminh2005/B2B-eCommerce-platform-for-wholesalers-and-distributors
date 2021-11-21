@@ -31,6 +31,8 @@ namespace API.Domains
         public DateTime? DateModified { get; set; }
         public bool IsActive { get; set; }
         public Guid? ActivationCode { get; set; }
+        public string BusinessLicense { get; set; }
+        public string TaxId { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Distributor> Distributors { get; set; }

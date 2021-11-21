@@ -111,7 +111,7 @@ namespace API.Services
 
         public async Task<Response<IEnumerable<HomeBannerResponse>>> GetHomeBanners()
         {
-            var homeBannerss = await _unitOfWork.GetRepository<HomeBanner>().GetAllAsync();
+            var homeBannerss = await _unitOfWork.GetRepository<HomeBanner>().GetAsync(orderBy: x => x.OrderBy(y => y.Position));
             var count = await _unitOfWork.GetRepository<HomeBanner>().CountAsync();
             if (count != 0)
             {
@@ -126,28 +126,41 @@ namespace API.Services
             {
                 if (!string.IsNullOrWhiteSpace(request.Id))
                 {
-                    HomeBanner newHomeBanner = await _unitOfWork.GetRepository<HomeBanner>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                    if (request.Position < 0 || request.Position == 0 || request.Position > 5)
+                    var ExistedHomeBanners = await _unitOfWork.GetRepository<HomeBanner>().GetAsync(orderBy: x => x.OrderBy(y => y.Position));
+                    if (request.Position <= 0 || request.Position > ExistedHomeBanners.Count())
                     {
-                        return new Response<string>(message: "HomeBanner position must be from range 1 to 5");
+                        return new Response<string>(message: "HomeBanner position must be from range 1 to " + +ExistedHomeBanners.Count());
                     }
                     else
                     {
+                        HomeBanner newHomeBanner = await _unitOfWork.GetRepository<HomeBanner>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
                         newHomeBanner.Name = request.Name;
                         newHomeBanner.Link = request.Link;
                         newHomeBanner.Image = request.Image;
-                        var ExistedHomeBanners = await _unitOfWork.GetRepository<HomeBanner>().GetAsync(orderBy: x => x.OrderBy(y => y.Position));
+
                         foreach (HomeBanner homeBanners1 in ExistedHomeBanners)
                         {
                             if (request.Position == homeBanners1.Position && newHomeBanner.Id != homeBanners1.Id)
                             {
-                                request.Position = homeBanners1.Position + 1;
+                                homeBanners1.Position = newHomeBanner.Position;
+                                _unitOfWork.GetRepository<HomeBanner>().UpdateAsync(homeBanners1);
                             }
                         }
                         newHomeBanner.Position = request.Position;
                         newHomeBanner.DateModified = DateTime.UtcNow;
                         _unitOfWork.GetRepository<HomeBanner>().UpdateAsync(newHomeBanner);
                         await _unitOfWork.SaveAsync();
+                        var dbBanners = await _unitOfWork.GetRepository<HomeBanner>().GetAsync(orderBy: x => x.OrderBy(y => y.Position));
+                        if (dbBanners.Any(x => x.Position == 1))
+                        {
+                            var pos = 1;
+                            foreach (var current in dbBanners)
+                            {
+                                current.Position = pos++;
+                                _unitOfWork.GetRepository<HomeBanner>().UpdateAsync(current);
+                            }
+                            await _unitOfWork.SaveAsync();
+                        }
                         return new Response<string>(newHomeBanner.Id.ToString(), message: "HomeBanner is updated");
                     }
                 }

@@ -466,6 +466,10 @@ namespace API.Domains
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(13);
 
+                entity.Property(e => e.TaxId)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Username)
                     .IsRequired()
                     .HasMaxLength(32);

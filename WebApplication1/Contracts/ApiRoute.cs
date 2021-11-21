@@ -73,14 +73,13 @@
             public const string Get = Base + "/product/{id}";
             public const string GetDistributor = Base + "/distributor/{id}/product";
             public const string GetAllProductDistributor = Base + "/{distributorId}/product";
-            public const string RetailerGetDistributor = Base + "/Retailer/distributor/{id}/product";
+            public const string RetailerGetDistributor = Base + "/retailer/distributor/{id}/product";
             public const string Filter = Base + "/product/page";
             public const string Create = Base + "/product";
             public const string Update = Base + "/product/";
             public const string Delete = Base + "/product/";
             public const string Recommendation = Base + "/product/recommendation";
             public const string GetAll = Base + "/product/";
-            //public const string GetAll = Base + "/product/";
         }
 
         public static class Banners
@@ -190,6 +189,8 @@
         {
             public const string Clients = Base + "/manager/notification/clients";
             public const string Role = Base + "/manager/notification/role";
+            public const string Get = Base + "/notification/{id}";
+            public const string GetAll = Base + "/user/{user-id}/notification";
         }
 
         public static class Momo

@@ -1,36 +1,32 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
-using System.Net.Mail;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace API.Helpers
 {
     public static class EmailSender
     {
-        public static bool Send(IConfiguration configuration, string to, string activationCode)
+        public static async Task<bool> SendAsync(IConfiguration configuration, string to, string activationCode)
         {
-            string from = "thanhminhmog@gmail.com"; //From address    
-            MailMessage message = new MailMessage(from, to);
+            var apiKey = configuration.GetSection("SENDGRID_API_KEY").Value;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("haru_konshita@hotmail.com", "The Sender");
+            var toEmail = new EmailAddress(to, "The Receiver");
 
-            string mailbody = "<a href=\"https://gecko-b3c27.web.app/email-vertified?activationCode=" + activationCode + " \"><button class=\"button\">Click Here to Vertified</button></a>";
-            message.Subject = "Sending Email Using Asp.Net & C#";
-            message.Body = mailbody;
-            message.BodyEncoding = Encoding.UTF8;
-            message.IsBodyHtml = true;
-            SmtpClient client = new SmtpClient("smtp.gmail.com", 587); //Gmail smtp    
-            System.Net.NetworkCredential basicCredential1 = new
-            System.Net.NetworkCredential(from, "Masterofgame1");
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Credentials = basicCredential1;
+            var subject = "Test Email with SendGrid";
+            var htmlContent = "<a href=\"https://gecko-b3c27.web.app/ss/email-vertified?activationCode=" + activationCode + "\"><button class=\"button\">Click Here to Vertified</button></a>";
+            var msg = MailHelper.CreateSingleEmail(from, toEmail, subject, null, htmlContent);
             try
             {
-                client.Send(message);
+                await client.SendEmailAsync(msg);
             }
             catch (Exception e)
             {
 
                 Console.WriteLine(e);
+                return false;
             }
             return true;
         }
