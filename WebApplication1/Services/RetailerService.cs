@@ -40,7 +40,7 @@ namespace API.Services
                             {
                                 DateCreated = DateTime.UtcNow,
                                 Id = Guid.NewGuid(),
-                                IsActive = true,
+                                IsActive = false,
                                 UserId = user.Id
                             };
                             await _unitOfWork.GetRepository<Retailer>().AddAsync(newRetailer);
