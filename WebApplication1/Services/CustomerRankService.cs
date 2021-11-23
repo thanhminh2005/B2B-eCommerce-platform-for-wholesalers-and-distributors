@@ -28,7 +28,7 @@ namespace API.Services
             if (customerRank == null && request.Threshold > 0 && request.DiscountRate > 0)
             {
                 var ranks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(x => x.DistributorId.Equals(Guid.Parse(request.DistributorId)));
-                if (ranks == null)
+                if (ranks != null)
                 {
                     if (!ranks.Any(x => x.Threshold == request.Threshold))
                     {
@@ -75,9 +75,9 @@ namespace API.Services
             if (customerRank != null && request.Threshold > 0 && request.DiscountRate > 0)
             {
                 var ranks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId));
-                if (ranks == null)
+                if (ranks != null)
                 {
-                    if (!ranks.Any(x => x.Threshold == request.Threshold))
+                    if (!ranks.Any(x => x.Threshold == request.Threshold) || !ranks.Any(x => x.DiscountRate == request.DiscountRate))
                     {
                         customerRank.DateModified = DateTime.UtcNow;
                         customerRank.MembershipRankId = Guid.Parse(request.MembershipRankId);
