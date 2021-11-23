@@ -45,9 +45,9 @@ namespace API.Services
                     }
                     await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(product.Id.ToString(), message: "Price added successfully");
+                    return new Response<string>(price.ProductId.ToString(), message: "Price added successfully");
                 }
-                return new Response<string>(product.Id.ToString(), message: "This specific quantity already has a price, please try again!");
+                return new Response<string>(price.ProductId.ToString(), message: "This specific quantity already has a price, please try again!");
             }
             return new Response<string>("Product Id not found");
         }
@@ -71,9 +71,9 @@ namespace API.Services
                     }
                     _unitOfWork.GetRepository<Price>().DeleteAsync(price);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(price.Id.ToString(), message: "Deleted price successfully");
+                    return new Response<string>(price.ProductId.ToString(), message: "Deleted price successfully");
                 }
-                return new Response<string>(product.Id.ToString(), message: "Can not delete the final price of product");
+                return new Response<string>(price.ProductId.ToString(), message: "Can not delete the final price of product");
             }
             return new Response<string>("Price Id is not existed");
         }

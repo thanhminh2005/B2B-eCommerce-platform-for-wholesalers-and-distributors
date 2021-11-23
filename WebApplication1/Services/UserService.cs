@@ -35,22 +35,25 @@ namespace API.Services
                     var emailExist = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Email.Equals(request.Email));
                     if (emailExist == null)
                     {
-
-                        User newUser = _mapper.Map<User>(request);
-                        newUser.DoB = DateConverter.StringToDateTime(request.DoB);
-                        newUser.RoleId = Guid.Parse(request.RoleId);
-                        newUser.DateCreated = DateTime.UtcNow;
-                        byte[] passwordHash, passwordSalt;
-                        PasswordHash.CreatePasswordHash(request.Password, out passwordHash, out passwordSalt);
-                        newUser.PasswordHash = passwordHash;
-                        newUser.PasswordSalt = passwordSalt;
-                        newUser.Id = Guid.NewGuid();
-                        newUser.IsActive = false;
-                        newUser.ActivationCode = Guid.NewGuid();
-                        await _unitOfWork.GetRepository<User>().AddAsync(newUser);
-                        await _unitOfWork.SaveAsync();
-                        var emailcheck = await EmailSender.SendAsync(_configuration, newUser.Email, newUser.ActivationCode.ToString());
-                        return new Response<string>(newUser.Id.ToString(), message: emailcheck.ToString());
+                        var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(Guid.Parse(request.RoleId));
+                        if (role != null)
+                        {
+                            User newUser = _mapper.Map<User>(request);
+                            newUser.DoB = DateConverter.StringToDateTime(request.DoB);
+                            newUser.RoleId = role.Id;
+                            newUser.DateCreated = DateTime.UtcNow;
+                            byte[] passwordHash, passwordSalt;
+                            PasswordHash.CreatePasswordHash(request.Password, out passwordHash, out passwordSalt);
+                            newUser.PasswordHash = passwordHash;
+                            newUser.PasswordSalt = passwordSalt;
+                            newUser.Id = Guid.NewGuid();
+                            newUser.IsActive = false;
+                            newUser.ActivationCode = Guid.NewGuid();
+                            await _unitOfWork.GetRepository<User>().AddAsync(newUser);
+                            await _unitOfWork.SaveAsync();
+                            var emailcheck = await EmailSender.SendAsync(_configuration, role.Name, newUser.Email, newUser.ActivationCode.ToString());
+                            return new Response<string>(newUser.Id.ToString(), message: "Account Created");
+                        }
                     }
                 }
             }
