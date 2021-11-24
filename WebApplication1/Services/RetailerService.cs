@@ -58,7 +58,7 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(Guid.Parse(request.Id));
-                if (distributor != null && distributor.IsActive != false)
+                if (distributor != null)
                 {
                     return new Response<RetailerResponse>(_mapper.Map<RetailerResponse>(distributor), message: "Succeed");
                 }

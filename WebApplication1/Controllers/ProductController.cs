@@ -2,8 +2,10 @@ using API.Contracts;
 using API.Domains;
 using API.DTOs.Products;
 using API.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -169,6 +171,22 @@ namespace API.Controllers
                 return Ok(response);
             }
             return NotFound(response);
+        }
+
+        [HttpPost(ApiRoute.Products.Upload)]
+        public async Task<IActionResult> Upload(string distributorId, IFormFile file, CancellationToken cancellationToken)
+        {
+            var request = new CreateProductsUsingExcelRequest
+            {
+                DistributorId = distributorId,
+                File = file,
+            };
+            var response = await _productService.ImportProductUsingExcel(request, cancellationToken);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
     }
 }

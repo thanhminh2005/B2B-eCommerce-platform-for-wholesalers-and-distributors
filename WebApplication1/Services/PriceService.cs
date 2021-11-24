@@ -107,7 +107,7 @@ namespace API.Services
                 var product = await _unitOfWork.GetRepository<Product>().GetByIdAsync(price.ProductId);
                 var prices = await _unitOfWork.GetRepository<Price>().GetAsync(x => x.ProductId.Equals(product.Id), orderBy: x => x.OrderBy(y => y.Volume));
                 var pricesList = prices.ToList();
-                if (!prices.Any(x => x.Volume == request.Volume))
+                if (!prices.Any(x => x.Volume == request.Volume && x.Value == request.Value))
                 {
                     if (price.Volume == product.MinQuantity)
                     {

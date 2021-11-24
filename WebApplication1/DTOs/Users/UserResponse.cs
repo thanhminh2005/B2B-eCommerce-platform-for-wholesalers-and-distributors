@@ -1,4 +1,6 @@
-﻿using System;
+﻿using API.DTOs.Distributors;
+using API.DTOs.Retailers;
+using System;
 
 namespace API.DTOs.Users
 {
@@ -17,6 +19,8 @@ namespace API.DTOs.Users
         public string BusinessLicense { get; set; }
         public string TaxId { get; set; }
         public bool IsActive { get; set; }
+        public UserDistributorResponse Distributor { get; set; }
+        public UserRetailerResponse Retailer { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
     }

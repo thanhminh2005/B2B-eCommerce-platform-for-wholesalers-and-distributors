@@ -1,6 +1,7 @@
 ﻿using API.Domains;
 using API.DTOs.Distributors;
 using API.DTOs.Orders;
+using API.DTOs.Retailers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
@@ -55,31 +56,43 @@ namespace API.Services
             {
                 var response = _mapper.Map<OrderResponse>(order);
                 var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.DistributorId), includeProperties: "User");
+                var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(x => x.Id.Equals(order.SessionId), includeProperties: "PaymentMethod,Retailer");
+                var session = sessions.ElementAt(0);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(session.Retailer.UserId);
+                session.Retailer.User = user;
+                response.Retailer = _mapper.Map<RetailerDisplayResponse>(session.Retailer);
                 response.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
                 return new Response<OrderResponse>(response, message: "Succeed");
             }
             return new Response<OrderResponse>(message: "Not Found");
         }
 
-        public async Task<Response<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request)
+        public async Task<PagedResponse<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request)
         {
-            var orders = await _unitOfWork.GetRepository<Order>().GetAsync(filter: x =>
+            var orders = await _unitOfWork.GetRepository<Order>().GetPagedReponseAsync(request.PageNumber,
+                                                                                        request.PageSize,
+                                                                                        filter: x =>
+                                                                                        (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
+                                                                                        && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
+                                                                                        && (request.Status == null || x.Status == request.Status),
+                                                                                        orderBy: x => x.OrderByDescending(y => y.DateCreated),
+                                                                                        includeProperties: "Distributor");
+            var count = await _unitOfWork.GetRepository<Order>().CountAsync(filter: x =>
                                                                             (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                             && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                            && (request.Status == null || x.Status == request.Status),
-                                                                            orderBy: x => x.OrderByDescending(y => y.DateCreated),
-                                                                            includeProperties: "Distributor");
-            if (orders.Any())
+                                                                            && (request.Status == null || x.Status == request.Status));
+            var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+            foreach (var order in response)
             {
-                var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
-                foreach (var order in response)
-                {
-                    var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.Distributor.Id), includeProperties: "User");
-                    order.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
-                }
-                return new Response<IEnumerable<OrderResponse>>(response, message: "Succeed");
+                var sessions = await _unitOfWork.GetRepository<Session>().GetAsync(x => x.Id.Equals(order.SessionId), includeProperties: "PaymentMethod,Retailer");
+                var session = sessions.ElementAt(0);
+                var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(session.Retailer.UserId);
+                session.Retailer.User = user;
+                order.Retailer = _mapper.Map<RetailerDisplayResponse>(session.Retailer);
+                var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(order.Distributor.Id), includeProperties: "User");
+                order.Distributor = _mapper.Map<DistributorDisplayResponse>(distributor);
             }
-            return new Response<IEnumerable<OrderResponse>>(message: "Empty");
+            return new PagedResponse<IEnumerable<OrderResponse>>(response, request.PageNumber, request.PageSize, count);
         }
 
         public async Task<Response<string>> UpdateOrder(UpdateOrderRequest request)

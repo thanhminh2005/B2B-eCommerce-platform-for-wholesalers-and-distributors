@@ -113,6 +113,17 @@ namespace API.Controllers
             return BadRequest(response);
         }
 
+        [HttpPut(ApiRoute.Users.ResetPassword)]
+        public async Task<IActionResult> Update([FromBody] CreateNewUserPasswordRequest request)
+        {
+            var response = await _userService.CreateNewUserPassword(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
         [HttpPut(ApiRoute.Users.Vertified)]
         public async Task<IActionResult> Vertification(string activationCode)
         {
