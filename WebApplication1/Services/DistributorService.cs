@@ -6,7 +6,6 @@ using API.Warppers;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -59,7 +58,7 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.Id));
-                if (distributor != null && distributor.IsActive != false)
+                if (distributor != null)
                 {
                     return new Response<DistributorResponse>(_mapper.Map<DistributorResponse>(distributor), message: "Succeed");
                 }
@@ -72,7 +71,6 @@ namespace API.Services
             var distributor = await _unitOfWork.GetRepository<Distributor>().GetAllAsync();
             if (distributor.Any())
             {
-                distributor = distributor.Where(x => x.IsActive == true);
                 return new Response<IEnumerable<DistributorResponse>>(_mapper.Map<IEnumerable<DistributorResponse>>(distributor), message: "Success");
             }
             return new Response<IEnumerable<DistributorResponse>>(message: "Empty");

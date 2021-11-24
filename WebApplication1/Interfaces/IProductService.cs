@@ -1,7 +1,7 @@
 using API.DTOs.Products;
 using API.Warppers;
 using System.Collections.Generic;
-
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace API.Interfaces
@@ -9,6 +9,7 @@ namespace API.Interfaces
     public interface IProductService
     {
         Task<Response<string>> CreateProduct(CreateProductRequest request);
+        Task<Response<string>> ImportProductUsingExcel(CreateProductsUsingExcelRequest request, CancellationToken cancellationToken);
         Task<Response<ProductResponse>> GetProductById(GetProductByIdRequest request);
         Task<Response<string>> UpdateProduct(UpdateProductRequest request);
         Task<Response<string>> RemoveProduct(RemoveProductRequest request);

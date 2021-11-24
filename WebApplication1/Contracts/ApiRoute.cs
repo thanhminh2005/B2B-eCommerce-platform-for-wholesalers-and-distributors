@@ -36,6 +36,7 @@
             public const string Get = Base + "/user/{id}";
             public const string Create = Base + "/user";
             public const string UpdatePassword = Base + "/update-password";
+            public const string ResetPassword = Base + "/reset-password";
             public const string Update = Base + "/user/";
             public const string Delete = Base + "/user/{id}";
             public const string CheckEmail = Base + "/user/check/email";
@@ -80,6 +81,7 @@
             public const string Delete = Base + "/product/";
             public const string Recommendation = Base + "/product/recommendation";
             public const string GetAll = Base + "/product/";
+            public const string Upload = Base + "/product/file-upload";
         }
 
         public static class Banners

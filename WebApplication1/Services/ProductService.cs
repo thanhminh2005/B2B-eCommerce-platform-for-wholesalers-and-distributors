@@ -6,10 +6,14 @@ using API.Helpers;
 using API.Interfaces;
 using API.Warppers;
 using AutoMapper;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace API.Services
 {
@@ -417,6 +421,103 @@ namespace API.Services
                 return new Response<IEnumerable<ProductResponse>>(response, message: "Succeed");
             }
             return new Response<IEnumerable<ProductResponse>>("Not Found");
+        }
+
+        public async Task<Response<string>> ImportProductUsingExcel(CreateProductsUsingExcelRequest request, CancellationToken cancellationToken)
+        {
+            var distributor = await _unitOfWork.GetRepository<Distributor>().GetByIdAsync(Guid.Parse(request.DistributorId));
+            if (distributor != null)
+            {
+
+                using (var stream = new MemoryStream())
+                {
+                    await request.File.CopyToAsync(stream, cancellationToken);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                        {
+                            ExcelPackage.LicenseContext = LicenseContext.Commercial;
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                            Product product = null;
+                            List<Price> prices = new List<Price>();
+                            var rowCount = worksheet.Dimension.Rows;
+                            for (int row = 2; row <= rowCount; row++)
+                            {
+                                if (worksheet.Cells[row, 1].Value.ToString().Length > 0)
+                                {
+                                    if (product != null)
+                                    {
+                                        var minQuanity = int.MaxValue;
+                                        foreach (var currentPrice in prices)
+                                        {
+                                            if (currentPrice.Volume < minQuanity)
+                                            {
+                                                currentPrice.Volume = minQuanity;
+                                            }
+                                        }
+                                        product.MinQuantity = minQuanity;
+                                        product.DateModified = DateTime.UtcNow;
+                                        _unitOfWork.GetRepository<Product>().UpdateAsync(product);
+                                        await _unitOfWork.SaveAsync();
+                                        product = null;
+                                    }
+                                    else
+                                    {
+                                        var subcategory = await _unitOfWork.GetRepository<SubCategory>().GetByIdAsync(Guid.Parse(worksheet.Cells[row, 3].Value.ToString().Trim()));
+                                        product = new Product
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            IsActive = true,
+                                            Status = 1,
+                                            OrderTime = 0,
+                                            DistributorId = Guid.Parse(request.DistributorId),
+                                            DateCreated = DateTime.Now,
+                                            Name = worksheet.Cells[row, 1].Value.ToString().Trim(),
+                                            Description = worksheet.Cells[row, 2].Value.ToString().Trim(),
+                                            SubCategoryId = subcategory.Id,
+                                        };
+                                        await _unitOfWork.GetRepository<Product>().AddAsync(product);
+                                        await _unitOfWork.SaveAsync();
+                                        var priceValue = int.Parse(worksheet.Cells[row, 4].Value.ToString().Trim());
+                                        var volumeValue = int.Parse(worksheet.Cells[row, 4].Value.ToString().Trim());
+                                        var price = new Price
+                                        {
+                                            DateCreated = DateTime.UtcNow,
+                                            Id = Guid.NewGuid(),
+                                            ProductId = product.Id,
+                                            Value = priceValue,
+                                            Volume = volumeValue
+                                        };
+                                        prices.Add(price);
+                                        await _unitOfWork.GetRepository<Price>().AddAsync(price);
+                                        await _unitOfWork.SaveAsync();
+                                    }
+                                }
+                                if (worksheet.Cells[row, 1].Value.ToString().Length == 0 &&
+                                    worksheet.Cells[row, 4].Value.ToString().Length > 0 &&
+                                    worksheet.Cells[row, 5].Value.ToString().Length > 0)
+                                {
+                                    var priceValue = int.Parse(worksheet.Cells[row, 4].Value.ToString().Trim());
+                                    var volumeValue = int.Parse(worksheet.Cells[row, 4].Value.ToString().Trim());
+                                    var price = new Price
+                                    {
+                                        DateCreated = DateTime.UtcNow,
+                                        Id = Guid.NewGuid(),
+                                        ProductId = product.Id,
+                                        Value = priceValue,
+                                        Volume = volumeValue
+                                    };
+                                    prices.Add(price);
+                                    await _unitOfWork.GetRepository<Price>().AddAsync(price);
+                                    await _unitOfWork.SaveAsync();
+                                }
+                            }
+                            return new Response<string>("Upload file to Import Compelete");
+                        }
+                    }
+                }
+            }
+            return new Response<string>("File not follow instruction");
         }
     }
 }

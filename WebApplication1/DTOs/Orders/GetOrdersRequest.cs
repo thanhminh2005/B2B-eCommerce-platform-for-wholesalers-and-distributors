@@ -1,6 +1,8 @@
-﻿namespace API.DTOs.Orders
+﻿using API.Warppers;
+
+namespace API.DTOs.Orders
 {
-    public class GetOrdersRequest
+    public class GetOrdersRequest : PagedRequest
     {
         public string SessionId { get; set; }
         public string DistributorId { get; set; }

@@ -44,9 +44,11 @@ namespace API.Helpers
 
 
             CreateMap<Distributor, DistributorResponse>().ReverseMap();
+            CreateMap<Distributor, UserDistributorResponse>().ReverseMap();
             CreateMap<Distributor, DistributorDisplayResponse>().ReverseMap();
 
             CreateMap<Retailer, RetailerResponse>().ReverseMap();
+            CreateMap<Retailer, UserRetailerResponse>().ReverseMap();
             CreateMap<Retailer, RetailerDisplayResponse>().ReverseMap();
 
             CreateMap<Product, ProductResponse>().ReverseMap();

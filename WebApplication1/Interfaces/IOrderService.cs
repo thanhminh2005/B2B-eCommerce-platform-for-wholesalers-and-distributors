@@ -8,7 +8,7 @@ namespace API.Interfaces
     public interface IOrderService
     {
         Task<Response<string>> CreateOrder(CreateOrderRequest request);
-        Task<Response<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request);
+        Task<PagedResponse<IEnumerable<OrderResponse>>> GetOrders(GetOrdersRequest request);
         Task<Response<OrderResponse>> GetOrderById(GetOrderByIdRequest request);
         Task<Response<string>> UpdateOrder(UpdateOrderRequest request);
         Task<Response<string>> DeleteOrder(DeleteOrderRequest request);

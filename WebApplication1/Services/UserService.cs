@@ -1,4 +1,7 @@
-﻿using API.Domains;
+﻿using API.Contracts;
+using API.Domains;
+using API.DTOs.Distributors;
+using API.DTOs.Retailers;
 using API.DTOs.Users;
 using API.Helpers;
 using API.Interfaces;
@@ -51,7 +54,33 @@ namespace API.Services
                             newUser.ActivationCode = Guid.NewGuid();
                             await _unitOfWork.GetRepository<User>().AddAsync(newUser);
                             await _unitOfWork.SaveAsync();
-                            var emailcheck = await EmailSender.SendAsync(_configuration, role.Name, newUser.Email, newUser.ActivationCode.ToString());
+                            if (role.Name.Equals(Authorization.RT))
+                            {
+                                var retailer = new Retailer
+                                {
+                                    DateCreated = DateTime.UtcNow,
+                                    IsActive = false,
+                                    Id = Guid.NewGuid(),
+                                    UserId = newUser.Id,
+                                };
+                                await _unitOfWork.GetRepository<Retailer>().AddAsync(retailer);
+                            }
+                            if (role.Name.Equals(Authorization.DT))
+                            {
+                                var distributor = new Distributor
+                                {
+                                    DateCreated = DateTime.UtcNow,
+                                    IsActive = false,
+                                    Id = Guid.NewGuid(),
+                                    UserId = newUser.Id,
+                                };
+                                await _unitOfWork.GetRepository<Distributor>().AddAsync(distributor);
+                            }
+                            var emailcheck = false;
+                            if (!role.Name.Equals(Authorization.AD))
+                            {
+                                emailcheck = await EmailSender.SendAsync(_configuration, role.Name, newUser.Email, newUser.ActivationCode.ToString());
+                            }
                             return new Response<string>(newUser.Id.ToString(), message: "Account Created");
                         }
                     }
@@ -123,11 +152,24 @@ namespace API.Services
                                                                                      filter: x =>
                                                                                      (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId)))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue)),
-                                                                                     orderBy: x => x.OrderBy(y => y.Username));
+                                                                                     orderBy: x => x.OrderBy(y => y.Username),
+                                                                                     includeProperties: "Retailers,Distributors");
+
 
             var totalcount = await _unitOfWork.GetRepository<User>().CountAsync(filter: x => (request.RoleId == null || x.RoleId.Equals(Guid.Parse(request.RoleId)))
                                                                                      && (request.SearchValue == null || x.Username.Contains(request.SearchValue)));
             var response = _mapper.Map<IEnumerable<UserResponse>>(users);
+            foreach (var user in response)
+            {
+                if (users.FirstOrDefault(x => x.Id.Equals(user.Id)).Distributors.Count > 0)
+                {
+                    user.Distributor = _mapper.Map<UserDistributorResponse>(users.FirstOrDefault(x => x.Id.Equals(user.Id)).Distributors.ElementAt(0));
+                }
+                if (users.FirstOrDefault(x => x.Id.Equals(user.Id)).Retailers.Count > 0)
+                {
+                    user.Retailer = _mapper.Map<UserRetailerResponse>(users.FirstOrDefault(x => x.Id.Equals(user.Id)).Retailers.ElementAt(0));
+                }
+            }
             return new PagedResponse<IEnumerable<UserResponse>>(response, request.PageNumber, request.PageSize, totalcount);
         }
 
@@ -163,6 +205,7 @@ namespace API.Services
             var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
             if (user != null)
             {
+                user.TaxId = request.TaxId;
                 user.Address = request.Address;
                 user.Avatar = request.Avatar;
                 user.DisplayName = request.DisplayName;
@@ -172,7 +215,6 @@ namespace API.Services
                 user.Sex = request.Sex;
                 user.IsActive = request.IsActive;
                 user.BusinessLicense = request.BusinessLicense;
-                user.TaxId = request.TaxId;
                 user.DateModified = DateTime.UtcNow;
                 _unitOfWork.GetRepository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveAsync();
@@ -197,6 +239,25 @@ namespace API.Services
                 }
             }
             return new Response<string>(message: "Failed To Vertified");
+        }
+
+        public async Task<Response<string>> CreateNewUserPassword(CreateNewUserPasswordRequest request)
+        {
+            var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username) && x.Email.Equals(request.Email));
+            if (user != null)
+            {
+                byte[] passwordHash, passwordSalt;
+                var password = PasswordHash.GenerateRandomAlphanumericString(12);
+                PasswordHash.CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+                user.DateModified = DateTime.UtcNow;
+                _unitOfWork.GetRepository<User>().UpdateAsync(user);
+                await _unitOfWork.SaveAsync();
+                bool checkEmail = await EmailSender.SendPasswordAsync(_configuration, user.Email, password);
+                return new Response<string>(user.Username, message: "Create New Password Successfully, Check Email For New Password");
+            }
+            return new Response<string>(message: "Failed To Update Password");
         }
     }
 }
