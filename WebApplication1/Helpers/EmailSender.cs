@@ -47,7 +47,7 @@ namespace API.Helpers
             var toEmail = new EmailAddress(to, "The Receiver");
 
             var subject = "Test Email with SendGrid";
-            var htmlContent = "<h3>"+password+"</h3>";
+            var htmlContent = "<h3>" + password + "</h3>";
             var msg = MailHelper.CreateSingleEmail(from, toEmail, subject, null, htmlContent);
             try
             {
