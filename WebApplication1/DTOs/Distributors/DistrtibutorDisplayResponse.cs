@@ -6,6 +6,7 @@ namespace API.DTOs.Distributors
     public class DistributorDisplayResponse
     {
         public Guid Id { get; set; }
+        public bool IsActive { get; set; }
         public UserDisplayResponse User { get; set; }
     }
 }

@@ -43,9 +43,9 @@ namespace API.Controllers
         }
 
         [HttpGet(ApiRoute.Retailers.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] GetRetailersRequest request)
         {
-            var response = await _retailerService.GetRetailers();
+            var response = await _retailerService.GetRetailers(request);
             if (response.Succeeded)
             {
                 return Ok(response);

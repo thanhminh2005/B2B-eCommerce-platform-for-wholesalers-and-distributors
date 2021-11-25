@@ -43,9 +43,9 @@ namespace API.Controllers
         }
 
         [HttpGet(ApiRoute.Distributors.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] GetDistributorsRequest request)
         {
-            var response = await _distributorService.GetDistributors();
+            var response = await _distributorService.GetDistributors(request);
             if (response.Succeeded)
             {
                 return Ok(response);
