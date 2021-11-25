@@ -66,14 +66,17 @@ namespace API.Services
             return new Response<DistributorResponse>("Failed");
         }
 
-        public async Task<Response<IEnumerable<DistributorResponse>>> GetDistributors()
+        public async Task<PagedResponse<IEnumerable<DistributorDisplayResponse>>> GetDistributors(GetDistributorsRequest request)
         {
-            var distributor = await _unitOfWork.GetRepository<Distributor>().GetAllAsync();
-            if (distributor.Any())
-            {
-                return new Response<IEnumerable<DistributorResponse>>(_mapper.Map<IEnumerable<DistributorResponse>>(distributor), message: "Success");
-            }
-            return new Response<IEnumerable<DistributorResponse>>(message: "Empty");
+            var distributors = await _unitOfWork.GetRepository<Distributor>().GetPagedReponseAsync(request.PageNumber,
+                request.PageSize,
+                x =>
+                (request.IsActive == null || x.IsActive == request.IsActive),
+                orderBy: x => x.OrderBy(y => y.DateCreated),
+                includeProperties: "User");
+            var count = await _unitOfWork.GetRepository<Distributor>().CountAsync(x =>
+                (request.IsActive == null || x.IsActive == request.IsActive));
+            return new PagedResponse<IEnumerable<DistributorDisplayResponse>>(_mapper.Map<IEnumerable<DistributorDisplayResponse>>(distributors), request.PageNumber, request.PageSize, count);
         }
 
         public async Task<Response<string>> UpdateDistributor(UpdateDistributorRequest request)

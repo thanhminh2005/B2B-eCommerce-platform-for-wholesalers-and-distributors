@@ -57,38 +57,39 @@ namespace API.Services
         {
             if (!string.IsNullOrWhiteSpace(request.Id))
             {
-                var distributor = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(Guid.Parse(request.Id));
-                if (distributor != null)
+                var retailer = await _unitOfWork.GetRepository<Retailer>().GetByIdAsync(Guid.Parse(request.Id));
+                if (retailer != null)
                 {
-                    return new Response<RetailerResponse>(_mapper.Map<RetailerResponse>(distributor), message: "Succeed");
+                    return new Response<RetailerResponse>(_mapper.Map<RetailerResponse>(retailer), message: "Succeed");
                 }
             }
             return new Response<RetailerResponse>("Failed");
         }
 
-        public async Task<Response<IEnumerable<RetailerResponse>>> GetRetailers()
+        public async Task<PagedResponse<IEnumerable<RetailerDisplayResponse>>> GetRetailers(GetRetailersRequest request)
         {
-            var distributor = await _unitOfWork.GetRepository<Retailer>().GetAllAsync();
-            if (distributor.Any())
-            {
-                distributor = distributor.Where(x => x.IsActive == true);
-                return new Response<IEnumerable<RetailerResponse>>(_mapper.Map<IEnumerable<RetailerResponse>>(distributor), message: "Success");
-            }
-            return new Response<IEnumerable<RetailerResponse>>(message: "Empty");
+            var retailers = await _unitOfWork.GetRepository<Retailer>().GetPagedReponseAsync(request.PageNumber,
+                request.PageSize,
+                x =>
+                (request.IsActive == null || x.IsActive == request.IsActive),
+                orderBy: x => x.OrderBy(y => y.DateCreated),
+                includeProperties: "User");
+            var count = await _unitOfWork.GetRepository<Retailer>().CountAsync(x =>
+                (request.IsActive == null || x.IsActive == request.IsActive));
+            return new PagedResponse<IEnumerable<RetailerDisplayResponse>>(_mapper.Map<IEnumerable<RetailerDisplayResponse>>(retailers), request.PageNumber, request.PageSize, count);
         }
-
         public async Task<Response<string>> UpdateRetailer(UpdateRetailerRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Id))
             {
-                var distributor = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
-                if (distributor != null)
+                var retailer = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
+                if (retailer != null)
                 {
-                    distributor.IsActive = request.IsActive;
-                    distributor.DateModified = DateTime.UtcNow;
-                    _unitOfWork.GetRepository<Retailer>().UpdateAsync(distributor);
+                    retailer.IsActive = request.IsActive;
+                    retailer.DateModified = DateTime.UtcNow;
+                    _unitOfWork.GetRepository<Retailer>().UpdateAsync(retailer);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(distributor.Id.ToString(), message: "Retailer Updated");
+                    return new Response<string>(retailer.Id.ToString(), message: "Retailer Updated");
                 }
             }
             return new Response<string>(message: "Fail to Update Retailer");

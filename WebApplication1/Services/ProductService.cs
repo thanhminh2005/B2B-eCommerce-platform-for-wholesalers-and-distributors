@@ -89,7 +89,7 @@ namespace API.Services
                 CurProduct.ParentCategoryId = parent.Id;
                 CurProduct.ParentCategoryName = parent.Name;
                 CurProduct.SubCategory = CurSubCategory;
-                CurProduct.Distributor = user.Username;
+                CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
             }
@@ -129,7 +129,7 @@ namespace API.Services
                 CurProduct.ParentCategoryId = parent.Id;
                 CurProduct.ParentCategoryName = parent.Name;
                 CurProduct.SubCategory = CurSubCategory;
-                CurProduct.Distributor = user.Username;
+                CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
             }
@@ -160,7 +160,7 @@ namespace API.Services
                     CurProduct.ParentCategoryId = parent.Id;
                     CurProduct.ParentCategoryName = parent.Name;
                     CurProduct.SubCategory = CurSubCategory;
-                    CurProduct.Distributor = user.Username;
+                    CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
                     return new Response<ProductResponse>(CurProduct, message: "Succeed");
                 }
@@ -253,7 +253,7 @@ namespace API.Services
                     CurProduct.ParentCategoryId = parent.Id;
                     CurProduct.ParentCategoryName = parent.Name;
                     CurProduct.SubCategory = CurSubCategory;
-                    CurProduct.Distributor = user.Username;
+                    CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
                     response.Add(CurProduct);
                 }
@@ -339,7 +339,7 @@ namespace API.Services
                 CurProduct.ParentCategoryId = parent.Id;
                 CurProduct.ParentCategoryName = parent.Name;
                 CurProduct.SubCategory = CurSubCategory;
-                CurProduct.Distributor = user.Username;
+                CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
             }
@@ -371,7 +371,7 @@ namespace API.Services
                 CurProduct.ParentCategoryId = parent.Id;
                 CurProduct.ParentCategoryName = parent.Name;
                 CurProduct.SubCategory = CurSubCategory;
-                CurProduct.Distributor = user.Username;
+                CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
             }
@@ -414,7 +414,7 @@ namespace API.Services
                     CurProduct.ParentCategoryId = parent.Id;
                     CurProduct.ParentCategoryName = parent.Name;
                     CurProduct.SubCategory = CurSubCategory;
-                    CurProduct.Distributor = user.Username;
+                    CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
                     response.Add(CurProduct);
                 }
