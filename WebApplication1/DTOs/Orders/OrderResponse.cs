@@ -11,7 +11,7 @@ namespace API.DTOs.Orders
         public Guid SessionId { get; set; }
         public RetailerDisplayResponse Retailer { get; set; }
         public DistributorDisplayResponse Distributor { get; set; }
-        public PaymentMethodResponse paymentMethod { get; set; }
+        public PaymentMethodResponse PaymentMethod { get; set; }
         public double OrderCost { get; set; }
         public int Status { get; set; }
     }
