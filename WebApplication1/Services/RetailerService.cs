@@ -68,19 +68,60 @@ namespace API.Services
 
         public async Task<PagedResponse<IEnumerable<RetailerDisplayResponse>>> GetRetailers(GetRetailersRequest request)
         {
-            var retailers = await _unitOfWork.GetRepository<Retailer>().GetPagedReponseAsync(request.PageNumber,
-                request.PageSize,
-                x =>
+            var retailers = await _unitOfWork.GetRepository<Retailer>().GetAsync(x =>
                 (request.IsActive == null || x.IsActive == request.IsActive),
                 orderBy: x => x.OrderBy(y => y.DateCreated),
                 includeProperties: "User");
-            var count = await _unitOfWork.GetRepository<Retailer>().CountAsync(x =>
-                (request.IsActive == null || x.IsActive == request.IsActive));
-            return new PagedResponse<IEnumerable<RetailerDisplayResponse>>(_mapper.Map<IEnumerable<RetailerDisplayResponse>>(retailers), request.PageNumber, request.PageSize, count);
+            var count = 0;
+            IEnumerable<Retailer> response = null;
+            if (string.IsNullOrWhiteSpace(request.Search))
+            {
+                if (request.HaveBusinessLicense == null)
+                {
+                    count = retailers.Count();
+                    response = retailers.Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == false)
+                {
+                    count = retailers.Where(x => x.User.BusinessLicense == null).Count();
+                    response = retailers.Where(x => x.User.BusinessLicense == null).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == true)
+                {
+                    count = retailers.Where(x => x.User.BusinessLicense != null).Count();
+                    response = retailers.Where(x => x.User.BusinessLicense != null).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+            }
+            else
+            {
+                if (request.HaveBusinessLicense == null)
+                {
+                    count = retailers.Where(x => x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search)).Count();
+                    response = retailers.Where(x => x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search)).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == false)
+                {
+                    count = retailers.Where(x => (x.User.BusinessLicense == null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Count();
+                    response = retailers.Where(x => (x.User.BusinessLicense == null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == true)
+                {
+                    count = retailers.Where(x => (x.User.BusinessLicense != null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Count();
+                    response = retailers.Where(x => (x.User.BusinessLicense != null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+
+            }
+            return new PagedResponse<IEnumerable<RetailerDisplayResponse>>(_mapper.Map<IEnumerable<RetailerDisplayResponse>>(response), request.PageNumber, request.PageSize, count);
         }
         public async Task<Response<string>> UpdateRetailer(UpdateRetailerRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Id))
+            if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var retailer = await _unitOfWork.GetRepository<Retailer>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
                 if (retailer != null)

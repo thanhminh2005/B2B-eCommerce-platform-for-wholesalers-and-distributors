@@ -95,7 +95,7 @@ namespace API.Services
                                                                                         (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                                         && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                                         && (request.Status == null || x.Status == request.Status),
-                                                                                        orderBy: x => x.OrderByDescending(y => y.DateCreated),
+                                                                                        orderBy: x => x.OrderBy(y => y.DateCreated),
                                                                                         includeProperties: "Distributor");
                 count = await _unitOfWork.GetRepository<Order>().CountAsync(filter: x =>
                                                                                 (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
