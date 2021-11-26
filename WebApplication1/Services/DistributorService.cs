@@ -68,20 +68,61 @@ namespace API.Services
 
         public async Task<PagedResponse<IEnumerable<DistributorDisplayResponse>>> GetDistributors(GetDistributorsRequest request)
         {
-            var distributors = await _unitOfWork.GetRepository<Distributor>().GetPagedReponseAsync(request.PageNumber,
-                request.PageSize,
-                x =>
+            var distributors = await _unitOfWork.GetRepository<Distributor>().GetAsync(x =>
                 (request.IsActive == null || x.IsActive == request.IsActive),
                 orderBy: x => x.OrderBy(y => y.DateCreated),
                 includeProperties: "User");
-            var count = await _unitOfWork.GetRepository<Distributor>().CountAsync(x =>
-                (request.IsActive == null || x.IsActive == request.IsActive));
-            return new PagedResponse<IEnumerable<DistributorDisplayResponse>>(_mapper.Map<IEnumerable<DistributorDisplayResponse>>(distributors), request.PageNumber, request.PageSize, count);
+            var count = 0;
+            IEnumerable<Distributor> response = null;
+            if (string.IsNullOrWhiteSpace(request.Search))
+            {
+                if (request.HaveBusinessLicense == null)
+                {
+                    count = distributors.Count();
+                    response = distributors.Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == false)
+                {
+                    count = distributors.Where(x => x.User.BusinessLicense == null).Count();
+                    response = distributors.Where(x => x.User.BusinessLicense == null).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == true)
+                {
+                    count = distributors.Where(x => x.User.BusinessLicense != null).Count();
+                    response = distributors.Where(x => x.User.BusinessLicense != null).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+            }
+            else
+            {
+                if (request.HaveBusinessLicense == null)
+                {
+                    count = distributors.Where(x => x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search)).Count();
+                    response = distributors.Where(x => x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search)).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == false)
+                {
+                    count = distributors.Where(x => (x.User.BusinessLicense == null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Count();
+                    response = distributors.Where(x => (x.User.BusinessLicense == null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+                if (request.HaveBusinessLicense == true)
+                {
+                    count = distributors.Where(x => (x.User.BusinessLicense != null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Count();
+                    response = distributors.Where(x => (x.User.BusinessLicense != null) && (x.User.Email.Contains(request.Search) || x.User.DisplayName.Contains(request.Search))).Skip((request.PageNumber - 1) * request.PageSize)
+                                          .Take(request.PageSize);
+                }
+
+            }
+            return new PagedResponse<IEnumerable<DistributorDisplayResponse>>(_mapper.Map<IEnumerable<DistributorDisplayResponse>>(response), request.PageNumber, request.PageSize, count);
         }
 
         public async Task<Response<string>> UpdateDistributor(UpdateDistributorRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Id))
+            if (!string.IsNullOrWhiteSpace(request.Id))
             {
                 var distributor = await _unitOfWork.GetRepository<Distributor>().FirstAsync(x => x.Id.Equals(Guid.Parse(request.Id)));
                 if (distributor != null)
