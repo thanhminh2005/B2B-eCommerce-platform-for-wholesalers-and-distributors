@@ -11,7 +11,6 @@ namespace API.Warppers
 
         public Response()
         {
-
         }
 
         public Response(T data, string message = null)

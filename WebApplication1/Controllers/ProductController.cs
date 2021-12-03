@@ -23,6 +23,14 @@ namespace API.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        public IProductService IProductService
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         [HttpGet(ApiRoute.Products.Get)]
         public async Task<IActionResult> Get(string id)
         {

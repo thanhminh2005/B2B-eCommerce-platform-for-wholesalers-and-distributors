@@ -60,7 +60,7 @@ namespace API.Services
                             TotalCost = 0,
                         };
                         await _unitOfWork.GetRepository<Session>().AddAsync(session);
-
+                        await _unitOfWork.SaveAsync();
                         var orders = new List<Order>();
                         double sessionCost = 0;
 
@@ -119,10 +119,9 @@ namespace API.Services
                                             Quantity = product.Quantity
 
                                         };
-                                        await _unitOfWork.GetRepository<OrderDetail>().AddAsync(orderDetail);
-                                        await _unitOfWork.SaveAsync();
                                         order.OrderCost += orderPrice;
                                         _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                                        await _unitOfWork.GetRepository<OrderDetail>().AddAsync(orderDetail);
                                         await _unitOfWork.SaveAsync();
                                     }
                                 }

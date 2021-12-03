@@ -42,7 +42,14 @@ namespace API.Services
                         if (role != null)
                         {
                             User newUser = _mapper.Map<User>(request);
-                            newUser.DoB = DateConverter.StringToDateTime(request.DoB);
+                            if (string.IsNullOrWhiteSpace(request.DoB))
+                            {
+                                newUser.DoB = DateTime.MinValue;
+                            }
+                            else
+                            {
+                                newUser.DoB = DateConverter.StringToDateTime(request.DoB);
+                            }
                             newUser.RoleId = role.Id;
                             newUser.DateCreated = DateTime.UtcNow;
                             byte[] passwordHash, passwordSalt;
@@ -76,6 +83,7 @@ namespace API.Services
                                 };
                                 await _unitOfWork.GetRepository<Distributor>().AddAsync(distributor);
                             }
+                            await _unitOfWork.SaveAsync();
                             var emailcheck = false;
                             if (!role.Name.Equals(Authorization.AD))
                             {
