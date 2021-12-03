@@ -36,7 +36,6 @@ namespace API.Services
             {
                 return new Response<LoginResponse>("Username and Password must be required");
             }
-
             var user = await _unitOfWork.GetRepository<User>().FirstAsync(x => x.Username.Equals(request.Username.ToLower().Trim()));
             var role = await _unitOfWork.GetRepository<Role>().GetByIdAsync(user.RoleId);
             if (user != null)

@@ -24,7 +24,7 @@ namespace API.Helpers
             }
             if (role.Equals(Authorization.DT))
             {
-                htmlContent = "<a href=\"https://geckoretailer.z23.web.core.windows.net/ss/email-vertified?activationCode=" + activationCode + "\"><button class=\"button\">Click Here to Vertified</button></a>";
+                htmlContent = "<a href=\"https://geckodistributor.z23.web.core.windows.net/email-vertified?activationCode=" + activationCode + "\"><button class=\"button\">Click Here to Vertified</button></a>";
             }
             var msg = MailHelper.CreateSingleEmail(from, toEmail, subject, null, htmlContent);
             try

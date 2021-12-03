@@ -45,7 +45,7 @@ namespace API.Services
                     }
                     await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(price.ProductId.ToString(), message: "Price added successfully");
+                    return new Response<string>(newPrice.ProductId.ToString(), message: "Price added successfully");
                 }
                 return new Response<string>(price.ProductId.ToString(), message: "This specific quantity already has a price, please try again!");
             }
@@ -128,7 +128,7 @@ namespace API.Services
                     }
                     if (price.Volume > product.MinQuantity)
                     {
-                        if (request.Volume < product.MinQuantity)
+                        if (request.Volume != product.MinQuantity)
                         {
                             product.MinQuantity = request.Volume;
                         }
