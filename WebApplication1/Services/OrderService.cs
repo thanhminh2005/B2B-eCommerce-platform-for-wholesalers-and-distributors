@@ -71,19 +71,27 @@ namespace API.Services
         {
             IEnumerable<Order> orders = null;
             var count = 0;
+            List<int> statusList = new List<int>();
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                foreach (var item in request.Status.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    statusList.Add(int.Parse(item));
+                }
+            }
             if (string.IsNullOrWhiteSpace(request.SessionId) && !string.IsNullOrWhiteSpace(request.RetailerId))
             {
                 var session = await _unitOfWork.GetRepository<Session>().GetAsync(x => x.RetailerId.Equals(Guid.Parse(request.RetailerId)),
                     orderBy: x => x.OrderBy(y => y.DateCreated));
                 orders = await _unitOfWork.GetRepository<Order>().GetPagedReponseAsync(request.PageNumber,
                     request.PageSize,
-                    x => (request.Status == null || x.Status == request.Status)
+                    x => (request.Status == null || statusList.Contains(x.Status))
                     && (session.Select(y => y.Id).Contains(x.SessionId))
                     && (request.DistributorId == null || x.DistributorId == Guid.Parse(request.DistributorId)),
                     orderBy: x => x.OrderBy(y => y.DateCreated),
                     includeProperties: "Distributor");
                 count = await _unitOfWork.GetRepository<Order>().CountAsync(
-                    x => (request.Status == null || x.Status == request.Status)
+                    x => (request.Status == null || statusList.Contains(x.Status))
                     && (session.Select(y => y.Id).Contains(x.SessionId))
                     && (request.DistributorId == null || x.DistributorId == Guid.Parse(request.DistributorId)));
             }
@@ -94,13 +102,13 @@ namespace API.Services
                                                                                         filter: x =>
                                                                                         (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                                         && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                        && (request.Status == null || x.Status == request.Status),
+                                                                                        && (request.Status == null || statusList.Contains(x.Status)),
                                                                                         orderBy: x => x.OrderBy(y => y.DateCreated),
                                                                                         includeProperties: "Distributor");
                 count = await _unitOfWork.GetRepository<Order>().CountAsync(filter: x =>
                                                                                 (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                                 && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
-                                                                                && (request.Status == null || x.Status == request.Status));
+                                                                                && (request.Status == null || statusList.Contains(x.Status)));
             }
             var response = _mapper.Map<IEnumerable<OrderResponse>>(orders);
             foreach (var order in response)

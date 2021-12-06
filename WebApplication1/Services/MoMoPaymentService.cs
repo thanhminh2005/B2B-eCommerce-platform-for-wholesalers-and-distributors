@@ -159,6 +159,7 @@ namespace API.Services
                                 //    TransId = request.TransId
                                 //};
                                 //var refundResponse = moMoHandler.RefundPayment(refundRequest, _configuration);
+                                transaction.Complete();
                                 return response;
                             }
                         }
@@ -184,6 +185,7 @@ namespace API.Services
                                 _unitOfWork.GetRepository<Order>().UpdateAsync(order);
                                 await _unitOfWork.SaveAsync();
                             }
+                            transaction.Complete();
                         }
                     }
                 }
