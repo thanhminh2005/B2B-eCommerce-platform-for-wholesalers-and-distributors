@@ -117,7 +117,7 @@ namespace API.Services
                                             {
                                                 if (rank.Threshold <= membership.Point)
                                                 {
-                                                    membership.MembershipRankId = rank.Id;
+                                                    membership.MembershipRankId = rank.MembershipRankId;
                                                 }
                                             }
                                         }

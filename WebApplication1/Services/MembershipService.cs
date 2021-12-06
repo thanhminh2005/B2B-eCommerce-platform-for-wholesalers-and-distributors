@@ -43,7 +43,13 @@ namespace API.Services
                                                                                            && x.RetailerId.Equals(Guid.Parse(request.RetailerId)));
             if (membership != null)
             {
-                return new Response<MembershipResponse>(_mapper.Map<MembershipResponse>(membership), message: "Success");
+                var customerRank = await _unitOfWork.GetRepository<CustomerRank>().FirstAsync(x => x.DistributorId.Equals(membership.DistributorId) && x.MembershipRankId.Equals(membership.MembershipRankId));
+                if(customerRank != null)
+                {
+                    var response = _mapper.Map<MembershipResponse>(membership);
+                    response.DiscountRate = customerRank.DiscountRate;
+                    return new Response<MembershipResponse>(response ,message: "Success");
+                }
             }
             return new Response<MembershipResponse>(message: "Not found");
         }
