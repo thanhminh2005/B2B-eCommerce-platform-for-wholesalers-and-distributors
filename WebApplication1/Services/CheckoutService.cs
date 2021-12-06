@@ -4,6 +4,7 @@ using API.DTOs.Orders;
 using API.DTOs.PaymentMethods;
 using API.Interfaces;
 using API.MoMo;
+using API.VNPay;
 using API.Warppers;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +46,7 @@ namespace API.Services
                         {
                             status = 2;
                         }
-                        if (paymentMethod.Name.Equals("Momo"))
+                        if (paymentMethod.Name.Equals("Momo") || paymentMethod.Name.Equals("VNPay"))
                         {
                             status = -1;
                         }
@@ -79,7 +80,7 @@ namespace API.Services
                                         DistributorId = productDetail.DistributorId,
                                         OrderCost = 0,
                                         SessionId = session.Id,
-                                        Status = status
+                                        Status = status,
                                     };
                                     await _unitOfWork.GetRepository<Order>().AddAsync(order);
                                     await _unitOfWork.SaveAsync();
@@ -125,12 +126,9 @@ namespace API.Services
                                         await _unitOfWork.SaveAsync();
                                     }
                                 }
-                                if (status == 1)
-                                {
-                                    productDetail.OrderTime += 1;
-                                    _unitOfWork.GetRepository<Product>().UpdateAsync(productDetail);
-                                    await _unitOfWork.SaveAsync();
-                                }
+                                productDetail.OrderTime = productDetail.OrderTime++;
+                                _unitOfWork.GetRepository<Product>().UpdateAsync(productDetail);
+                                await _unitOfWork.SaveAsync();
                             }
                             else
                             {
@@ -144,28 +142,55 @@ namespace API.Services
                             sessionCost += order.OrderCost;
                         }
                         session.TotalCost = sessionCost;
+                        if (sessionCost < 1000)
+                        {
+                            return new Response<CheckOutResponse>("Amount too low");
+                        }
                         _unitOfWork.GetRepository<Session>().UpdateAsync(session);
                         await _unitOfWork.SaveAsync();
 
                         //paymentProcess
                         MoMoPaymentResponse paymentResponse = null;
+                        string VNPayPaymentUrl = null;
                         if (status == -1)
                         {
-                            var paymentRequest = new MoMoPaymentRequest
+                            if (paymentMethod.Name.Equals("Momo"))
                             {
-                                Amount = (long)session.TotalCost,
-                                OrderId = session.Id.ToString(),
-                                OrderInfo = "test",
-                                RedirectUrl = request.RedirectUrl
-                            };
-                            var momoHandler = new MoMoHandler(_httpContext);
-                            paymentResponse = momoHandler.CreatePayment(paymentRequest, _configuration);
-                            if (paymentResponse.ResultCode != 0)
-                            {
-                                return new Response<CheckOutResponse>("Momo payment is not connect able");
+                                var paymentRequest = new MoMoPaymentRequest
+                                {
+                                    Amount = (long)session.TotalCost,
+                                    OrderId = session.Id.ToString(),
+                                    OrderInfo = "test",
+                                    RedirectUrl = request.RedirectUrl
+                                };
+                                var momoHandler = new MoMoHandler(_httpContext);
+                                paymentResponse = momoHandler.CreatePayment(paymentRequest, _configuration);
+                                if (paymentResponse.ResultCode != 0)
+                                {
+                                    return new Response<CheckOutResponse>("Momo payment is not connect able");
+                                }
                             }
-                        }
+                            if (paymentMethod.Name.Equals("VNPay"))
+                            {
+                                var orderInfo = new VnPayOrderInfo
+                                {
+                                    Amount = (long)session.TotalCost,
+                                    BankCode = "NCB",
+                                    CreatedDate = DateTime.Now,
+                                    OrderDesc = session.Id.ToString(),
+                                    OrderId = DateTime.Now.Ticks,
+                                    Status = status.ToString(),
+                                    ReturnUrl = request.RedirectUrl
+                                };
+                                VnPayMethod vnpay = new VnPayMethod(_configuration, _httpContext);
+                                VNPayPaymentUrl = vnpay.CreatePayUrl(orderInfo);
+                                if (VNPayPaymentUrl == null)
+                                {
+                                    return new Response<CheckOutResponse>("VNPay payment url cant create");
+                                }
+                            }
 
+                        }
                         var response = new CheckOutResponse
                         {
                             DateCreated = session.DateCreated,
@@ -175,7 +200,8 @@ namespace API.Services
                             SessionId = session.Id,
                             ShippingAddress = request.ShippingAddress,
                             TotalCost = session.TotalCost,
-                            PaymentResponse = paymentResponse
+                            PaymentResponse = paymentResponse,
+                            VNPayPaymentUrl = VNPayPaymentUrl,
                         };
                         transaction.Complete();
                         return new Response<CheckOutResponse>(response, message: "Order Succeed");

@@ -7,6 +7,6 @@ namespace API.DTOs.Orders
         public string SessionId { get; set; }
         public string DistributorId { get; set; }
         public string RetailerId { get; set; }
-        public int? Status { get; set; }
+        public string Status { get; set; }
     }
 }

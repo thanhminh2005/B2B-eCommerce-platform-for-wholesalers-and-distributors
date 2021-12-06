@@ -200,6 +200,10 @@
             public const string Create = Base + "/momo/";
             public const string IPN = Base + "/momo/ipn";
         }
+        public static class VNPay
+        {
+            public const string IPN = Base + "/vnp/ipn";
+        }
     }
 
 }

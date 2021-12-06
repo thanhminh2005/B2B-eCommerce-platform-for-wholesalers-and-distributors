@@ -119,7 +119,10 @@ namespace API.Services
                         {
                             pricesList.Remove(price);
                             var minVolume = 0;
-                            minVolume = pricesList.Min(x => x.Volume);
+                            if (pricesList.Any())
+                            {
+                                minVolume = pricesList.Min(x => x.Volume);
+                            }
                             if (minVolume != 0)
                             {
                                 product.MinQuantity = minVolume;
@@ -128,10 +131,18 @@ namespace API.Services
                     }
                     if (price.Volume > product.MinQuantity)
                     {
-                        if (request.Volume != product.MinQuantity)
+                        if (request.Volume < product.MinQuantity)
                         {
                             product.MinQuantity = request.Volume;
                         }
+                        if (request.Volume == product.MinQuantity)
+                        {
+                            return new Response<string>("Dublicated volume");
+                        }
+                    }
+                    if (price.Volume < product.MinQuantity)
+                    {
+                        product.MinQuantity = request.Volume;
                     }
                     price.Value = request.Value;
                     price.Volume = request.Volume;
@@ -142,8 +153,9 @@ namespace API.Services
                     await _unitOfWork.SaveAsync();
                     return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s price updated successfully");
                 }
+                return new Response<string>(price.ProductId.ToString(), message: product.Name + "'s there nothing to update");
             }
-            return new Response<string>(request.Id, "Price ID is not existed");
+            return new Response<string>("Price ID is not existed");
         }
 
     }
