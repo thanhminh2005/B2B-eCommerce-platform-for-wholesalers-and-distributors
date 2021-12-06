@@ -90,6 +90,7 @@ namespace API.Services
                 CurProduct.ParentCategoryName = parent.Name;
                 CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.DisplayName;
+                CurProduct.DistributorId = distributor.Id;
                 CurProduct.ListPrice = priceResponses;
                 response.Add(CurProduct);
             }
@@ -131,6 +132,7 @@ namespace API.Services
                 CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
+                CurProduct.DistrubutorId = distributor.Id;
                 response.Add(CurProduct);
             }
             return new PagedResponse<IEnumerable<RetailerGetProductsResponse>>(response, request.PageNumber, request.PageSize, totalcount);
@@ -162,6 +164,7 @@ namespace API.Services
                     CurProduct.SubCategory = CurSubCategory;
                     CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
+                    CurProduct.DistributorId = distributor.Id;
                     return new Response<ProductResponse>(CurProduct, message: "Succeed");
                 }
                 else if (product != null && !product.IsActive)
@@ -255,6 +258,7 @@ namespace API.Services
                     CurProduct.SubCategory = CurSubCategory;
                     CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
+                    CurProduct.DistrubutorId = distributor.Id;
                     response.Add(CurProduct);
                 }
             }
@@ -280,7 +284,6 @@ namespace API.Services
                     {
                         return new Response<string>(product.Id.ToString(), message: "Product is activated");
                     }
-
                 }
             }
             return new Response<string>(message: "Fail to remove product");
@@ -341,6 +344,7 @@ namespace API.Services
                 CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
+                CurProduct.DistrubutorId = distributor.Id;
                 response.Add(CurProduct);
             }
             //get all in list, count all, get 10 random number not duplicate, add in list
@@ -373,6 +377,7 @@ namespace API.Services
                 CurProduct.SubCategory = CurSubCategory;
                 CurProduct.Distributor = user.DisplayName;
                 CurProduct.ListPrice = priceResponses;
+                CurProduct.DistributorId = distributor.Id;
                 response.Add(CurProduct);
             }
             return new PagedResponse<IEnumerable<ProductResponse>>(response, 1, 30, totalcount);
@@ -416,6 +421,7 @@ namespace API.Services
                     CurProduct.SubCategory = CurSubCategory;
                     CurProduct.Distributor = user.DisplayName;
                     CurProduct.ListPrice = priceResponses;
+                    CurProduct.DistributorId = distributor.Id;
                     response.Add(CurProduct);
                 }
                 return new Response<IEnumerable<ProductResponse>>(response, message: "Succeed");

@@ -12,6 +12,7 @@ namespace API.DTOs.Products
         public string ParentCategoryName { get; set; }
         public SubCategoryResponse SubCategory { get; set; }
         public string Distributor { get; set; }
+        public Guid DistrubutorId { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }

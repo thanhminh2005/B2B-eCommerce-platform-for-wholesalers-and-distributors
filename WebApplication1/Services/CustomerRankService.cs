@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static API.Contracts.ApiRoute;
 
 namespace API.Services
 {
@@ -39,6 +40,28 @@ namespace API.Services
                         newCustomerRank.DateCreated = DateTime.UtcNow;
                         await _unitOfWork.GetRepository<CustomerRank>().AddAsync(newCustomerRank);
                         await _unitOfWork.SaveAsync();
+                        var memberships = await _unitOfWork.GetRepository<Membership>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId));
+                        var customerRanks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId), orderBy: x => x.OrderBy(y => y.Threshold));
+                        if(memberships.Any())
+                        {
+                            foreach (var membership in memberships)
+                            {
+                                if (customerRanks.Any())
+                                {
+                                    customerRanks.OrderBy(x => x.Threshold);
+                                    foreach (var rank in customerRanks)
+                                    {
+                                        if (rank.Threshold <= membership.Point)
+                                        {
+                                            membership.MembershipRankId = rank.MembershipRankId;
+                                        }
+                                        
+                                    }
+                                    _unitOfWork.GetRepository<Membership>().UpdateAsync(membership);
+                                }
+                            }
+                            await _unitOfWork.SaveAsync();
+                        }
                         return new Response<string>(newCustomerRank.Id.ToString(), message: "Customer's Rank Created");
                     }
                 }
@@ -85,6 +108,27 @@ namespace API.Services
                         customerRank.DiscountRate = request.DiscountRate;
                         _unitOfWork.GetRepository<CustomerRank>().UpdateAsync(customerRank);
                         await _unitOfWork.SaveAsync();
+                        var memberships = await _unitOfWork.GetRepository<Membership>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId));
+                        var customerRanks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId), orderBy: x => x.OrderBy(y => y.Threshold));
+                        if (memberships.Any())
+                        {
+                            foreach (var membership in memberships)
+                            {
+                                if (customerRanks.Any())
+                                {
+                                    foreach (var rank in customerRanks)
+                                    {
+                                        if (rank.Threshold <= membership.Point)
+                                        {
+                                            membership.MembershipRankId = rank.MembershipRankId;
+                                        }
+                                        
+                                    }
+                                    _unitOfWork.GetRepository<Membership>().UpdateAsync(membership);
+                                }
+                            }
+                            await _unitOfWork.SaveAsync();
+                        }
                         return new Response<string>(request.Id, message: "Customer's Rank Updated");
                     }
                 }
