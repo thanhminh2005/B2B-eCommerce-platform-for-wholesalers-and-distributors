@@ -53,7 +53,7 @@ namespace API.Services
                     await _unitOfWork.GetRepository<Product>().AddAsync(newProduct);
                     await _unitOfWork.GetRepository<Price>().AddAsync(newPrice);
                     await _unitOfWork.SaveAsync();
-                    return new Response<string>(newProduct.Name, message: "Product registered successfully ");
+                    return new Response<string>(newProduct.Id.ToString(), message: "Product registered successfully ");
                 }
                 return new Response<string>(message: "Distributor is not activated ");
             }

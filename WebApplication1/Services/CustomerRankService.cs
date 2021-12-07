@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static API.Contracts.ApiRoute;
 
 namespace API.Services
 {
@@ -42,7 +41,7 @@ namespace API.Services
                         await _unitOfWork.SaveAsync();
                         var memberships = await _unitOfWork.GetRepository<Membership>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId));
                         var customerRanks = await _unitOfWork.GetRepository<CustomerRank>().GetAsync(x => x.DistributorId.Equals(customerRank.DistributorId), orderBy: x => x.OrderBy(y => y.Threshold));
-                        if(memberships.Any())
+                        if (memberships.Any())
                         {
                             foreach (var membership in memberships)
                             {
@@ -55,7 +54,7 @@ namespace API.Services
                                         {
                                             membership.MembershipRankId = rank.MembershipRankId;
                                         }
-                                        
+
                                     }
                                     _unitOfWork.GetRepository<Membership>().UpdateAsync(membership);
                                 }
@@ -122,7 +121,7 @@ namespace API.Services
                                         {
                                             membership.MembershipRankId = rank.MembershipRankId;
                                         }
-                                        
+
                                     }
                                     _unitOfWork.GetRepository<Membership>().UpdateAsync(membership);
                                 }
