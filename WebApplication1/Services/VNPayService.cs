@@ -139,45 +139,44 @@ namespace API.Services
                                                 };
                                                 await _unitOfWork.GetRepository<Notification>().AddAsync(notification);
                                                 await _unitOfWork.SaveAsync();
-                                                transaction.Complete();
                                             }
                                         }
+                                        returnString = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ";
+                                        return new Response<string>(orderDesc, returnString);
                                     }
-                                }
-                            }
-                        }
-                    }
-                    returnString = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ";
-                    return new Response<string>(orderDesc, returnString);
-                }
-                else
-                {
-                    //Thanh toan khong thanh cong. Ma loi: vnp_ResponseCode
-                    using (TransactionScope transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync((Guid.Parse(orderDesc)));
-                        if (session != null)
-                        {
-                            if (session.Status == -1)
-                            {
-                                session.Status = 0;
-                                _unitOfWork.GetRepository<Session>().UpdateAsync(session);
-                                await _unitOfWork.SaveAsync();
-                                var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(Guid.Parse(orderDesc)));
-                                if (orders.Any())
-                                {
-                                    foreach (var order in orders)
+                                    else
                                     {
-                                        order.Status = 0;
-                                        _unitOfWork.GetRepository<Order>().UpdateAsync(order);
-                                        await _unitOfWork.SaveAsync();
+                                        //Thanh toan khong thanh cong. Ma loi: vnp_ResponseCode
+                                        if (session != null)
+                                        {
+                                            if (session.Status == -1)
+                                            {
+                                                session.Status = 0;
+                                                _unitOfWork.GetRepository<Session>().UpdateAsync(session);
+                                                await _unitOfWork.SaveAsync();
+                                                var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(Guid.Parse(orderDesc)));
+                                                if (orders.Any())
+                                                {
+                                                    foreach (var order in orders)
+                                                    {
+                                                        order.Status = 0;
+                                                        _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                                                        await _unitOfWork.SaveAsync();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        returnString = "Có lỗi xảy ra trong quá trình xử lý.Mã lỗi: " + vnp_ResponseCode;
                                     }
-                                    transaction.Complete();
+                                }
+                                else
+                                {
+                                    returnString = "Đơn hàng đã được xử lí";
                                 }
                             }
                         }
+                        transaction.Complete();
                     }
-                    returnString = "Có lỗi xảy ra trong quá trình xử lý.Mã lỗi: " + vnp_ResponseCode;
                 }
             }
             else

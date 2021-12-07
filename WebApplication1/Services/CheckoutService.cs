@@ -103,7 +103,7 @@ namespace API.Services
                                                 discountRate = customerRank.DiscountRate;
                                             }
                                         }
-                                        orderPrice = (price.Value * product.Quantity) - ((price.Value * product.Quantity) * discountRate);
+                                        orderPrice = (price.Value * product.Quantity) - ((price.Value * product.Quantity) * (discountRate * 0.01));
                                     }
                                 }
                                 foreach (var order in orders)
@@ -180,7 +180,7 @@ namespace API.Services
                                     OrderDesc = session.Id.ToString(),
                                     OrderId = DateTime.Now.Ticks,
                                     Status = status.ToString(),
-                                    ReturnUrl = request.RedirectUrl
+                                    ReturnUrl = request.RedirectUrl,
                                 };
                                 VnPayMethod vnpay = new VnPayMethod(_configuration, _httpContext);
                                 VNPayPaymentUrl = vnpay.CreatePayUrl(orderInfo);

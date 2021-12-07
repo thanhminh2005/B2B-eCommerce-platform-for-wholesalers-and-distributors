@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost(ApiRoute.VNPay.IPN)]
+        [HttpGet(ApiRoute.VNPay.IPN)]
         public async Task<IActionResult> Login(string url)
         {
             var response = await _service.SendIPNAsync(url);
