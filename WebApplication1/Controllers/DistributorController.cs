@@ -53,6 +53,17 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Distributors.GetByCategory)]
+        public async Task<IActionResult> GetByCategory([FromQuery] GetDistributorsByCategoryRequest request)
+        {
+            var response = await _distributorService.GetDistributorsByCategory(request);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
         [HttpPut(ApiRoute.Distributors.Update)]
         public async Task<IActionResult> Update([FromBody] UpdateDistributorRequest request)
         {

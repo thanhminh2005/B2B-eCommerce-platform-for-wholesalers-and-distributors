@@ -120,6 +120,50 @@ namespace API.Services
             return new PagedResponse<IEnumerable<DistributorDisplayResponse>>(_mapper.Map<IEnumerable<DistributorDisplayResponse>>(response), request.PageNumber, request.PageSize, count);
         }
 
+        public async Task<Response<IEnumerable<DistributorDisplayResponse>>> GetDistributorsByCategory(GetDistributorsByCategoryRequest request)
+        {
+            var distributors = await _unitOfWork.GetRepository<Distributor>().GetAsync(x =>
+                (request.IsActive == null || x.IsActive == request.IsActive),
+                orderBy: x => x.OrderBy(y => y.DateCreated),
+                includeProperties: "User,Products");
+            IEnumerable<Distributor> response = null;
+            if (!string.IsNullOrWhiteSpace(request.CategoryId) && string.IsNullOrWhiteSpace(request.SubCategoryId))
+            {
+                var subcategories = await _unitOfWork.GetRepository<SubCategory>().GetAsync(x => x.CategoryId.Equals(Guid.Parse(request.CategoryId)));
+                if (subcategories.Any())
+                {
+                    var listresponse = new List<Distributor>();
+                    foreach (var subcategory in subcategories)
+                    {
+                        var distri = distributors.Where(x => x.Products.Select(x => x.SubCategoryId).Contains(subcategory.Id));
+                        foreach (var dis in distri)
+                        {
+                            if (!listresponse.Contains(dis))
+                            {
+                                listresponse.Add(dis);
+                            }
+                        }
+                    }
+                    response = listresponse.AsEnumerable();
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(request.SubCategoryId))
+            {
+                var subcategory = await _unitOfWork.GetRepository<SubCategory>().GetByIdAsync(Guid.Parse(request.SubCategoryId));
+                if (subcategory != null)
+                {
+                    response = distributors.Where(x => x.Products.Select(x => x.SubCategoryId).Contains(subcategory.Id));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.CategoryId) && !string.IsNullOrWhiteSpace(request.SubCategoryId))
+            {
+                response = distributors;
+            }
+
+            return new Response<IEnumerable<DistributorDisplayResponse>>(_mapper.Map<IEnumerable<DistributorDisplayResponse>>(response), "Succeed");
+        }
+
         public async Task<Response<string>> UpdateDistributor(UpdateDistributorRequest request)
         {
             if (!string.IsNullOrWhiteSpace(request.Id))
