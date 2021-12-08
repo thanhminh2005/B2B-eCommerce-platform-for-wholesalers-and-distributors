@@ -14,6 +14,7 @@
         public static class Distributors
         {
             public const string GetAll = Base + "/distributor/";
+            public const string GetByCategory = Base + "/distributor/category/";
             public const string Get = Base + "/distributor/{id}";
             public const string Create = Base + "/distributor";
             public const string Update = Base + "/distributor/";

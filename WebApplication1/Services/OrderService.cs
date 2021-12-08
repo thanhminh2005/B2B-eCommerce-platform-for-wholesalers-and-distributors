@@ -82,13 +82,13 @@ namespace API.Services
             if (string.IsNullOrWhiteSpace(request.SessionId) && !string.IsNullOrWhiteSpace(request.RetailerId))
             {
                 var session = await _unitOfWork.GetRepository<Session>().GetAsync(x => x.RetailerId.Equals(Guid.Parse(request.RetailerId)),
-                    orderBy: x => x.OrderBy(y => y.DateCreated));
+                    orderBy: x => x.OrderByDescending(y => y.DateCreated));
                 orders = await _unitOfWork.GetRepository<Order>().GetPagedReponseAsync(request.PageNumber,
                     request.PageSize,
                     x => (request.Status == null || statusList.Contains(x.Status))
                     && (session.Select(y => y.Id).Contains(x.SessionId))
                     && (request.DistributorId == null || x.DistributorId == Guid.Parse(request.DistributorId)),
-                    orderBy: x => x.OrderBy(y => y.DateCreated),
+                    orderBy: x => x.OrderByDescending(y => y.DateCreated),
                     includeProperties: "Distributor");
                 count = await _unitOfWork.GetRepository<Order>().CountAsync(
                     x => (request.Status == null || statusList.Contains(x.Status))
@@ -103,7 +103,7 @@ namespace API.Services
                                                                                         (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
                                                                                         && (request.DistributorId == null || x.DistributorId.Equals(Guid.Parse(request.DistributorId)))
                                                                                         && (request.Status == null || statusList.Contains(x.Status)),
-                                                                                        orderBy: x => x.OrderBy(y => y.DateCreated),
+                                                                                        orderBy: x => x.OrderByDescending(y => y.DateCreated),
                                                                                         includeProperties: "Distributor");
                 count = await _unitOfWork.GetRepository<Order>().CountAsync(filter: x =>
                                                                                 (request.SessionId == null || x.SessionId.Equals(Guid.Parse(request.SessionId)))
@@ -130,11 +130,18 @@ namespace API.Services
             if (order != null)
             {
                 order.OrderCost = request.OrderCost;
-                order.SessionId = Guid.Parse(request.SessionId);
                 order.Status = request.Status;
                 order.DateModified = DateTime.UtcNow;
                 _unitOfWork.GetRepository<Order>().UpdateAsync(order);
                 await _unitOfWork.SaveAsync();
+                var orders = await _unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(order.SessionId));
+                var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(order.SessionId);
+                if (orders.Select(x => x.Status).All(x => x.Equals(3)))
+                {
+                    session.Status = 3;
+                    _unitOfWork.GetRepository<Session>().UpdateAsync(session);
+                    await _unitOfWork.SaveAsync();
+                }
                 return new Response<string>(request.Id, message: "Updated");
             }
             return new Response<string>(message: "Update Failed");

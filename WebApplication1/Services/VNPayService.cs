@@ -142,6 +142,7 @@ namespace API.Services
                                             }
                                         }
                                         returnString = "Giao dịch được thực hiện thành công. Cảm ơn quý khách đã sử dụng dịch vụ";
+                                        transaction.Complete();
                                         return new Response<string>(orderDesc, returnString);
                                     }
                                     else
@@ -166,6 +167,7 @@ namespace API.Services
                                                 }
                                             }
                                         }
+                                        transaction.Complete();
                                         returnString = "Có lỗi xảy ra trong quá trình xử lý.Mã lỗi: " + vnp_ResponseCode;
                                     }
                                 }
@@ -175,7 +177,6 @@ namespace API.Services
                                 }
                             }
                         }
-                        transaction.Complete();
                     }
                 }
             }

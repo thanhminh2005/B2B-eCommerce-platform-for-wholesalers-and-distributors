@@ -10,6 +10,7 @@ namespace API.Interfaces
         Task<Response<string>> CreateDistributor(CreateDistributorRequest request);
         Task<PagedResponse<IEnumerable<DistributorDisplayResponse>>> GetDistributors(GetDistributorsRequest request);
         Task<Response<DistributorResponse>> GetDistributorById(GetDistributorByIdRequest request);
+        Task<Response<IEnumerable<DistributorDisplayResponse>>> GetDistributorsByCategory(GetDistributorsByCategoryRequest request);
         Task<Response<string>> UpdateDistributor(UpdateDistributorRequest request);
     }
 }
