@@ -163,5 +163,53 @@ namespace API.Services
             }
             return new Response<string>(message: "Delete Failed");
         }
+
+        public async Task<Response<double>> GetOrderCurrentPrice(string id)
+        {
+            var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(Guid.Parse(id));
+            if (order != null)
+            {
+                var orderPrice = 0d;
+                var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(order.SessionId);
+                if (order.Status >= 3)
+                {
+                    var orderDetails = await _unitOfWork.GetRepository<OrderDetail>().GetAsync(x => x.OrderId.Equals(order.Id));
+                    var productIdList = orderDetails.Select(x => x.ProductId).ToList();
+                    if (productIdList.Any())
+                    {
+                        var products = await _unitOfWork.GetRepository<Product>().GetAsync(x => productIdList.Contains(x.Id) && x.Status == 1, includeProperties: "Prices");
+                        if (products.Any())
+                        {
+                            foreach (var product in products)
+                            {
+                                var currentOrderDetail = orderDetails.First(x => x.ProductId == product.Id);
+                                product.Prices.OrderBy(x => x.Volume);
+                                foreach (var price in product.Prices)
+                                {
+                                    if (currentOrderDetail.Quantity >= price.Volume)
+                                    {
+                                        var discountRate = 0d;
+                                        var member = await _unitOfWork.GetRepository<Membership>().FirstAsync(x => x.DistributorId.Equals(product.DistributorId) && x.RetailerId.Equals(session.RetailerId));
+                                        if (member != null)
+                                        {
+                                            var customerRank = await _unitOfWork.GetRepository<CustomerRank>().FirstAsync(x => x.DistributorId.Equals(product.DistributorId) && x.MembershipRankId.Equals(member.MembershipRankId));
+                                            if (customerRank != null)
+                                            {
+                                                discountRate = customerRank.DiscountRate;
+                                            }
+                                        }
+                                        orderPrice += (price.Value * currentOrderDetail.Quantity) - ((price.Value * currentOrderDetail.Quantity) * (discountRate * 0.01));
+                                    }
+                                }
+                            }
+                            return new Response<double>(orderPrice, "Current Price");
+                        }
+                        return new Response<double>("Some of this order's product not available");
+                    }
+                }
+                return new Response<double>("This order is not complete to run this function");
+            }
+            return new Response<double>("Can not calculate current price");
+        }
     }
 }

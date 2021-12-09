@@ -156,7 +156,7 @@ namespace API.Services
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(request.CategoryId) && !string.IsNullOrWhiteSpace(request.SubCategoryId))
+            if (string.IsNullOrWhiteSpace(request.CategoryId) && string.IsNullOrWhiteSpace(request.SubCategoryId))
             {
                 response = distributors;
             }

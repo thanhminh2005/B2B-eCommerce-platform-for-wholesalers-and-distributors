@@ -51,6 +51,17 @@ namespace API.Controllers
             return NotFound(response);
         }
 
+        [HttpGet(ApiRoute.Orders.GetCurrentPrice)]
+        public async Task<IActionResult> GetCurrentPrice(string id)
+        {
+            var response = await _orderService.GetOrderCurrentPrice(id);
+            if (response.Succeeded)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
+        }
+
 
         [HttpPut(ApiRoute.Orders.Update)]
         public async Task<IActionResult> Update([FromBody] UpdateOrderRequest request)

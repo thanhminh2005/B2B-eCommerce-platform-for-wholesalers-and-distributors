@@ -132,6 +132,7 @@
         public static class Orders
         {
             public const string GetAll = Base + "/order/";
+            public const string GetCurrentPrice = Base + "/order/{id}/current-price/";
             public const string Get = Base + "/order/{id}";
             public const string Create = Base + "/order/";
             public const string Update = Base + "/order";
