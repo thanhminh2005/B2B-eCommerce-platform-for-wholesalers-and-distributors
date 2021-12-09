@@ -30,8 +30,10 @@ namespace API.Controllers
         [HttpGet(ApiRoute.OrderDetails.Get)]
         public async Task<IActionResult> Get(string id)
         {
-            GetOrderDetailByIdRequest request = new GetOrderDetailByIdRequest();
-            request.Id = id;
+            GetOrderDetailByIdRequest request = new GetOrderDetailByIdRequest
+            {
+                Id = id
+            };
             var response = await _orderDetailService.GetOrderDetailById(request);
             if (response.Succeeded)
             {
@@ -66,8 +68,10 @@ namespace API.Controllers
         [HttpDelete(ApiRoute.OrderDetails.Delete)]
         public async Task<IActionResult> Delete(string id)
         {
-            DeleteOrderDetailRequest request = new DeleteOrderDetailRequest();
-            request.Id = id;
+            DeleteOrderDetailRequest request = new DeleteOrderDetailRequest
+            {
+                Id = id
+            };
             var response = await _orderDetailService.DeleteOrderDetail(request);
             if (response.Succeeded)
             {

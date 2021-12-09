@@ -40,7 +40,7 @@ namespace API.MoMo
                 ;
 
             MoMoSecurity crypto = new MoMoSecurity();
-            string signature = crypto.signSHA256(rawHash, secretkey);
+            string signature = crypto.SignSHA256(rawHash, secretkey);
 
             JObject message = new JObject
             {
@@ -89,7 +89,7 @@ namespace API.MoMo
                                                     ;
 
             MoMoSecurity crypto = new MoMoSecurity();
-            string signature = crypto.signSHA256(refundHash, secretkey);
+            string signature = crypto.SignSHA256(refundHash, secretkey);
 
             JObject message = new JObject
             {

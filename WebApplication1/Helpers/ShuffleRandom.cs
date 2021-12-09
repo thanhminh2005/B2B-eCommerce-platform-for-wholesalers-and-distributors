@@ -5,7 +5,7 @@ namespace API.Helpers
 {
     public static class ShuffleRandom
     {
-        private static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
 
         public static List<T> GetRandomItems<T>(this IList<T> list, int maxCount)
         {

@@ -1,13 +1,11 @@
 ﻿using System.IO;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace API.MoMo
 {
     public class MoMoPayment
     {
-        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
         public MoMoPayment()
         {
         }

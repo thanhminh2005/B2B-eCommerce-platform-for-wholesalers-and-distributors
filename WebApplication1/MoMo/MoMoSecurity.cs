@@ -6,13 +6,12 @@ namespace API.MoMo
 {
     public class MoMoSecurity
     {
-        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
         public MoMoSecurity()
         {
         }
 
-        public string getHash(string partnerCode, string merchantRefId,
+        public string GetHash(string partnerCode, string merchantRefId,
             string amount, string paymentCode, string storeId, string storeName, string publicKeyXML)
         {
             string json = "{\"partnerCode\":\"" +
@@ -45,7 +44,7 @@ namespace API.MoMo
             return result;
 
         }
-        public string buildQueryHash(string partnerCode, string merchantRefId,
+        public string BuildQueryHash(string partnerCode, string merchantRefId,
             string requestid, string publicKey)
         {
             string json = "{\"partnerCode\":\"" +
@@ -75,7 +74,7 @@ namespace API.MoMo
 
         }
 
-        public string buildRefundHash(string partnerCode, string merchantRefId,
+        public string BuildRefundHash(string partnerCode, string merchantRefId,
             string momoTranId, long amount, string description, string publicKey)
         {
             string json = "{\"partnerCode\":\"" +
@@ -106,7 +105,7 @@ namespace API.MoMo
             return result;
 
         }
-        public string signSHA256(string message, string key)
+        public string SignSHA256(string message, string key)
         {
             byte[] keyByte = Encoding.UTF8.GetBytes(key);
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
