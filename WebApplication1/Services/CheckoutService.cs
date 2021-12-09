@@ -203,12 +203,36 @@ namespace API.Services
                             PaymentResponse = paymentResponse,
                             VNPayPaymentUrl = VNPayPaymentUrl,
                         };
+                        await ChangeStatusDueToExpiredAsync(session, _unitOfWork);
                         transaction.Complete();
                         return new Response<CheckOutResponse>(response, message: "Order Succeed");
                     }
                 }
             }
             return new Response<CheckOutResponse>(message: "Order Failed");
+        }
+        private async Task ChangeStatusDueToExpiredAsync(Session session, IUnitOfWork unitOfWork)
+        {
+            await Task.Delay(600);
+            if (session != null)
+            {
+                if (session.Status == -1)
+                {
+                    session.Status = 0;
+                    unitOfWork.GetRepository<Session>().UpdateAsync(session);
+                    await unitOfWork.SaveAsync();
+                    var orders = await unitOfWork.GetRepository<Order>().GetAsync(x => x.SessionId.Equals(session.Id));
+                    if (orders.Any())
+                    {
+                        foreach (var order in orders)
+                        {
+                            order.Status = 0;
+                            _unitOfWork.GetRepository<Order>().UpdateAsync(order);
+                            await _unitOfWork.SaveAsync();
+                        }
+                    }
+                }
+            }
         }
     }
 }
