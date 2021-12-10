@@ -30,8 +30,10 @@ namespace API.Controllers
         [HttpGet(ApiRoute.Users.Get)]
         public async Task<IActionResult> Get(string id)
         {
-            GetUserByIdRequest request = new GetUserByIdRequest();
-            request.Id = id;
+            GetUserByIdRequest request = new GetUserByIdRequest
+            {
+                Id = id
+            };
             var response = await _userService.GetUserById(request);
             if (response.Succeeded)
             {

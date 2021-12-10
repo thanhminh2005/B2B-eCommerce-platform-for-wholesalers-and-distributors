@@ -30,8 +30,10 @@ namespace API.Controllers
         [HttpGet(ApiRoute.Sessions.Get)]
         public async Task<IActionResult> Get(string id)
         {
-            GetSessionByIdRequest request = new GetSessionByIdRequest();
-            request.Id = id;
+            GetSessionByIdRequest request = new GetSessionByIdRequest
+            {
+                Id = id
+            };
             var response = await _sessionService.GetSessionById(request);
             if (response.Succeeded)
             {
@@ -66,8 +68,10 @@ namespace API.Controllers
         [HttpDelete(ApiRoute.Sessions.Delete)]
         public async Task<IActionResult> Delete(string id)
         {
-            DeleteSessionRequest request = new DeleteSessionRequest();
-            request.Id = id;
+            DeleteSessionRequest request = new DeleteSessionRequest
+            {
+                Id = id
+            };
             var response = await _sessionService.DeleteSession(request);
             if (response.Succeeded)
             {

@@ -29,7 +29,7 @@ namespace API.Helpers
             this IEnumerable<T> collection,
             Func<T, K> id_selector,
             Func<T, K> parent_id_selector,
-            K root_id = default(K))
+            K root_id = default)
         {
             foreach (var c in collection.Where(c => EqualityComparer<K>.Default.Equals(parent_id_selector(c), root_id)))
             {

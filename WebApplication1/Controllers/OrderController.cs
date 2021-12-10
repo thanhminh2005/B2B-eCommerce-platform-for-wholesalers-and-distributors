@@ -30,8 +30,10 @@ namespace API.Controllers
         [HttpGet(ApiRoute.Orders.Get)]
         public async Task<IActionResult> Get(string id)
         {
-            GetOrderByIdRequest request = new GetOrderByIdRequest();
-            request.Id = id;
+            GetOrderByIdRequest request = new GetOrderByIdRequest
+            {
+                Id = id
+            };
             var response = await _orderService.GetOrderById(request);
             if (response.Succeeded)
             {
@@ -77,8 +79,10 @@ namespace API.Controllers
         [HttpDelete(ApiRoute.Orders.Delete)]
         public async Task<IActionResult> Delete(string id)
         {
-            DeleteOrderRequest request = new DeleteOrderRequest();
-            request.Id = id;
+            DeleteOrderRequest request = new DeleteOrderRequest
+            {
+                Id = id
+            };
             var response = await _orderService.DeleteOrder(request);
             if (response.Succeeded)
             {

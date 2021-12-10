@@ -23,8 +23,7 @@ namespace API.Services
 
         public async Task<Response<string>> CreateSession(CreateSessionRequest request)
         {
-            var session = new Session();
-            session = _mapper.Map<Session>(request);
+            var session = _mapper.Map<Session>(request);
             session.Id = Guid.NewGuid();
             session.DateCreated = DateTime.UtcNow;
             session.Status = 1;

@@ -203,7 +203,7 @@ namespace API.Services
                             PaymentResponse = paymentResponse,
                             VNPayPaymentUrl = VNPayPaymentUrl,
                         };
-                        await ChangeStatusDueToExpiredAsync(session, _unitOfWork);
+                        await ChangeStatusDueToExpiredAsync(session.Id, _unitOfWork);
                         transaction.Complete();
                         return new Response<CheckOutResponse>(response, message: "Order Succeed");
                     }
@@ -211,9 +211,10 @@ namespace API.Services
             }
             return new Response<CheckOutResponse>(message: "Order Failed");
         }
-        private async Task ChangeStatusDueToExpiredAsync(Session session, IUnitOfWork unitOfWork)
+        private async Task ChangeStatusDueToExpiredAsync(Guid sessionId, IUnitOfWork unitOfWork)
         {
             await Task.Delay(600);
+            var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(sessionId);
             if (session != null)
             {
                 if (session.Status == -1)

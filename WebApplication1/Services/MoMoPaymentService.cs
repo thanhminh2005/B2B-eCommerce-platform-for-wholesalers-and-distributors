@@ -42,7 +42,7 @@ namespace API.Services
                 "&transId=" + request.TransId
                 ;
             MoMoSecurity crypto = new MoMoSecurity();
-            string signature = crypto.signSHA256(rawHash, secretkey);
+            string signature = crypto.SignSHA256(rawHash, secretkey);
 
             string responseHash = "accessKey=" + accessKey +
                 "&extraData=" + request.ExtraData +
@@ -53,7 +53,7 @@ namespace API.Services
                 "&responseTime=" + request.ResponseTime +
                 "&resultCode=" + request.ResultCode
                 ;
-            string responseSignature = crypto.signSHA256(responseHash, secretkey);
+            string responseSignature = crypto.SignSHA256(responseHash, secretkey);
             IPNResponse response = new IPNResponse
             {
                 ExtraData = request.ExtraData,
