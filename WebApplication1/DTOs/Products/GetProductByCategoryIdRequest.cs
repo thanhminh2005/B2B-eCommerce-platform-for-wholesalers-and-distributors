@@ -2,6 +2,7 @@
 {
     public class GetProductByCategoryIdRequest
     {
-        public string Id { get; set; }
+        public string DistributorId { get; set; }
+        public string CategoryId { get; set; }
     }
 }

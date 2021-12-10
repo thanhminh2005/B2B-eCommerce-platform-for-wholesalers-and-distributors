@@ -213,7 +213,7 @@ namespace API.Services
         }
         private async Task ChangeStatusDueToExpiredAsync(Guid sessionId, IUnitOfWork unitOfWork)
         {
-            await Task.Delay(600);
+            await Task.Delay(600000);
             var session = await _unitOfWork.GetRepository<Session>().GetByIdAsync(sessionId);
             if (session != null)
             {
